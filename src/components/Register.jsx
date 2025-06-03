@@ -21,6 +21,7 @@ export default function Register() {
     try {
       const res = await register({ email, password, username, dob });
       setMessage(res.message || "Đăng ký thành công.");
+      navigate("/confirm-email");
     } catch (error) {
       if (error.details?.errors) {
         const messages = Object.values(error.details.errors).flat();
@@ -48,21 +49,57 @@ export default function Register() {
           exit={{ opacity: 0, y: -30, scale: 0.95 }}
           transition={{ duration: 0.3 }}
           className={`fixed left-1/2 top-8 z-50 -translate-x-1/2 flex items-center gap-3 rounded-xl px-6 py-4 shadow-2xl text-base font-semibold
-          ${message.includes("thành công")
+          ${
+            message.includes("thành công")
               ? "bg-green-50 text-green-700 border border-green-200"
-              : "bg-red-50 text-red-700 border border-red-200"}
+              : "bg-red-50 text-red-700 border border-red-200"
+          }
         `}
           role="alert"
         >
           {message.includes("thành công") ? (
-            <svg className="w-6 h-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="#bbf7d0" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4" />
+            <svg
+              className="w-6 h-6 text-green-500"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <circle
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="2"
+                fill="#bbf7d0"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M9 12l2 2 4-4"
+              />
             </svg>
           ) : (
-            <svg className="w-6 h-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="#fef2f2" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 9l-6 6m0-6l6 6" />
+            <svg
+              className="w-6 h-6 text-red-500"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <circle
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="2"
+                fill="#fef2f2"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M15 9l-6 6m0-6l6 6"
+              />
             </svg>
           )}
           <span className="whitespace-pre-line">{message}</span>
@@ -92,9 +129,11 @@ export default function Register() {
               onFocus={() => setFocusField("username")}
               onBlur={() => setFocusField("")}
               className={`w-full px-5 py-3 border-2 rounded-lg transition-all duration-300 bg-white text-base shadow-sm
-                ${focusField === "username"
-                  ? "border-blue-500 ring-2 ring-blue-200"
-                  : "border-gray-300 focus:border-blue-400"}
+                ${
+                  focusField === "username"
+                    ? "border-blue-500 ring-2 ring-blue-200"
+                    : "border-gray-300 focus:border-blue-400"
+                }
                 placeholder-gray-400`}
             />
             <motion.span
@@ -128,9 +167,11 @@ export default function Register() {
               onFocus={() => setFocusField("dob")}
               onBlur={() => setFocusField("")}
               className={`w-full px-5 py-3 border-2 rounded-lg transition-all duration-300 bg-white text-base shadow-sm
-                ${focusField === "dob"
-                  ? "border-blue-500 ring-2 ring-blue-200"
-                  : "border-gray-300 focus:border-blue-400"}
+                ${
+                  focusField === "dob"
+                    ? "border-blue-500 ring-2 ring-blue-200"
+                    : "border-gray-300 focus:border-blue-400"
+                }
                 placeholder-gray-400`}
             />
             <motion.span
@@ -166,9 +207,11 @@ export default function Register() {
               onBlur={() => setFocusField("")}
               autoComplete="email"
               className={`w-full px-5 py-3 border-2 rounded-lg transition-all duration-300 bg-white text-base shadow-sm
-                ${focusField === "email"
-                  ? "border-blue-500 ring-2 ring-blue-200"
-                  : "border-gray-300 focus:border-blue-400"}
+                ${
+                  focusField === "email"
+                    ? "border-blue-500 ring-2 ring-blue-200"
+                    : "border-gray-300 focus:border-blue-400"
+                }
                 placeholder-gray-400`}
             />
             <motion.span
@@ -204,9 +247,11 @@ export default function Register() {
               onBlur={() => setFocusField("")}
               autoComplete="new-password"
               className={`w-full px-5 py-3 border-2 rounded-lg transition-all duration-300 bg-white text-base shadow-sm
-                ${focusField === "password"
-                  ? "border-blue-500 ring-2 ring-blue-200"
-                  : "border-gray-300 focus:border-blue-400"}
+                ${
+                  focusField === "password"
+                    ? "border-blue-500 ring-2 ring-blue-200"
+                    : "border-gray-300 focus:border-blue-400"
+                }
                 placeholder-gray-400`}
             />
             <motion.span
@@ -234,9 +279,24 @@ export default function Register() {
           >
             {loading ? (
               <>
-                <svg className="animate-spin h-6 w-6 text-white" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                <svg
+                  className="animate-spin h-6 w-6 text-white"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                  ></path>
                 </svg>
                 Đang đăng ký...
               </>

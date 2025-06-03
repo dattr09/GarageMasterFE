@@ -1,14 +1,14 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import "./App.css"; // Import file CSS chính
+import "./App.css";
 import MainLayout from "./components/MainLayout";
-import AuthContainer from "./components/AuthContainer"; // Import container chứa đăng nhập và đăng ký
-import ForgotPassword from "./components/ForgotPassword"; // Import trang quên mật khẩu
-import ResetPassword from "./components/ResetPassword"; // Import trang đặt lại mật khẩu
+import AuthContainer from "./components/AuthContainer";
+import ForgotPassword from "./components/ForgotPassword";
+import ResetPassword from "./components/ResetPassword";
 import ConfirmEmail from "./components/ConfirmEmail";
 
 // Hàm kiểm tra trạng thái đăng nhập
 function PrivateRoute({ children }) {
-  const isAuthenticated = localStorage.getItem("token"); // Kiểm tra token trong localStorage
+  const isAuthenticated = !!localStorage.getItem("token");
   return isAuthenticated ? children : <Navigate to="/login" replace />;
 }
 
@@ -16,14 +16,26 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Route đăng nhập */}
+        {/* Nếu user đã đăng nhập thì chuyển về /dashboard, ngược lại thì /login */}
+        <Route
+          path="/"
+          element={
+            localStorage.getItem("token") ? (
+              <Navigate to="/MainLayout" replace />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+
+        {/* Các route công khai */}
         <Route path="/login" element={<AuthContainer />} />
         <Route path="/register" element={<AuthContainer />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/confirm-email" element={<ConfirmEmail />} />
 
-        {/* Route được bảo vệ */}
+        {/* Các route bảo vệ - tất cả path con nằm trong MainLayout */}
         <Route
           path="/*"
           element={
