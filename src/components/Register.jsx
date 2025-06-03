@@ -5,8 +5,9 @@ import { useNavigate } from "react-router-dom";
 
 export default function Register() {
   const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
+  const [dob, setDob] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [focusField, setFocusField] = useState("");
@@ -17,14 +18,8 @@ export default function Register() {
     setMessage("");
     setLoading(true);
 
-    if (password !== confirmPassword) {
-      setMessage("Mật khẩu và xác nhận mật khẩu không khớp.");
-      setLoading(false);
-      return;
-    }
-
     try {
-      const res = await register({ email, password });
+      const res = await register({ email, password, username, dob });
       setMessage(res.message || "Đăng ký thành công.");
     } catch (error) {
       if (error.details?.errors) {
@@ -43,12 +38,115 @@ export default function Register() {
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 50 }}
       transition={{ duration: 0.4 }}
-      className="w-full px-8 py-4"
+      className="w-full px-8 py-4 relative"
     >
-      <h2 className="text-3xl font-extrabold text-blue-800 text-center mb-4 tracking-wide drop-shadow">
+      {/* Thông báo đẹp như Login, nổi ở đầu trang và căn giữa */}
+      {message && (
+        <motion.div
+          initial={{ opacity: 0, y: -30, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -30, scale: 0.95 }}
+          transition={{ duration: 0.3 }}
+          className={`fixed left-1/2 top-8 z-50 -translate-x-1/2 flex items-center gap-3 rounded-xl px-6 py-4 shadow-2xl text-base font-semibold
+          ${message.includes("thành công")
+              ? "bg-green-50 text-green-700 border border-green-200"
+              : "bg-red-50 text-red-700 border border-red-200"}
+        `}
+          role="alert"
+        >
+          {message.includes("thành công") ? (
+            <svg className="w-6 h-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="#bbf7d0" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4" />
+            </svg>
+          ) : (
+            <svg className="w-6 h-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="#fef2f2" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 9l-6 6m0-6l6 6" />
+            </svg>
+          )}
+          <span className="whitespace-pre-line">{message}</span>
+        </motion.div>
+      )}
+
+      <h2 className="text-3xl font-extrabold text-blue-800 text-center mb-8 tracking-wide drop-shadow">
         Đăng ký
       </h2>
       <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Tên người dùng */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05 }}
+        >
+          <label className="block font-semibold text-gray-700 mb-2 text-lg tracking-wide">
+            Tên người dùng
+          </label>
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Nhập tên của bạn"
+              required
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              onFocus={() => setFocusField("username")}
+              onBlur={() => setFocusField("")}
+              className={`w-full px-5 py-3 border-2 rounded-lg transition-all duration-300 bg-white text-base shadow-sm
+                ${focusField === "username"
+                  ? "border-blue-500 ring-2 ring-blue-200"
+                  : "border-gray-300 focus:border-blue-400"}
+                placeholder-gray-400`}
+            />
+            <motion.span
+              initial={false}
+              animate={{
+                opacity: focusField === "username" ? 1 : 0,
+                x: focusField === "username" ? 0 : -10,
+              }}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-500 text-xl pointer-events-none"
+              transition={{ duration: 0.2 }}
+            >
+              <i className="fas fa-user"></i>
+            </motion.span>
+          </div>
+        </motion.div>
+        {/* Ngày sinh */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.08 }}
+        >
+          <label className="block font-semibold text-gray-700 mb-2 text-lg tracking-wide">
+            Ngày sinh
+          </label>
+          <div className="relative">
+            <input
+              type="date"
+              required
+              value={dob}
+              onChange={(e) => setDob(e.target.value)}
+              onFocus={() => setFocusField("dob")}
+              onBlur={() => setFocusField("")}
+              className={`w-full px-5 py-3 border-2 rounded-lg transition-all duration-300 bg-white text-base shadow-sm
+                ${focusField === "dob"
+                  ? "border-blue-500 ring-2 ring-blue-200"
+                  : "border-gray-300 focus:border-blue-400"}
+                placeholder-gray-400`}
+            />
+            <motion.span
+              initial={false}
+              animate={{
+                opacity: focusField === "dob" ? 1 : 0,
+                x: focusField === "dob" ? 0 : -10,
+              }}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-500 text-xl pointer-events-none"
+              transition={{ duration: 0.2 }}
+            >
+              <i className="fas fa-calendar-alt"></i>
+            </motion.span>
+          </div>
+        </motion.div>
+        {/* Email */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -86,6 +184,7 @@ export default function Register() {
             </motion.span>
           </div>
         </motion.div>
+        {/* Mật khẩu */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -126,51 +225,24 @@ export default function Register() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
-          <label className="block font-semibold text-gray-700 mb-2 text-lg tracking-wide">
-            Xác nhận mật khẩu
-          </label>
-          <div className="relative">
-            <input
-              type="password"
-              placeholder="Xác nhận mật khẩu"
-              required
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              onFocus={() => setFocusField("confirm")}
-              onBlur={() => setFocusField("")}
-              autoComplete="new-password"
-              className={`w-full px-5 py-3 border-2 rounded-lg transition-all duration-300 bg-white text-base shadow-sm
-                ${focusField === "confirm"
-                  ? "border-blue-500 ring-2 ring-blue-200"
-                  : "border-gray-300 focus:border-blue-400"}
-                placeholder-gray-400`}
-            />
-            <motion.span
-              initial={false}
-              animate={{
-                opacity: focusField === "confirm" ? 1 : 0,
-                x: focusField === "confirm" ? 0 : -10,
-              }}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-500 text-xl pointer-events-none"
-              transition={{ duration: 0.2 }}
-            >
-              <i className="fas fa-lock"></i>
-            </motion.span>
-          </div>
-        </motion.div>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
         >
           <button
             type="submit"
             disabled={loading}
-            className="cursor-pointer w-full py-3 bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white font-bold rounded-lg shadow-lg transition-all duration-300 disabled:opacity-60 text-lg tracking-wide"
+            className="cursor-pointer w-full py-3 bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white font-bold rounded-lg shadow-lg transition-all duration-300 disabled:opacity-60 text-lg tracking-wide flex items-center justify-center gap-2"
           >
-            {loading ? "Đang đăng ký..." : "Đăng ký"}
+            {loading ? (
+              <>
+                <svg className="animate-spin h-6 w-6 text-white" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                </svg>
+                Đang đăng ký...
+              </>
+            ) : (
+              "Đăng ký"
+            )}
           </button>
         </motion.div>
       </form>
@@ -190,20 +262,6 @@ export default function Register() {
           Đăng nhập
         </button>
       </motion.div>
-
-      {message && (
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className={`mt-5 text-center font-semibold ${message.includes("thành công")
-            ? "text-green-600"
-            : "text-red-600"
-            }`}
-          role="alert"
-        >
-          {message}
-        </motion.p>
-      )}
     </motion.div>
   );
 }
