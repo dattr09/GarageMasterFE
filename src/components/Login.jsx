@@ -11,6 +11,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [focusField, setFocusField] = useState("");
   const [oauthMessage, setOauthMessage] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -50,11 +51,10 @@ export default function Login() {
           exit={{ opacity: 0, y: -30, scale: 0.95 }}
           transition={{ duration: 0.3 }}
           className={`fixed left-1/2 top-8 z-50 -translate-x-1/2 flex items-center gap-3 rounded-xl px-6 py-4 shadow-2xl text-base font-semibold
-        ${
-          message.includes("thành công")
-            ? "bg-green-50 text-green-700 border border-green-200"
-            : "bg-red-50 text-red-700 border border-red-200"
-        }
+        ${message.includes("thành công")
+              ? "bg-green-50 text-green-700 border border-green-200"
+              : "bg-red-50 text-red-700 border border-red-200"
+            }
         `}
           role="alert"
         >
@@ -131,10 +131,9 @@ export default function Login() {
               autoComplete="username"
               placeholder="Nhập email của bạn"
               className={`w-full px-5 py-3 border-2 rounded-lg transition-all duration-300 bg-white text-base shadow-sm
-                ${
-                  focusField === "email"
-                    ? "border-blue-500 ring-2 ring-blue-200"
-                    : "border-gray-300 focus:border-blue-400"
+                ${focusField === "email"
+                  ? "border-blue-500 ring-2 ring-blue-200"
+                  : "border-gray-300 focus:border-blue-400"
                 }
                 placeholder-gray-400`}
             />
@@ -162,7 +161,7 @@ export default function Login() {
           </label>
           <div className="relative">
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -171,24 +170,26 @@ export default function Login() {
               autoComplete="current-password"
               placeholder="Nhập mật khẩu"
               className={`w-full px-5 py-3 border-2 rounded-lg transition-all duration-300 bg-white text-base shadow-sm
-                ${
-                  focusField === "password"
-                    ? "border-blue-500 ring-2 ring-blue-200"
-                    : "border-gray-300 focus:border-blue-400"
+                ${focusField === "password"
+                  ? "border-blue-500 ring-2 ring-blue-200"
+                  : "border-gray-300 focus:border-blue-400"
                 }
                 placeholder-gray-400`}
             />
-            <motion.span
-              initial={false}
-              animate={{
-                opacity: focusField === "password" ? 1 : 0,
-                x: focusField === "password" ? 0 : -10,
-              }}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-500 text-xl pointer-events-none"
-              transition={{ duration: 0.2 }}
+            <span
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 cursor-pointer text-lg"
+              onClick={() => setShowPassword((v) => !v)}
+              tabIndex={0}
+              role="button"
+              aria-label={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+              style={{ padding: 0 }}
             >
-              <i className="fas fa-lock"></i>
-            </motion.span>
+              {showPassword ? (
+                <i className="fas fa-eye-slash"></i>
+              ) : (
+                <i className="fas fa-eye"></i>
+              )}
+            </span>
           </div>
           {/* Nút quên mật khẩu */}
           <div className="text-right mt-2">
@@ -274,7 +275,7 @@ export default function Login() {
             setOauthMessage("Tính năng đăng nhập Apple sẽ sớm có!")
           }
         >
-          {/* Apple logo đẹp, tối giản */}
+          {/* Apple */}
           <svg
             className="w-6 h-6 text-white"
             fill="currentColor"

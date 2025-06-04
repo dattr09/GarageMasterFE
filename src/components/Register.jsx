@@ -11,7 +11,37 @@ export default function Register() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [focusField, setFocusField] = useState("");
+  const [passwordValid, setPasswordValid] = useState(null);
+  const [passwordChecks, setPasswordChecks] = useState({
+    length: false,
+    upper: false,
+    lower: false,
+    number: false,
+    special: false,
+  });
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+
+  const checkPassword = (pwd) => {
+    // Điều kiện: ít nhất 8 ký tự, có chữ hoa, chữ thường, số, ký tự đặc biệt
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+    return regex.test(pwd);
+  };
+
+  const checkPasswordDetail = (pwd) => ({
+    length: pwd.length >= 8,
+    upper: /[A-Z]/.test(pwd),
+    lower: /[a-z]/.test(pwd),
+    number: /\d/.test(pwd),
+    special: /[\W_]/.test(pwd),
+  });
+
+  const handlePasswordChange = (e) => {
+    const value = e.target.value;
+    setPassword(value);
+    setPasswordValid(value.length > 0 ? checkPassword(value) : null);
+    setPasswordChecks(checkPasswordDetail(value));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,6 +51,10 @@ export default function Register() {
     try {
       const res = await register({ email, password, username, dob });
       setMessage(res.message || "Đăng ký thành công.");
+
+      // Sau khi đăng ký thành công:
+      localStorage.setItem("pendingEmail", email);
+      localStorage.setItem("pendingPassword", password);
       navigate("/confirm-email");
     } catch (error) {
       if (error.details?.errors) {
@@ -49,11 +83,10 @@ export default function Register() {
           exit={{ opacity: 0, y: -30, scale: 0.95 }}
           transition={{ duration: 0.3 }}
           className={`fixed left-1/2 top-8 z-50 -translate-x-1/2 flex items-center gap-3 rounded-xl px-6 py-4 shadow-2xl text-base font-semibold
-          ${
-            message.includes("thành công")
+          ${message.includes("thành công")
               ? "bg-green-50 text-green-700 border border-green-200"
               : "bg-red-50 text-red-700 border border-red-200"
-          }
+            }
         `}
           role="alert"
         >
@@ -128,11 +161,10 @@ export default function Register() {
               onChange={(e) => setUsername(e.target.value)}
               onFocus={() => setFocusField("username")}
               onBlur={() => setFocusField("")}
-              className={`w-full px-5 py-3 border-2 rounded-lg transition-all duration-300 bg-white text-base shadow-sm
-                ${
-                  focusField === "username"
-                    ? "border-blue-500 ring-2 ring-blue-200"
-                    : "border-gray-300 focus:border-blue-400"
+              className={`w-full px-4 py-2 border-2 rounded-lg transition-all duration-300 bg-white text-base shadow-sm
+                ${focusField === "username"
+                  ? "border-blue-500 ring-2 ring-blue-200"
+                  : "border-gray-300 focus:border-blue-400"
                 }
                 placeholder-gray-400`}
             />
@@ -166,11 +198,10 @@ export default function Register() {
               onChange={(e) => setDob(e.target.value)}
               onFocus={() => setFocusField("dob")}
               onBlur={() => setFocusField("")}
-              className={`w-full px-5 py-3 border-2 rounded-lg transition-all duration-300 bg-white text-base shadow-sm
-                ${
-                  focusField === "dob"
-                    ? "border-blue-500 ring-2 ring-blue-200"
-                    : "border-gray-300 focus:border-blue-400"
+              className={`w-full px-4 py-2 border-2 rounded-lg transition-all duration-300 bg-white text-base shadow-sm
+                ${focusField === "dob"
+                  ? "border-blue-500 ring-2 ring-blue-200"
+                  : "border-gray-300 focus:border-blue-400"
                 }
                 placeholder-gray-400`}
             />
@@ -206,11 +237,10 @@ export default function Register() {
               onFocus={() => setFocusField("email")}
               onBlur={() => setFocusField("")}
               autoComplete="email"
-              className={`w-full px-5 py-3 border-2 rounded-lg transition-all duration-300 bg-white text-base shadow-sm
-                ${
-                  focusField === "email"
-                    ? "border-blue-500 ring-2 ring-blue-200"
-                    : "border-gray-300 focus:border-blue-400"
+              className={`w-full px-4 py-2 border-2 rounded-lg transition-all duration-300 bg-white text-base shadow-sm
+                ${focusField === "email"
+                  ? "border-blue-500 ring-2 ring-blue-200"
+                  : "border-gray-300 focus:border-blue-400"
                 }
                 placeholder-gray-400`}
             />
@@ -238,34 +268,75 @@ export default function Register() {
           </label>
           <div className="relative">
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               placeholder="Nhập mật khẩu"
               required
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={handlePasswordChange}
               onFocus={() => setFocusField("password")}
               onBlur={() => setFocusField("")}
               autoComplete="new-password"
-              className={`w-full px-5 py-3 border-2 rounded-lg transition-all duration-300 bg-white text-base shadow-sm
-                ${
-                  focusField === "password"
-                    ? "border-blue-500 ring-2 ring-blue-200"
-                    : "border-gray-300 focus:border-blue-400"
+              className={`w-full px-4 py-2 border-2 rounded-lg transition-all duration-300 bg-white text-base shadow-sm
+                ${focusField === "password"
+                  ? "border-blue-500 ring-2 ring-blue-200"
+                  : "border-gray-300 focus:border-blue-400"
                 }
                 placeholder-gray-400`}
             />
-            <motion.span
-              initial={false}
-              animate={{
-                opacity: focusField === "password" ? 1 : 0,
-                x: focusField === "password" ? 0 : -10,
-              }}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-500 text-xl pointer-events-none"
-              transition={{ duration: 0.2 }}
+            <span
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 cursor-pointer text-lg"
+              onClick={() => setShowPassword((v) => !v)}
+              tabIndex={0}
+              role="button"
+              aria-label={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+              style={{ padding: 0 }}
             >
-              <i className="fas fa-lock"></i>
-            </motion.span>
+              {showPassword ? (
+                <i className="fas fa-eye-slash"></i>
+              ) : (
+                <i className="fas fa-eye"></i>
+              )}
+            </span>
           </div>
+          {/* Hiển thị tiêu chí mật khẩu gọn gàng */}
+          {(focusField === "password" || password.length > 0) && (
+            <div className="mt-2">
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs font-medium">
+                <div className="flex items-center gap-1">
+                  {passwordChecks.length ? (
+                    <span className="text-green-600">✔️</span>
+                  ) : (
+                    <span className="text-red-500">❌</span>
+                  )}
+                  <span>Ít nhất 8 ký tự</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  {passwordChecks.upper && passwordChecks.lower ? (
+                    <span className="text-green-600">✔️</span>
+                  ) : (
+                    <span className="text-red-500">❌</span>
+                  )}
+                  <span>Có chữ hoa & thường</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  {passwordChecks.number ? (
+                    <span className="text-green-600">✔️</span>
+                  ) : (
+                    <span className="text-red-500">❌</span>
+                  )}
+                  <span>Có số</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  {passwordChecks.special ? (
+                    <span className="text-green-600">✔️</span>
+                  ) : (
+                    <span className="text-red-500">❌</span>
+                  )}
+                  <span>Ký tự đặc biệt</span>
+                </div>
+              </div>
+            </div>
+          )}
         </motion.div>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
