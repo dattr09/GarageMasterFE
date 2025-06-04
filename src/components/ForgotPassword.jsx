@@ -12,14 +12,26 @@ export default function ForgotPassword() {
     e.preventDefault();
     setMessage("");
     setLoading(true);
-    // Gửi request quên mật khẩu ở đây (giả lập)
-    setTimeout(() => {
-      setMessage("Nếu email tồn tại, hướng dẫn đặt lại mật khẩu đã được gửi!");
-      setLoading(false);
-      setTimeout(() => {
-        navigate("/reset-password");
-      }, 2000);
-    }, 1500);
+    try {
+      const res = await fetch("http://localhost:5119/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        localStorage.setItem("resetEmail", email);
+        setMessage("Vui lòng kiểm tra email - mật khẩu mới đã được gửi thành công!");
+        setTimeout(() => {
+          navigate("/reset-password");
+        }, 2000);
+      } else {
+        setMessage(data.message || "Có lỗi xảy ra!");
+      }
+    } catch (err) {
+      setMessage("Không thể kết nối máy chủ!");
+    }
+    setLoading(false);
   };
 
   return (

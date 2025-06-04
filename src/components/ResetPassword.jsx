@@ -9,10 +9,19 @@ export default function ResetPassword() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const [email, setEmail] = useState(localStorage.getItem("resetEmail") || "");
+
+  const [showCurrent, setShowCurrent] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
+    if (!email) {
+      setMessage("Không tìm thấy email để đổi mật khẩu.");
+      return;
+    }
     if (!current) {
       setMessage("Vui lòng nhập mật khẩu hiện tại.");
       return;
@@ -26,14 +35,30 @@ export default function ResetPassword() {
       return;
     }
     setLoading(true);
-    // Gửi request đổi mật khẩu ở đây (giả lập)
-    setTimeout(() => {
-      setMessage("Đổi mật khẩu thành công!");
-      setLoading(false);
-      setTimeout(() => {
-        navigate("/login");
-      }, 1200);
-    }, 1500);
+
+    // Thêm dòng này để kiểm tra giá trị gửi lên
+    console.log({ email, current, password });
+
+    try {
+      const res = await fetch("http://localhost:5119/api/auth/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, currentPassword: current, newPassword: password }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setMessage("Đổi mật khẩu thành công!");
+        setTimeout(() => {
+          localStorage.removeItem("resetEmail");
+          navigate("/login");
+        }, 1200);
+      } else {
+        setMessage(data.message || "Đổi mật khẩu thất bại.");
+      }
+    } catch (err) {
+      setMessage("Không thể kết nối máy chủ!");
+    }
+    setLoading(false);
   };
 
   return (
@@ -82,40 +107,88 @@ export default function ResetPassword() {
             <label className="block font-semibold text-gray-700 mb-2 text-lg tracking-wide">
               Mật khẩu hiện tại
             </label>
-            <input
-              type="password"
-              required
-              value={current}
-              onChange={(e) => setCurrent(e.target.value)}
-              placeholder="Nhập mật khẩu hiện tại"
-              className="w-full px-5 py-3 border-2 rounded-lg transition-all duration-300 bg-white text-base shadow-sm border-gray-300 focus:border-blue-400 placeholder-gray-400"
-            />
+            <div className="relative">
+              <input
+                type={showCurrent ? "text" : "password"}
+                required
+                value={current}
+                onChange={(e) => setCurrent(e.target.value)}
+                placeholder="Nhập mật khẩu hiện tại"
+                className="w-full px-5 py-3 border-2 rounded-lg transition-all duration-300 bg-white text-base shadow-sm border-gray-300 focus:border-blue-400 placeholder-gray-400"
+              />
+              <span
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 cursor-pointer text-lg"
+                onClick={() => setShowCurrent((v) => !v)}
+                tabIndex={0}
+                role="button"
+                aria-label={showCurrent ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+                style={{ padding: 0 }}
+              >
+                {showCurrent ? (
+                  <i className="fas fa-eye-slash"></i>
+                ) : (
+                  <i className="fas fa-eye"></i>
+                )}
+              </span>
+            </div>
           </div>
           <div>
             <label className="block font-semibold text-gray-700 mb-2 text-lg tracking-wide">
               Mật khẩu mới
             </label>
-            <input
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Nhập mật khẩu mới"
-              className="w-full px-5 py-3 border-2 rounded-lg transition-all duration-300 bg-white text-base shadow-sm border-gray-300 focus:border-blue-400 placeholder-gray-400"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Nhập mật khẩu mới"
+                className="w-full px-5 py-3 border-2 rounded-lg transition-all duration-300 bg-white text-base shadow-sm border-gray-300 focus:border-blue-400 placeholder-gray-400"
+              />
+              <span
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 cursor-pointer text-lg"
+                onClick={() => setShowPassword((v) => !v)}
+                tabIndex={0}
+                role="button"
+                aria-label={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+                style={{ padding: 0 }}
+              >
+                {showPassword ? (
+                  <i className="fas fa-eye-slash"></i>
+                ) : (
+                  <i className="fas fa-eye"></i>
+                )}
+              </span>
+            </div>
           </div>
           <div>
             <label className="block font-semibold text-gray-700 mb-2 text-lg tracking-wide">
               Xác nhận mật khẩu mới
             </label>
-            <input
-              type="password"
-              required
-              value={confirm}
-              onChange={(e) => setConfirm(e.target.value)}
-              placeholder="Nhập lại mật khẩu mới"
-              className="w-full px-5 py-3 border-2 rounded-lg transition-all duration-300 bg-white text-base shadow-sm border-gray-300 focus:border-blue-400 placeholder-gray-400"
-            />
+            <div className="relative">
+              <input
+                type={showConfirm ? "text" : "password"}
+                required
+                value={confirm}
+                onChange={(e) => setConfirm(e.target.value)}
+                placeholder="Nhập lại mật khẩu mới"
+                className="w-full px-5 py-3 border-2 rounded-lg transition-all duration-300 bg-white text-base shadow-sm border-gray-300 focus:border-blue-400 placeholder-gray-400"
+              />
+              <span
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 cursor-pointer text-lg"
+                onClick={() => setShowConfirm((v) => !v)}
+                tabIndex={0}
+                role="button"
+                aria-label={showConfirm ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+                style={{ padding: 0 }}
+              >
+                {showConfirm ? (
+                  <i className="fas fa-eye-slash"></i>
+                ) : (
+                  <i className="fas fa-eye"></i>
+                )}
+              </span>
+            </div>
           </div>
           <button
             type="submit"
