@@ -14,7 +14,7 @@ export default function BrandDetails({ brand, parts, onClose }) {
               <thead>
                 <tr className="bg-blue-100 text-blue-800">
                   <th className="py-2 px-4 text-center">Hãng xe</th>
-                  <th className="py-2 px-4 text-center">ID</th>
+                  {/* <th className="py-2 px-4 text-center">ID</th> */}
                 </tr>
               </thead>
               <tbody>
@@ -22,9 +22,9 @@ export default function BrandDetails({ brand, parts, onClose }) {
                   <td className="py-3 px-4 text-center text-blue-900 text-lg border-b">
                     {brand.name}
                   </td>
-                  <td className="py-3 px-4 text-center text-blue-900 text-lg border-b">
-                    {brand.id}
-                  </td>
+                  {/* <td className="py-3 px-4 text-center text-blue-900 text-lg border-b">
+                  {brand.id}
+                </td> */}
                 </tr>
               </tbody>
             </table>
