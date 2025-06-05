@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { getAllParts, deletePart, searchPartsByName } from "../../services/PartsApi";
 import { getAllBrands } from "../../services/BrandApi";
-import PartForm from "./PartForm";
+import AddPartForm from "./AddPartForm";
+import EditPartForm from "./EditPartForm";
 import PartDetails from "./PartDetails";
 import Swal from "sweetalert2";
 
@@ -67,7 +68,7 @@ export default function PartsList() {
           Tìm
         </button>
         <button
-          onClick={() => setShowForm(true)}
+          onClick={() => setShowForm({ type: "add" })}
           className="bg-green-600 hover:bg-green-800 text-white font-semibold px-6 py-2 rounded-lg shadow transition"
         >
           Thêm mới
@@ -109,7 +110,7 @@ export default function PartsList() {
                       Chi tiết
                     </button>
                     <button
-                      onClick={() => setShowForm(part)}
+                      onClick={() => setShowForm({ type: "edit", part })}
                       className="bg-yellow-500 hover:bg-yellow-700 text-white px-3 py-1 rounded transition shadow"
                       title="Sửa"
                     >
@@ -130,14 +131,24 @@ export default function PartsList() {
         </table>
       </div>
       {showForm && (
-        <PartForm
-          part={typeof showForm === "object" ? showForm : null}
-          onClose={() => setShowForm(false)}
-          onSaved={() => {
-            getAllParts().then(setParts);
-            setShowForm(false);
-          }}
-        />
+        showForm.type === "add" ? (
+          <AddPartForm
+            onClose={() => setShowForm(false)}
+            onSaved={() => {
+              getAllParts().then(setParts);
+              setShowForm(false);
+            }}
+          />
+        ) : (
+          <EditPartForm
+            part={showForm.part}
+            onClose={() => setShowForm(false)}
+            onSaved={() => {
+              getAllParts().then(setParts);
+              setShowForm(false);
+            }}
+          />
+        )
       )}
       {selectedPart && (
         <PartDetails

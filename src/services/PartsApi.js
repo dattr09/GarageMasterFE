@@ -37,7 +37,8 @@ export async function updatePart(id, part) {
     body: JSON.stringify(part),
   });
   if (!res.ok) throw new Error("Cập nhật phụ tùng thất bại");
-  return res.json();
+  // Nếu status 204 thì không có body để .json()
+  return;
 }
 
 export async function deletePart(id) {

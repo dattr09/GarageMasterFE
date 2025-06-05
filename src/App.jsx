@@ -5,8 +5,6 @@ import AuthContainer from "./components/AuthContainer";
 import ForgotPassword from "./components/ForgotPassword";
 import ResetPassword from "./components/ResetPassword";
 import ConfirmEmail from "./components/ConfirmEmail";
-import PartsList from "./components/Parts/PartsList";
-import BrandList from "./components/Brands/BrandList";
 
 // Hàm kiểm tra trạng thái đăng nhập
 function PrivateRoute({ children }) {
@@ -18,18 +16,6 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Nếu user đã đăng nhập thì chuyển về /dashboard, ngược lại thì /login */}
-        <Route
-          path="/"
-          element={
-            localStorage.getItem("token") ? (
-              <Navigate to="/MainLayout" replace />
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          }
-        />
-
         {/* Các route công khai */}
         <Route path="/login" element={<AuthContainer />} />
         <Route path="/register" element={<AuthContainer />} />
@@ -37,7 +23,7 @@ function App() {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/confirm-email" element={<ConfirmEmail />} />
 
-        {/* Các route bảo vệ - tất cả path con nằm trong MainLayout */}
+        {/* Route bảo vệ - tất cả path con nằm trong MainLayout */}
         <Route
           path="/*"
           element={
@@ -46,8 +32,6 @@ function App() {
             </PrivateRoute>
           }
         />
-        <Route path="/parts" element={<PartsList />} />
-        <Route path="/brands" element={<BrandList />} />
       </Routes>
     </BrowserRouter>
   );

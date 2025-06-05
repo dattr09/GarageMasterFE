@@ -23,7 +23,8 @@ export async function updateBrand(id, data) {
     body: JSON.stringify(data),
   });
   if (!res.ok) throw new Error("Cập nhật hãng xe thất bại");
-  return res.json();
+  // Không cần return res.json() vì backend trả về 204
+  return;
 }
 
 export async function deleteBrand(id) {
@@ -31,5 +32,6 @@ export async function deleteBrand(id) {
     method: "DELETE",
   });
   if (!res.ok) throw new Error("Xóa hãng xe thất bại");
-  return res.json();
+  // Không cần return res.json() vì backend trả về 204
+  return;
 }

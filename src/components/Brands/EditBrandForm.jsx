@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { createBrand, updateBrand } from "../../services/BrandApi";
+import { updateBrand } from "../../services/BrandApi";
 
-export default function BrandForm({ brand, onClose, onSaved }) {
+export default function EditBrandForm({ brand, onClose, onSaved }) {
   const [name, setName] = useState(brand ? brand.name : "");
   const [error, setError] = useState("");
 
@@ -12,11 +12,7 @@ export default function BrandForm({ brand, onClose, onSaved }) {
       return;
     }
     try {
-      if (brand) {
-        await updateBrand(brand.id, { name });
-      } else {
-        await createBrand(name);
-      }
+      await updateBrand(brand.id, { name });
       onSaved();
     } catch (err) {
       setError(err.message || "Có lỗi xảy ra!");
@@ -27,7 +23,7 @@ export default function BrandForm({ brand, onClose, onSaved }) {
     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
       <div className="bg-white rounded-2xl shadow-2xl p-10 w-full max-w-md border border-blue-200">
         <h3 className="text-2xl font-bold text-blue-700 mb-8 text-center tracking-wide drop-shadow">
-          {brand ? "Sửa hãng xe" : "Thêm hãng xe"}
+          Sửa hãng xe
         </h3>
         {error && (
           <div className="mb-4 text-red-600 text-center font-semibold">{error}</div>
