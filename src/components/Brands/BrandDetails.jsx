@@ -14,6 +14,7 @@ export default function BrandDetails({ brand, parts, onClose }) {
               <thead>
                 <tr className="bg-blue-100 text-blue-800">
                   <th className="py-2 px-4 text-center">Hãng xe</th>
+                  <th className="py-2 px-4 text-center">Ảnh</th>
                   {/* <th className="py-2 px-4 text-center">ID</th> */}
                 </tr>
               </thead>
@@ -21,6 +22,15 @@ export default function BrandDetails({ brand, parts, onClose }) {
                 <tr>
                   <td className="py-3 px-4 text-center text-blue-900 text-lg border-b">
                     {brand.name}
+                  </td>
+                  <td className="py-3 px-4 text-center border-b">
+                    {brand.image && (
+                      <img
+                        src={brand.image}
+                        alt={brand.name}
+                        className="h-14 w-14 object-contain mx-auto"
+                      />
+                    )}
                   </td>
                   {/* <td className="py-3 px-4 text-center text-blue-900 text-lg border-b">
                   {brand.id}

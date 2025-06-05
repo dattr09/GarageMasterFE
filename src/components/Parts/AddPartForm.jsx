@@ -12,9 +12,11 @@ export default function AddPartForm({ onClose, onSaved }) {
     unit: "",
     limitStock: "",
     brandId: "",
+    image: "", // Thêm trường image
   });
   const [brands, setBrands] = useState([]);
   const [error, setError] = useState("");
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     getAllBrands().then(setBrands);
@@ -28,11 +30,35 @@ export default function AddPartForm({ onClose, onSaved }) {
     });
   };
 
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setUploading(true);
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "GarageMaster"); // Thay bằng preset của bạn
+
+    const res = await fetch(
+      "https://api.cloudinary.com/v1_1/nguyentu11/image/upload", // Thay bằng cloud_name của bạn
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+    const data = await res.json();
+    setForm((prev) => ({ ...prev, image: data.secure_url }));
+    setUploading(false);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     if (!form.brandId) {
       setError("Vui lòng chọn hãng xe hợp lệ!");
+      return;
+    }
+    if (!form.image) {
+      setError("Vui lòng chọn ảnh phụ tùng!");
       return;
     }
     try {
@@ -87,6 +113,19 @@ export default function AddPartForm({ onClose, onSaved }) {
                 <option key={b.id} value={b.id}>{b.name}</option>
               ))}
             </select>
+          </div>
+          <div>
+            <label className="block font-semibold mb-1 text-gray-700">Ảnh phụ tùng</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="block w-full text-sm text-gray-500"
+            />
+            {uploading && <div className="text-blue-500 mt-2">Đang tải ảnh...</div>}
+            {form.image && (
+              <img src={form.image} alt="preview" className="w-20 h-20 object-contain rounded shadow mt-2" />
+            )}
           </div>
           <div className="md:col-span-2 flex gap-6 mt-6 justify-center">
             <button type="submit" className="bg-blue-600 hover:bg-blue-800 text-white font-semibold px-10 py-2 rounded-xl shadow-lg transition text-lg">Lưu</button>

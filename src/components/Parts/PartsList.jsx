@@ -52,7 +52,7 @@ export default function PartsList() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto bg-white rounded-xl shadow-lg p-8 mt-8">
+    <div className="max-w-6xl mx-auto bg-white rounded-xl shadow-lg p-8 mt-8">
       <h2 className="text-2xl font-bold text-blue-800 mb-6 text-center drop-shadow">Danh sách phụ tùng</h2>
       <div className="flex flex-col md:flex-row items-center gap-4 mb-6">
         <input
@@ -74,61 +74,56 @@ export default function PartsList() {
           Thêm mới
         </button>
       </div>
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-white rounded-lg shadow border">
-          <thead>
-            <tr className="bg-blue-100 text-blue-800">
-              <th className="py-3 px-4 text-center font-semibold">Tên</th>
-              <th className="py-3 px-4 text-center font-semibold">Số lượng</th>
-              <th className="py-3 px-4 text-center font-semibold">Giá bán</th>
-              <th className="py-3 px-4 text-center font-semibold">Đơn vị</th>
-              <th className="py-3 px-4 text-center font-semibold">Hãng</th>
-              <th className="py-3 px-4 text-center font-semibold">Thao tác</th>
-            </tr>
-          </thead>
-          <tbody>
-            {parts.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="py-6 text-center text-gray-400 italic">
-                  Không có phụ tùng nào.
-                </td>
-              </tr>
-            ) : (
-              parts.map((part) => (
-                <tr key={part.id} className="border-b hover:bg-blue-50 transition">
-                  <td className="py-2 px-4 text-center">{part.name}</td>
-                  <td className="py-2 px-4 text-center">{part.quantity}</td>
-                  <td className="py-2 px-4 text-center">{part.price.toLocaleString()}₫</td>
-                  <td className="py-2 px-4 text-center">{part.unit}</td>
-                  <td className="py-2 px-4 text-center">{getBrandName(part.brandId)}</td>
-                  <td className="py-2 px-4 flex justify-center gap-2">
-                    <button
-                      onClick={() => setSelectedPart(part)}
-                      className="bg-blue-500 hover:bg-blue-700 text-white px-3 py-1 rounded transition shadow"
-                      title="Chi tiết"
-                    >
-                      Chi tiết
-                    </button>
-                    <button
-                      onClick={() => setShowForm({ type: "edit", part })}
-                      className="bg-yellow-500 hover:bg-yellow-700 text-white px-3 py-1 rounded transition shadow"
-                      title="Sửa"
-                    >
-                      Sửa
-                    </button>
-                    <button
-                      onClick={() => handleDelete(part.id)}
-                      className="bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded transition shadow"
-                      title="Xóa"
-                    >
-                      Xóa
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {parts.length === 0 ? (
+          <div className="col-span-full text-center text-gray-400 italic py-8">
+            Không có phụ tùng nào.
+          </div>
+        ) : (
+          parts.map((part) => (
+            <div key={part.id} className="bg-white rounded-xl shadow p-4 flex flex-col items-center relative">
+              {part.image ? (
+                <img
+                  src={part.image}
+                  alt={part.name}
+                  className="w-24 h-24 object-contain rounded shadow mb-3"
+                />
+              ) : (
+                <div className="w-24 h-24 flex items-center justify-center bg-gray-100 rounded mb-3 text-gray-400 italic">
+                  Không có ảnh
+                </div>
+              )}
+              <div className="font-semibold text-blue-900 text-lg mb-1">{part.name}</div>
+              <div className="text-gray-700 mb-1">Số lượng: <span className="font-medium">{part.quantity}</span></div>
+              <div className="text-blue-700 font-bold mb-1">{part.price.toLocaleString()}₫</div>
+              <div className="text-gray-500 text-sm mb-1">Đơn vị: {part.unit}</div>
+              <div className="text-gray-500 text-sm mb-2">Hãng: {getBrandName(part.brandId)}</div>
+              <div className="flex gap-2 mt-2">
+                <button
+                  onClick={() => setSelectedPart(part)}
+                  className="bg-blue-500 hover:bg-blue-700 text-white px-3 py-1 rounded transition shadow"
+                  title="Chi tiết"
+                >
+                  Chi tiết
+                </button>
+                <button
+                  onClick={() => setShowForm({ type: "edit", part })}
+                  className="bg-yellow-500 hover:bg-yellow-700 text-white px-3 py-1 rounded transition shadow"
+                  title="Sửa"
+                >
+                  Sửa
+                </button>
+                <button
+                  onClick={() => handleDelete(part.id)}
+                  className="bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded transition shadow"
+                  title="Xóa"
+                >
+                  Xóa
+                </button>
+              </div>
+            </div>
+          ))
+        )}
       </div>
       {showForm && (
         showForm.type === "add" ? (
