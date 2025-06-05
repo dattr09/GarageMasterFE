@@ -12,6 +12,8 @@ export default function Header() {
         <Link to="/" className="hover:text-blue-600 font-medium text-gray-700">Trang chủ</Link>
         <Link to="/services" className="hover:text-blue-600 font-medium text-gray-700">Dịch vụ</Link>
         <Link to="/contact" className="hover:text-blue-600 font-medium text-gray-700">Liên hệ</Link>
+        <Link to="/parts" className="hover:text-blue-600 font-medium text-gray-700">Phụ tùng</Link>
+        <Link to="/brands" className="hover:text-blue-600 font-medium text-gray-700">Hãng xe</Link>
         <Link to="/login" className="hover:text-blue-600 font-medium text-gray-700">Đăng nhập</Link>
       </div>
     </nav>
