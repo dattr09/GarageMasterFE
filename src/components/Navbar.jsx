@@ -26,48 +26,40 @@ export default function Navbar() {
   };
 
   return (
-    <div className="w-full h-[70vh] relative overflow-hidden rounded shadow-lg">
-      {/* Lớp phủ nền trắng trong suốt */}
-      <div className="absolute inset-0 bg-white/60 z-0 rounded-xl"></div>
+    <div className="w-full h-[70vh] relative overflow-hidden rounded-xl">
       {images.map((img, idx) => (
         <img
           key={img}
           src={img}
           alt={`image-${idx + 1}`}
-          className={`absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-700 rounded-xl ${current === idx ? "opacity-100" : "opacity-0"}`}
+          className={`absolute top-0 left-0 w-full h-full object-cover ${current === idx ? "" : "hidden"}`}
           style={{ zIndex: 1 }}
         />
       ))}
-      {/* Nút chuyển trái/phải */}
+      {/* Nút chuyển trái */}
       <button
-        className="absolute left-4 top-1/2 -translate-y-1/2 bg-transparent hover:bg-black/30 text-white rounded-full w-12 h-12 flex items-center justify-center z-10"
+        className="absolute left-0 top-1/2 -translate-y-1/2 bg-transparent text-white w-12 h-20 flex items-center justify-center z-10"
         onClick={prevImage}
         aria-label="Ảnh trước"
         type="button"
+        style={{ border: "none", boxShadow: "none" }}
       >
-        <span className="text-xl flex items-center justify-center">&#8592;</span>
+        <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        </svg>
       </button>
+      {/* Nút chuyển phải */}
       <button
-        className="absolute right-4 top-1/2 -translate-y-1/2 bg-transparent hover:bg-black/30 text-white rounded-full w-12 h-12 flex items-center justify-center z-10"
+        className="absolute right-0 top-1/2 -translate-y-1/2 bg-transparent text-white w-12 h-20 flex items-center justify-center z-10"
         onClick={nextImage}
         aria-label="Ảnh sau"
         type="button"
+        style={{ border: "none", boxShadow: "none" }}
       >
-        <span className="text-xl flex items-center justify-center">&#8594;</span>
+        <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        </svg>
       </button>
-      {/* Dots indicator */}
-      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2 z-10">
-        {images.map((_, idx) => (
-          <button
-            key={idx}
-            className={`w-2 h-2 rounded-full ${current === idx ? "bg-blue-600" : "bg-gray-300"} border-none outline-none`}
-            style={{ cursor: "pointer" }}
-            onClick={() => setCurrent(idx)}
-            aria-label={`Chọn ảnh ${idx + 1}`}
-            type="button"
-          />
-        ))}
-      </div>
     </div>
   );
 }

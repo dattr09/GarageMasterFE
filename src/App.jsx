@@ -5,6 +5,8 @@ import AuthContainer from "./components/AuthContainer";
 import ForgotPassword from "./components/ForgotPassword";
 import ResetPassword from "./components/ResetPassword";
 import ConfirmEmail from "./components/ConfirmEmail";
+import PartsList from "./components/Parts/PartsList";
+import BrandList from "./components/Brands/BrandList";
 
 // Hàm kiểm tra trạng thái đăng nhập
 function PrivateRoute({ children }) {
@@ -44,6 +46,8 @@ function App() {
             </PrivateRoute>
           }
         />
+        <Route path="/parts" element={<PartsList />} />
+        <Route path="/brands" element={<BrandList />} />
       </Routes>
     </BrowserRouter>
   );

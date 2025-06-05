@@ -7,6 +7,11 @@ const featuredProducts = [
   { name: "Phanh đĩa Brembo", img: "/images/acc-brake.png", price: "2.000.000đ", stock: 5 },
   { name: "Đèn pha LED", img: "/images/acc-headlight.png", price: "800.000đ", stock: 10 },
   { name: "Gương chiếu hậu cao cấp", img: "/images/acc-mirror.png", price: "400.000đ", stock: 15 },
+  { name: "Bugi NGK", img: "/images/acc-sparkplug.png", price: "120.000đ", stock: 30 },
+  { name: "Lọc gió Bosch", img: "/images/acc-airfilter.png", price: "180.000đ", stock: 25 },
+  { name: "Dây curoa Gates", img: "/images/acc-belt.png", price: "250.000đ", stock: 18 },
+  { name: "Má phanh Nissin", img: "/images/acc-brakepad.png", price: "320.000đ", stock: 22 },
+  { name: "Còi xe Hella", img: "/images/acc-horn.png", price: "90.000đ", stock: 40 },
 ];
 
 const PRODUCTS_PER_PAGE = 5;
