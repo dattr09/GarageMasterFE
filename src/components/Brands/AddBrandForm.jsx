@@ -3,7 +3,19 @@ import { createBrand } from "../../services/BrandApi";
 
 export default function AddBrandForm({ onClose, onSaved }) {
   const [name, setName] = useState("");
+  const [image, setImage] = useState("");
   const [error, setError] = useState("");
+
+  // Xử lý chọn file ảnh
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImage(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -11,8 +23,12 @@ export default function AddBrandForm({ onClose, onSaved }) {
       setError("Tên hãng xe không được để trống");
       return;
     }
+    if (!image) {
+      setError("Vui lòng chọn ảnh hãng xe");
+      return;
+    }
     try {
-      await createBrand(name);
+      await createBrand({ name, image });
       onSaved();
     } catch (err) {
       setError(err.message || "Có lỗi xảy ra!");
@@ -38,6 +54,18 @@ export default function AddBrandForm({ onClose, onSaved }) {
               required
               className="px-4 py-2 border rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
+          </div>
+          <div>
+            <label className="block font-semibold mb-1 text-gray-700">Ảnh</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="px-4 py-2 border rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
+            {image && (
+              <img src={image} alt="Preview" className="h-16 mt-2 mx-auto object-contain" />
+            )}
           </div>
           <div className="flex gap-4 mt-4 justify-center">
             <button

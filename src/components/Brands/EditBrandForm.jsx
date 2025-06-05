@@ -3,6 +3,7 @@ import { updateBrand } from "../../services/BrandApi";
 
 export default function EditBrandForm({ brand, onClose, onSaved }) {
   const [name, setName] = useState(brand ? brand.name : "");
+  const [image, setImage] = useState(brand ? brand.image || "" : "");
   const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
@@ -12,7 +13,7 @@ export default function EditBrandForm({ brand, onClose, onSaved }) {
       return;
     }
     try {
-      await updateBrand(brand.id, { name });
+      await updateBrand(brand.id, { name, image });
       onSaved();
     } catch (err) {
       setError(err.message || "Có lỗi xảy ra!");
@@ -36,6 +37,15 @@ export default function EditBrandForm({ brand, onClose, onSaved }) {
               onChange={e => setName(e.target.value)}
               placeholder="Tên hãng xe"
               required
+              className="px-4 py-2 border rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
+          </div>
+          <div>
+            <label className="block font-semibold mb-1 text-gray-700">Ảnh (URL)</label>
+            <input
+              value={image}
+              onChange={e => setImage(e.target.value)}
+              placeholder="Nhập URL ảnh hãng xe"
               className="px-4 py-2 border rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
           </div>

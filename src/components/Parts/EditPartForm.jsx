@@ -12,6 +12,7 @@ export default function EditPartForm({ part, onClose, onSaved }) {
     unit: part?.unit || "",
     limitStock: part?.limitStock || "",
     brandId: part?.brandId || "",
+    image: part?.image || "", // Thêm trường image
   });
   const [brands, setBrands] = useState([]);
   const [error, setError] = useState("");
@@ -88,6 +89,7 @@ export default function EditPartForm({ part, onClose, onSaved }) {
               ))}
             </select>
           </div>
+          <FormInput label="Link ảnh" name="image" value={form.image} onChange={handleChange} placeholder="https://..." />
           <div className="md:col-span-2 flex gap-6 mt-6 justify-center">
             <button type="submit" className="bg-blue-600 hover:bg-blue-800 text-white font-semibold px-10 py-2 rounded-xl shadow-lg transition text-lg">Lưu</button>
             <button type="button" onClick={onClose} className="bg-gray-400 hover:bg-gray-600 text-white font-semibold px-10 py-2 rounded-xl shadow-lg transition text-lg">Hủy</button>

@@ -6,11 +6,11 @@ export async function getAllBrands() {
   return res.json();
 }
 
-export async function createBrand(name) {
+export async function createBrand(data) {
   const res = await fetch(API_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name }),
+    body: JSON.stringify(data),
   });
   if (!res.ok) throw new Error("Tạo hãng xe thất bại");
   return res.json();

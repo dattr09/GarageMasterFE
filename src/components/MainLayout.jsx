@@ -6,11 +6,18 @@ import PartsList from "./Parts/PartsList";
 import BrandList from "./Brands/BrandList";
 import HomePage from "./HomePage";
 
+const HEADER_HEIGHT = 64;
+
 const MainLayout = () => {
   return (
     <div className="main-layout animated-gradient flex flex-col min-h-screen">
-      <Header />
-      <main className="flex-1 p-4">
+      <div
+        className="fixed top-0 left-0 w-full z-50 bg-white/80 shadow"
+        style={{ height: HEADER_HEIGHT }}
+      >
+        <Header />
+      </div>
+      <main className="flex-1 p-4" style={{ paddingTop: HEADER_HEIGHT }}>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="brands" element={<BrandList />} />

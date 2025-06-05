@@ -1,12 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { AiOutlineDown, AiOutlineUp } from "react-icons/ai";
+import { getAllParts } from "../services/PartsApi";
+import { getAllBrands } from "../services/BrandApi"; // Thêm dòng này
 
 // Navbar Carousel
 const images = [
-  "/public/image1.jpg",
-  "/public/image2.jpg",
-  "/public/image3.jpg",
-  "/public/image4.jpg",
+  "/public/image5.jpg",
+  "/public/image6.jpg",
+  "/public/image7.jpg",
+  "/public/image8.jpg",
+];
+
+// Thêm mảng caption cho từng ảnh
+const captions = [
+  "GarageMaster\nGiải pháp phụ tùng xe máy toàn diện",
+  "Đa dạng sản phẩm, chính hãng\nGiá tốt, dịch vụ tận tâm",
+  "Hỗ trợ kỹ thuật và bảo hành uy tín",
+  "Đặt hàng nhanh chóng, giao hàng tận nơi",
 ];
 
 function NavbarCarousel() {
@@ -29,6 +39,7 @@ function NavbarCarousel() {
 
   return (
     <div className="w-full h-[75vh] relative overflow-hidden rounded-xl bg-white">
+      {/* Ảnh nền */}
       {images.map((img, idx) => (
         <img
           key={img}
@@ -37,9 +48,22 @@ function NavbarCarousel() {
           className={`absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-700 ${current === idx ? "opacity-100 z-10" : "opacity-0 z-0"}`}
         />
       ))}
-      {/* Nút chuyển trái */}
+      {/* Lớp phủ màu */}
+      <div className="absolute inset-0 bg-black/45 z-20"></div>
+      {/* Thẻ chữ trên lớp phủ */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center z-30">
+        <h1 className="text-4xl md:text-6xl font-bold text-white drop-shadow-lg mb-4 text-center">
+          {captions[current].split('\n').map((line, idx) => (
+            <span key={idx}>
+              {line}
+              <br />
+            </span>
+          ))}
+        </h1>
+      </div>
+      {/* Nút chuyển trái/phải và dots giữ nguyên */}
       <button
-        className="absolute left-0 top-1/2 -translate-y-1/2 bg-transparent w-10 h-10 flex items-center justify-center z-30 transition"
+        className="absolute left-0 top-1/2 -translate-y-1/2 bg-transparent w-10 h-10 flex items-center justify-center z-40 transition"
         onClick={prevImage}
         aria-label="Ảnh trước"
         type="button"
@@ -49,9 +73,8 @@ function NavbarCarousel() {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
         </svg>
       </button>
-      {/* Nút chuyển phải */}
       <button
-        className="absolute right-0 top-1/2 -translate-y-1/2 bg-transparent w-10 h-10 flex items-center justify-center z-30 transition"
+        className="absolute right-0 top-1/2 -translate-y-1/2 bg-transparent w-10 h-10 flex items-center justify-center z-40 transition"
         onClick={nextImage}
         aria-label="Ảnh sau"
         type="button"
@@ -61,12 +84,15 @@ function NavbarCarousel() {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
         </svg>
       </button>
-      {/* Dots indicator */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-30">
+      {/* Dots */}
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-40">
         {images.map((_, idx) => (
           <button
             key={idx}
-            className={`w-3 h-3 rounded-full transition-all duration-300 border-2 ${current === idx ? "bg-white border-blue-500 scale-125" : "bg-white/60 border-white"}`}
+            className={`w-2.5 h-2.5 rounded-full transition-all duration-300 border ${current === idx
+              ? "bg-white border-white scale-110 shadow"
+              : "bg-white/30 border-transparent"
+              }`}
             onClick={() => setCurrent(idx)}
             aria-label={`Chọn ảnh ${idx + 1}`}
             type="button"
@@ -96,16 +122,21 @@ const accessories = [
   { name: "Bơm xăng", img: "/images/acc-fuelpump.png" },
   { name: "Dây điện", img: "/images/acc-wire.png" },
   { name: "Ống xả", img: "/images/acc-exhaust.png" },
-  { name: "Kính chắn gió", img: "/images/acc-windshield.png" },
+  { name: "/images/acc-windshield.png", img: "/images/acc-windshield.png" },
 ];
 
 const ITEMS_PER_ROW = 6;
 const ROWS_DEFAULT = 2;
 const DEFAULT_ITEMS = ITEMS_PER_ROW * ROWS_DEFAULT;
 
-function Accessories() {
+function Accessories({ parts = [] }) {
+  // Lấy danh mục duy nhất theo tên và ảnh
+  const categories = Array.from(
+    new Map(parts.map(item => [item.name, { name: item.name, img: item.image }])).values()
+  );
+
   const [showAll, setShowAll] = useState(false);
-  const visibleAccessories = showAll ? accessories : accessories.slice(0, DEFAULT_ITEMS);
+  const visibleAccessories = showAll ? categories : categories.slice(0, DEFAULT_ITEMS);
 
   return (
     <div className="bg-white/80 rounded-xl shadow p-6 relative">
@@ -127,7 +158,7 @@ function Accessories() {
           </div>
         ))}
       </div>
-      {accessories.length > DEFAULT_ITEMS && (
+      {categories.length > DEFAULT_ITEMS && (
         <button
           className="absolute left-1/2 -translate-x-1/2 -bottom-4 w-8 h-8 flex items-center justify-center bg-white rounded-full shadow p-0 border border-gray-200 hover:bg-gray-100 transition"
           onClick={() => setShowAll((v) => !v)}
@@ -141,33 +172,12 @@ function Accessories() {
 }
 
 // Featured Products
-const featuredProducts = [
-  { name: "Lốp Michelin", img: "/images/acc-tire.png", price: "1.200.000đ", stock: 12 },
-  { name: "Ắc quy GS", img: "/images/acc-battery.png", price: "950.000đ", stock: 8 },
-  { name: "Dầu nhớt Castrol", img: "/images/acc-oil.png", price: "350.000đ", stock: 20 },
-  { name: "Phanh đĩa Brembo", img: "/images/acc-brake.png", price: "2.000.000đ", stock: 5 },
-  { name: "Đèn pha LED", img: "/images/acc-headlight.png", price: "800.000đ", stock: 10 },
-  { name: "Gương chiếu hậu cao cấp", img: "/images/acc-mirror.png", price: "400.000đ", stock: 15 },
-  { name: "Bugi NGK", img: "/images/acc-sparkplug.png", price: "120.000đ", stock: 30 },
-  { name: "Lọc gió Bosch", img: "/images/acc-airfilter.png", price: "180.000đ", stock: 25 },
-  { name: "Dây curoa Gates", img: "/images/acc-belt.png", price: "250.000đ", stock: 18 },
-  { name: "Má phanh Nissin", img: "/images/acc-brakepad.png", price: "320.000đ", stock: 22 },
-  { name: "Còi xe Hella", img: "/images/acc-horn.png", price: "90.000đ", stock: 40 },
-];
-
-const genuineParts = [
-  { name: "Lọc dầu Toyota", img: "/images/acc-oilfilter.png", price: "220.000đ", stock: 15 },
-  { name: "Bugi Denso", img: "/images/acc-sparkplug.png", price: "130.000đ", stock: 20 },
-  { name: "Má phanh Honda", img: "/images/acc-brakepad.png", price: "350.000đ", stock: 10 },
-  { name: "Ắc quy Panasonic", img: "/images/acc-battery.png", price: "1.100.000đ", stock: 7 },
-  { name: "Lọc gió Hyundai", img: "/images/acc-airfilter.png", price: "200.000đ", stock: 12 },
-];
-
-const PRODUCTS_PER_PAGE = 5;
-
-function FeaturedProducts() {
+function FeaturedProducts({ parts = [], brands = [] }) {
+  const PRODUCTS_PER_PAGE = 5;
+  // Lấy 10 sản phẩm đầu tiên làm nổi bật (hoặc tuỳ ý)
+  const featuredProducts = parts.slice(0, 10);
   const [page, setPage] = useState(0);
-  const totalPages = featuredProducts.length - PRODUCTS_PER_PAGE + 1;
+  const totalPages = Math.max(featuredProducts.length - PRODUCTS_PER_PAGE + 1, 1);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -197,17 +207,21 @@ function FeaturedProducts() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-6 mb-4">
           {currentProducts.map((item, idx) => (
             <div
-              key={item.name}
+              key={item.id || item.name}
               className="flex flex-col items-center bg-white rounded-lg shadow hover:shadow-lg p-4 transition"
             >
               <img
-                src={item.img}
+                src={item.image || item.img}
                 alt={item.name}
                 className="w-20 h-20 object-contain mb-2"
               />
               <span className="font-medium text-gray-800">{item.name}</span>
-              <span className="text-blue-600 font-semibold">{item.price}</span>
-              <span className="text-xs text-gray-500 mb-1">Tồn kho: {item.stock}</span>
+              <span className="text-blue-600 font-semibold">
+                {item.price ? item.price.toLocaleString("vi-VN") + " VND" : ""}
+              </span>
+              <span className="text-xs text-gray-500 mb-1">
+                Tồn kho: {item.quantity ?? item.stock}
+              </span>
               <div className="flex gap-2 mt-3">
                 <button
                   className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm"
@@ -243,44 +257,53 @@ function FeaturedProducts() {
       <div className="bg-white/80 rounded-xl shadow p-6">
         <h3 className="text-lg font-semibold mb-3 text-gray-800">Phụ tùng chính hãng</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-6 mb-2">
-          {genuineParts.map((item) => (
+          {brands.slice(0, 10).map((brand) => (
             <div
-              key={item.name}
+              key={brand.id || brand.name}
               className="flex flex-col items-center bg-white rounded-lg shadow hover:shadow-lg p-4 transition"
             >
               <img
-                src={item.img}
-                alt={item.name}
+                src={brand.image}
+                alt={brand.name}
                 className="w-20 h-20 object-contain mb-2"
               />
-              <span className="font-medium text-gray-800">{item.name}</span>
-              <span className="text-blue-600 font-semibold">{item.price}</span>
-              <span className="text-xs text-gray-500 mb-1">Tồn kho: {item.stock}</span>
-              <div className="flex gap-2 mt-3">
-                <button
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm"
-                  onClick={() => handleBuy(item)}
-                >
-                  Mua ngay
-                </button>
-                <button
-                  className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm"
-                  onClick={() => handleAddToCart(item)}
-                >
-                  Thêm giỏ hàng
-                </button>
-              </div>
+              <span className="font-medium text-gray-800">{brand.name}</span>
             </div>
           ))}
         </div>
       </div>
       {/* Card 3: Giới thiệu */}
-      <div className="bg-blue-50 rounded-xl shadow p-6 text-gray-700 text-center">
-        <h4 className="text-lg font-semibold mb-2 text-blue-700">Giới thiệu GarageMaster</h4>
-        <p>
-          GarageMaster cung cấp các sản phẩm phụ tùng, phụ kiện ô tô chính hãng và chất lượng cao.
-          Chúng tôi cam kết mang đến cho khách hàng sự lựa chọn đa dạng, giá cả hợp lý và dịch vụ tận tâm.
-        </p>
+      <div
+        className="rounded-xl shadow p-6 text-gray-700"
+        style={{
+          backgroundImage: "url('/public/about.jpg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          minHeight: "400px",
+          position: "relative",
+        }}
+      >
+        {/* Lớp phủ giúp dễ đọc chữ */}
+        <div className="absolute inset-0 bg-black/30 rounded-xl"></div>
+        <div className="relative z-10 text-left px-2 md:px-8 py-2">
+          <h4 className="text-3xl md:text-4xl font-bold mb-6 text-blue-300 drop-shadow-lg">Giới thiệu GarageMaster</h4>
+          <p className="mb-4 text-white md:text-xl font-medium drop-shadow">
+            GarageMaster là nền tảng cung cấp phụ tùng, phụ kiện ô tô và xe máy chính hãng, chất lượng cao.
+          </p>
+          <p className="mb-4 text-white md:text-xl font-medium drop-shadow">
+            Chúng tôi hợp tác với nhiều thương hiệu uy tín, đảm bảo nguồn gốc xuất xứ rõ ràng cho từng sản phẩm.
+          </p>
+          <p className="mb-4 text-white md:text-xl font-medium drop-shadow">
+            Khách hàng được hỗ trợ tư vấn kỹ thuật tận tâm, cùng chính sách bảo hành minh bạch.
+          </p>
+          <p className="mb-4 text-white md:text-xl font-medium drop-shadow">
+            Đặt hàng nhanh chóng, giao hàng tận nơi trên toàn quốc với giá cả cạnh tranh.
+          </p>
+          <p className="text-white md:text-xl font-medium drop-shadow">
+            GarageMaster cam kết đồng hành cùng khách hàng trên mọi hành trình, mang lại sự an tâm và tiện lợi tối đa.
+          </p>
+        </div>
       </div>
     </div>
   );
@@ -288,11 +311,19 @@ function FeaturedProducts() {
 
 // Trang tổng hợp
 export default function HomePage() {
+  const [parts, setParts] = useState([]);
+  const [brands, setBrands] = useState([]);
+
+  useEffect(() => {
+    getAllParts().then(setParts);
+    getAllBrands().then(setBrands);
+  }, []);
+
   return (
     <div className="w-full max-w-9xl mx-auto px-4 flex flex-col gap-8">
       <NavbarCarousel />
-      <Accessories />
-      <FeaturedProducts />
+      <Accessories parts={parts} />
+      <FeaturedProducts parts={parts} brands={brands} />
     </div>
   );
 }

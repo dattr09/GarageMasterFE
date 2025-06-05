@@ -91,14 +91,14 @@ export default function BrandList() {
             <thead>
               <tr className="bg-gradient-to-r from-blue-200 to-blue-100 text-blue-900">
                 <th className="py-3 px-4 text-center font-bold text-base tracking-wide rounded-tl-xl">Tên hãng xe</th>
-                {/* <th className="py-3 px-4 text-center font-bold text-base tracking-wide">ID</th> */}
+                <th className="py-3 px-4 text-center font-bold text-base tracking-wide">Ảnh</th>
                 <th className="py-3 px-4 text-center font-bold text-base tracking-wide rounded-tr-xl">Thao tác</th>
               </tr>
             </thead>
             <tbody>
               {brands.length === 0 ? (
                 <tr>
-                  <td colSpan={2} className="py-8 text-center text-gray-400 italic bg-gray-50 rounded-b-xl">
+                  <td colSpan={3} className="py-8 text-center text-gray-400 italic bg-gray-50 rounded-b-xl">
                     Không có hãng xe nào.
                   </td>
                 </tr>
@@ -109,7 +109,11 @@ export default function BrandList() {
                     className={`transition ${idx % 2 === 0 ? "bg-white" : "bg-blue-50"} hover:bg-blue-100`}
                   >
                     <td className="py-3 px-4 text-center align-middle font-medium">{brand.name}</td>
-                    {/* <td className="py-3 px-4 text-center align-middle font-mono text-xs text-gray-500">{brand.id}</td> */}
+                    <td className="py-3 px-4 text-center">
+                      {brand.image && (
+                        <img src={brand.image} alt={brand.name} className="h-10 w-10 object-contain mx-auto" />
+                      )}
+                    </td>
                     <td className="py-3 px-4 flex justify-center items-center gap-2 align-middle">
                       <button
                         onClick={() => handleShowDetail(brand)}
