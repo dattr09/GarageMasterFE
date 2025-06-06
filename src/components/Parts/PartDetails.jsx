@@ -29,15 +29,24 @@ export default function PartDetails({ part, brands = [], onClose }) {
           <DetailRow label="Số lượng" value={part.quantity} />
           <DetailRow
             label="Giá bán"
-            value={part.price?.toLocaleString() + "₫"}
+            value={part.price?.toLocaleString("vi-VN", {
+              style: "currency",
+              currency: "VND",
+            })}
           />
           <DetailRow
             label="Giá nhập"
-            value={part.buyPrice?.toLocaleString() + "₫"}
+            value={part.buyPrice?.toLocaleString("vi-VN", {
+              style: "currency",
+              currency: "VND",
+            })}
           />
           <DetailRow
             label="Giá NV"
-            value={part.empPrice?.toLocaleString() + "₫"}
+            value={part.empPrice?.toLocaleString("vi-VN", {
+              style: "currency",
+              currency: "VND",
+            })}
           />
           <DetailRow label="Đơn vị" value={part.unit} />
           <DetailRow label="Tồn kho tối thiểu" value={part.limitStock} />

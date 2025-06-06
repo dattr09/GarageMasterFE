@@ -8,6 +8,33 @@ export default function AuthContainer() {
   const location = useLocation();
   const isRegister = location.pathname === "/register";
 
+  // Animation cho logo
+  const logoVariants = {
+    login: {
+      x: 0,
+      rotate: 0,
+      transition: { type: "spring", stiffness: 60, damping: 14 },
+    },
+    register: {
+      x: 420,
+      rotate: [0, 12, -8, 6, -4, 2, 0],
+      transition: { type: "spring", stiffness: 60, damping: 14 },
+    },
+  };
+
+  const logoVariantsReverse = {
+    login: {
+      x: -420,
+      rotate: [0, -12, 8, -6, 4, -2, 0],
+      transition: { type: "spring", stiffness: 60, damping: 14 },
+    },
+    register: {
+      x: 0,
+      rotate: 0,
+      transition: { type: "spring", stiffness: 60, damping: 14 },
+    },
+  };
+
   return (
     <>
       {/* Nhúng CSS động gradient-x vào đây */}
@@ -28,72 +55,108 @@ export default function AuthContainer() {
         `}
       </style>
       <div className="flex items-center justify-center w-full min-h-screen animate-gradient-x bg-gradient-to-br from-blue-500 via-indigo-200 via-cyan-100 to-blue-200">
-        <div
-          className="relative bg-white/60 backdrop-blur-md rounded-2xl shadow-xl overflow-hidden max-w-4xl min-h-[650px] w-full"
-        >
-          {/* Logo & Slogan động */}
-          <motion.div
-            className="hidden md:flex flex-col items-center justify-center absolute top-0 left-0 h-full w-1/2 z-10
-    bg-gradient-to-br from-blue-500 via-indigo-400 via-cyan-300 to-blue-200
-    animate-gradient-x text-white px-10 py-12"
-            initial={false}
-            animate={{
-              x: isRegister ? "100%" : "0%",
-            }}
-            transition={{ duration: 0.7, ease: "easeInOut" }}
-          >
-            <img
-              src="/Logo_Garage_DatHoangTu.png"
-              alt="GarageMaster Logo"
-              style={{ width: "200px", height: "200px", objectFit: "contain" }}
-              className="mb-6 rounded-full"
-            />
-            <h3 className="text-3xl font-bold mb-3 text-white drop-shadow text-center tracking-wide">
-              GarageMaster
-            </h3>
-            {/* Slogan */}
-            <div className="w-full flex flex-col items-center justify-center mt-2">
-              <span className="block text-base font-semibold text-blue-50 text-center tracking-wide">
-                Xe có khò khè, gọi{" "}
-                <span className="text-yellow-200 font-bold">DatHoangTu</span>
-              </span>
-              <span className="block text-base font-semibold text-blue-50 text-center tracking-wide mt-1">
-                Hoàng tử không cưỡi ngựa, chỉ cưỡi{" "}
-                <span className="text-yellow-200 font-bold">xe ngon</span>!
-              </span>
-            </div>
-          </motion.div>
-          {/* Form động */}
-          <div className="absolute top-0 h-full w-1/2 right-0 md:block hidden z-20">
-            <AnimatePresence mode="wait">
-              {location.pathname === "/login" && (
-                <motion.div
-                  key="login"
-                  initial={{ opacity: 0, x: 100 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -100 }}
-                  transition={{ duration: 0.3, ease: "easeInOut" }}
-                  className="h-full flex items-center"
-                >
-                  <Login />
-                </motion.div>
-              )}
-              {location.pathname === "/register" && (
-                <motion.div
-                  key="register"
-                  initial={{ opacity: 0, x: -100 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 100 }}
-                  transition={{ duration: 0.3, ease: "easeInOut" }}
-                  className="h-full flex items-center"
-                  style={{ position: "absolute", left: "-100%", width: "100%" }}
-                >
-                  <Register />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-          {/* Form động cho mobile */}
+        <div className="relative bg-white/60 backdrop-blur-md rounded-2xl shadow-xl overflow-hidden max-w-4xl min-h-[650px] w-full">
+          {/* Đăng nhập: logo bên trái, form bên phải */}
+          {!isRegister && (
+            <>
+              <motion.div
+                className="hidden md:flex flex-col items-center justify-center absolute top-0 left-0 h-full w-1/2 z-10
+                  bg-gradient-to-br from-blue-500 via-indigo-400 via-cyan-300 to-blue-200
+                  animate-gradient-x text-white px-10 py-12"
+              >
+                <motion.img
+                  src="/Logo_Garage_DatHoangTu.png"
+                  alt="GarageMaster Logo"
+                  style={{ width: "200px", height: "200px", objectFit: "contain" }}
+                  className="mb-6 rounded-full"
+                  initial="register"
+                  animate="login"
+                  variants={logoVariants}
+                />
+                <h3 className="text-3xl font-bold mb-3 text-white drop-shadow text-center tracking-wide">
+                  GarageMaster
+                </h3>
+                {/* Slogan */}
+                <div className="w-full flex flex-col items-center justify-center mt-2">
+                  <span className="block text-base font-semibold text-blue-50 text-center tracking-wide">
+                    Xe có khò khè, gọi{" "}
+                    <span className="text-yellow-200 font-bold">DatHoangTu</span>
+                  </span>
+                  <span className="block text-base font-semibold text-blue-50 text-center tracking-wide mt-1">
+                    Hoàng tử không cưỡi ngựa, chỉ cưỡi{" "}
+                    <span className="text-yellow-200 font-bold">xe ngon</span>!
+                  </span>
+                </div>
+              </motion.div>
+              <div className="absolute top-0 h-full w-1/2 right-0 md:block hidden z-20">
+                <AnimatePresence mode="wait">
+                  {location.pathname === "/login" && (
+                    <motion.div
+                      key="login"
+                      initial={{ opacity: 0, x: 100 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -100 }}
+                      transition={{ duration: 0.5, ease: "easeInOut" }}
+                      className="h-full flex items-center"
+                    >
+                      <Login />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </>
+          )}
+          {/* Đăng ký: logo bên phải, form bên trái */}
+          {isRegister && (
+            <>
+              <motion.div
+                className="hidden md:flex flex-col items-center justify-center absolute top-0 right-0 h-full w-1/2 z-10
+                  bg-gradient-to-br from-blue-500 via-indigo-400 via-cyan-300 to-blue-200
+                  animate-gradient-x text-white px-10 py-12"
+              >
+                <motion.img
+                  src="/Logo_Garage_DatHoangTu1.png"
+                  alt="GarageMaster Logo"
+                  style={{ width: "200px", height: "200px", objectFit: "contain" }}
+                  className="mb-6 rounded-full"
+                  initial="login"
+                  animate="register"
+                  variants={logoVariantsReverse}
+                />
+                <h3 className="text-3xl font-bold mb-3 text-white drop-shadow text-center tracking-wide">
+                  GarageMaster
+                </h3>
+                {/* Slogan */}
+                <div className="w-full flex flex-col items-center justify-center mt-2">
+                  <span className="block text-base font-semibold text-blue-50 text-center tracking-wide">
+                    Xe có khò khè, gọi{" "}
+                    <span className="text-yellow-200 font-bold">DatHoangTu</span>
+                  </span>
+                  <span className="block text-base font-semibold text-blue-50 text-center tracking-wide mt-1">
+                    Hoàng tử không cưỡi ngựa, chỉ cưỡi{" "}
+                    <span className="text-yellow-200 font-bold">xe ngon</span>!
+                  </span>
+                </div>
+              </motion.div>
+              <div className="absolute top-0 h-full w-1/2 left-0 md:block hidden z-20">
+                <AnimatePresence mode="wait">
+                  {location.pathname === "/register" && (
+                    <motion.div
+                      key="register"
+                      initial={{ opacity: 0, x: -100 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 100 }}
+                      transition={{ duration: 0.5, ease: "easeInOut" }}
+                      className="h-full flex items-center"
+                    >
+                      <Register />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </>
+          )}
+          {/* Form động cho mobile giữ nguyên */}
           <div className="md:hidden w-full p-4">
             <AnimatePresence mode="wait">
               {location.pathname === "/login" && (

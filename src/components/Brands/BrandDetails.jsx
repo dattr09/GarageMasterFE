@@ -69,7 +69,10 @@ export default function BrandDetails({ brand, parts, onClose }) {
                       <td className="py-2 px-4 text-center">{part.name}</td>
                       <td className="py-2 px-4 text-center">{part.quantity}</td>
                       <td className="py-2 px-4 text-center">
-                        {part.price?.toLocaleString()}₫
+                        {part.price?.toLocaleString("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        })}
                       </td>
                       <td className="py-2 px-4 text-center">{part.unit}</td>
                     </tr>
