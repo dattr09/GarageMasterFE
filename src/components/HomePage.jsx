@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { AiOutlineDown, AiOutlineUp } from "react-icons/ai";
 import { getAllParts } from "../services/PartsApi";
-import { getAllBrands } from "../services/BrandApi"; // Thêm dòng này
+import { getAllBrands } from "../services/BrandApi";
 
 // Navbar Carousel
 const images = [
@@ -38,7 +38,7 @@ function NavbarCarousel() {
   };
 
   return (
-    <div className="w-full h-[75vh] relative overflow-hidden rounded-xl bg-white">
+    <div className="w-full h-[92vh] relative overflow-hidden rounded-xl bg-white">
       {/* Ảnh nền */}
       {images.map((img, idx) => (
         <img
@@ -103,28 +103,6 @@ function NavbarCarousel() {
   );
 }
 
-// Accessories
-const accessories = [
-  { name: "Lốp xe", img: "/images/acc-tire.png" },
-  { name: "Ắc quy", img: "/images/acc-battery.png" },
-  { name: "Dầu nhớt", img: "/images/acc-oil.png" },
-  { name: "Phanh", img: "/images/acc-brake.png" },
-  { name: "Đèn pha", img: "/images/acc-headlight.png" },
-  { name: "Gương chiếu hậu", img: "/images/acc-mirror.png" },
-  { name: "Bugi", img: "/images/acc-sparkplug.png" },
-  { name: "Lọc gió", img: "/images/acc-airfilter.png" },
-  { name: "Dây curoa", img: "/images/acc-belt.png" },
-  { name: "Má phanh", img: "/images/acc-brakepad.png" },
-  { name: "Còi xe", img: "/images/acc-horn.png" },
-  { name: "Bình xăng", img: "/images/acc-tank.png" },
-  { name: "Lọc dầu", img: "/images/acc-oilfilter.png" },
-  { name: "Cảm biến", img: "/images/acc-sensor.png" },
-  { name: "Bơm xăng", img: "/images/acc-fuelpump.png" },
-  { name: "Dây điện", img: "/images/acc-wire.png" },
-  { name: "Ống xả", img: "/images/acc-exhaust.png" },
-  { name: "/images/acc-windshield.png", img: "/images/acc-windshield.png" },
-];
-
 const ITEMS_PER_ROW = 6;
 const ROWS_DEFAULT = 2;
 const DEFAULT_ITEMS = ITEMS_PER_ROW * ROWS_DEFAULT;
@@ -139,18 +117,19 @@ function Accessories({ parts = [] }) {
   const visibleAccessories = showAll ? categories : categories.slice(0, DEFAULT_ITEMS);
 
   return (
-    <div className="bg-white/80 rounded-xl shadow p-6 relative">
+    <div className="bg-white/80 rounded-xl shadow p-4 relative">
       <h2 className="text-xl font-bold mb-4 text-gray-800">Danh mục phụ tùng</h2>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
         {visibleAccessories.map((item, idx) => (
           <div
             key={idx}
-            className="flex flex-col items-center bg-white rounded-lg shadow hover:shadow-lg p-3 transition"
+            className="flex flex-col items-center bg-white rounded-lg shadow hover:shadow-lg px-1 py-2 transition" // Giảm padding card
+            style={{ minHeight: "auto" }}
           >
             <img
               src={item.img}
               alt={item.name}
-              className="w-14 h-14 object-contain mb-2"
+              className="w-24 h-24 object-contain mb-1"
             />
             <span className="text-sm font-medium text-gray-700 text-center">
               {item.name}
@@ -174,7 +153,6 @@ function Accessories({ parts = [] }) {
 // Featured Products
 function FeaturedProducts({ parts = [], brands = [] }) {
   const PRODUCTS_PER_PAGE = 5;
-  // Lấy 10 sản phẩm đầu tiên làm nổi bật (hoặc tuỳ ý)
   const featuredProducts = parts.slice(0, 10);
   const [page, setPage] = useState(0);
   const totalPages = Math.max(featuredProducts.length - PRODUCTS_PER_PAGE + 1, 1);
@@ -280,7 +258,7 @@ function FeaturedProducts({ parts = [], brands = [] }) {
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
-          minHeight: "400px",
+          minHeight: "550px",
           position: "relative",
         }}
       >

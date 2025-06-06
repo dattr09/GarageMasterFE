@@ -8,14 +8,14 @@ import Swal from "sweetalert2";
 
 export default function PartsList() {
   const [parts, setParts] = useState([]);
-  const [brands, setBrands] = useState([]); // Thêm state này
+  const [brands, setBrands] = useState([]);
   const [search, setSearch] = useState("");
   const [selectedPart, setSelectedPart] = useState(null);
   const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
     getAllParts().then(setParts);
-    getAllBrands().then(setBrands); // Lấy danh sách brands
+    getAllBrands().then(setBrands);
   }, []);
 
   const handleDelete = async (id) => {
@@ -95,7 +95,9 @@ export default function PartsList() {
               )}
               <div className="font-semibold text-blue-900 text-lg mb-1">{part.name}</div>
               <div className="text-gray-700 mb-1">Số lượng: <span className="font-medium">{part.quantity}</span></div>
-              <div className="text-blue-700 font-bold mb-1">{part.price.toLocaleString()}₫</div>
+              <div className="text-blue-700 font-bold mb-1">
+                {part.price.toLocaleString("vi-VN", { style: "currency", currency: "VND" })}
+              </div>
               <div className="text-gray-500 text-sm mb-1">Đơn vị: {part.unit}</div>
               <div className="text-gray-500 text-sm mb-2">Hãng: {getBrandName(part.brandId)}</div>
               <div className="flex gap-2 mt-2">
@@ -148,7 +150,7 @@ export default function PartsList() {
       {selectedPart && (
         <PartDetails
           part={selectedPart}
-          brands={brands} // truyền thêm prop brands
+          brands={brands}
           onClose={() => setSelectedPart(null)}
         />
       )}

@@ -205,17 +205,6 @@ export default function Register() {
                 }
                 placeholder-gray-400`}
             />
-            <motion.span
-              initial={false}
-              animate={{
-                opacity: focusField === "dob" ? 1 : 0,
-                x: focusField === "dob" ? 0 : -10,
-              }}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-500 text-xl pointer-events-none"
-              transition={{ duration: 0.2 }}
-            >
-              <i className="fas fa-calendar-alt"></i>
-            </motion.span>
           </div>
         </motion.div>
         {/* Email */}
