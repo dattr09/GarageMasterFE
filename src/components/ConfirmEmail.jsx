@@ -96,7 +96,7 @@ export default function ConfirmEmail() {
       localStorage.removeItem("pendingPassword");
       setMessage("Xác thực thành công!");
       setTimeout(() => {
-        navigate("/");
+        navigate("/login");
       }, 2000);
     } catch (error) {
       setMessage(error.message || "Xác nhận thất bại.");
