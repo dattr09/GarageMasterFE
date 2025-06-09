@@ -2,42 +2,32 @@ import React from "react";
 
 export default function BrandDetails({ brand, parts, onClose }) {
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-      <div className="bg-white rounded-2xl shadow-2xl p-10 w-full max-w-3xl border border-blue-200">
-        <h3 className="text-2xl font-bold text-blue-700 mb-8 text-center tracking-wide drop-shadow">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-3xl shadow-2xl p-10 w-full max-w-3xl border border-blue-100 relative">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-2xl font-bold transition"
+          title="Đóng"
+          type="button"
+        >
+          ×
+        </button>
+        <h3 className="text-3xl font-extrabold text-blue-700 mb-8 text-center tracking-wide drop-shadow">
           Chi tiết hãng xe
         </h3>
-        {/* Bảng thông tin hãng xe */}
-        <div className="mb-10">
-          <div className="bg-white rounded-xl shadow border border-blue-100 p-6 mb-8">
-            <table className="min-w-full bg-white rounded-lg shadow border">
-              <thead>
-                <tr className="bg-blue-100 text-blue-800">
-                  <th className="py-2 px-4 text-center">Hãng xe</th>
-                  <th className="py-2 px-4 text-center">Ảnh</th>
-                  {/* <th className="py-2 px-4 text-center">ID</th> */}
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td className="py-3 px-4 text-center text-blue-900 text-lg border-b">
-                    {brand.name}
-                  </td>
-                  <td className="py-3 px-4 text-center border-b">
-                    {brand.image && (
-                      <img
-                        src={brand.image}
-                        alt={brand.name}
-                        className="h-14 w-14 object-contain mx-auto"
-                      />
-                    )}
-                  </td>
-                  {/* <td className="py-3 px-4 text-center text-blue-900 text-lg border-b">
-                  {brand.id}
-                </td> */}
-                </tr>
-              </tbody>
-            </table>
+        {/* Thông tin hãng xe */}
+        <div className="flex flex-col items-center mb-10">
+          {brand.image ? (
+            <img
+              src={brand.image}
+              alt={brand.name}
+              className="w-32 h-32 object-contain rounded-2xl border border-blue-100 shadow mx-auto"
+            />
+          ) : (
+            <span className="text-gray-400 italic">Không có ảnh</span>
+          )}
+          <div className="mt-4 text-xl font-semibold text-blue-900">
+            {brand.name}
           </div>
         </div>
         {/* Bảng danh sách linh kiện */}
@@ -85,7 +75,7 @@ export default function BrandDetails({ brand, parts, onClose }) {
         <div className="flex justify-center mt-8">
           <button
             onClick={onClose}
-            className="bg-blue-600 hover:bg-blue-800 text-white font-semibold px-10 py-2 rounded-xl shadow-lg transition text-lg"
+            className="bg-blue-600 hover:bg-blue-800 text-white font-bold px-12 py-3 rounded-2xl shadow-xl transition text-lg tracking-wide"
           >
             Đóng
           </button>
