@@ -78,9 +78,17 @@ export default function AddPartForm({ onClose, onSaved }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-      <div className="bg-white rounded-2xl shadow-2xl p-10 w-full max-w-2xl border border-blue-200">
-        <h3 className="text-2xl font-bold text-blue-700 mb-8 text-center tracking-wide drop-shadow">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-3xl shadow-2xl p-10 w-full max-w-2xl border border-blue-100 relative">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-2xl font-bold transition"
+          title="Đóng"
+          type="button"
+        >
+          ×
+        </button>
+        <h3 className="text-3xl font-extrabold text-blue-700 mb-8 text-center tracking-wide drop-shadow">
           Thêm phụ tùng
         </h3>
         {error && (
@@ -106,7 +114,7 @@ export default function AddPartForm({ onClose, onSaved }) {
               value={form.brandId}
               onChange={handleChange}
               required
-              className="px-4 py-2 border rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="px-4 py-2 border-2 border-gray-200 rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
             >
               <option value="">-- Chọn hãng xe --</option>
               {brands.map((b) => (
@@ -120,16 +128,32 @@ export default function AddPartForm({ onClose, onSaved }) {
               type="file"
               accept="image/*"
               onChange={handleImageChange}
-              className="block w-full text-sm text-gray-500"
+              className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
             />
-            {uploading && <div className="text-blue-500 mt-2">Đang tải ảnh...</div>}
+            {uploading && <div className="text-blue-500 mt-2 animate-pulse">Đang tải ảnh...</div>}
             {form.image && (
-              <img src={form.image} alt="preview" className="w-20 h-20 object-contain rounded shadow mt-2" />
+              <img
+                src={form.image}
+                alt="preview"
+                className="w-32 h-32 object-contain rounded-2xl border border-blue-100 shadow mt-3 mx-auto"
+              />
             )}
           </div>
-          <div className="md:col-span-2 flex gap-6 mt-6 justify-center">
-            <button type="submit" className="bg-blue-600 hover:bg-blue-800 text-white font-semibold px-10 py-2 rounded-xl shadow-lg transition text-lg">Lưu</button>
-            <button type="button" onClick={onClose} className="bg-gray-400 hover:bg-gray-600 text-white font-semibold px-10 py-2 rounded-xl shadow-lg transition text-lg">Hủy</button>
+          <div className="md:col-span-2 flex gap-6 mt-8 justify-center">
+            <button
+              type="submit"
+              className="bg-blue-600 hover:bg-blue-800 text-white font-bold px-12 py-3 rounded-2xl shadow-xl transition text-lg tracking-wide disabled:opacity-60"
+              disabled={uploading}
+            >
+              {uploading ? "Đang lưu..." : "Lưu"}
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="bg-gray-300 hover:bg-gray-500 text-gray-800 font-bold px-12 py-3 rounded-2xl shadow-xl transition text-lg tracking-wide"
+            >
+              Hủy
+            </button>
           </div>
         </form>
       </div>
@@ -143,7 +167,7 @@ function FormInput({ label, ...props }) {
       <label className="block font-semibold mb-1 text-gray-700">{label}</label>
       <input
         {...props}
-        className="px-4 py-2 border rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+        className="px-4 py-2 border-2 border-gray-200 rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
       />
     </div>
   );

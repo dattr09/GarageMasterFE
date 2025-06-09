@@ -74,50 +74,54 @@ export default function PartsList() {
           Thêm mới
         </button>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
         {parts.length === 0 ? (
           <div className="col-span-full text-center text-gray-400 italic py-8">
             Không có phụ tùng nào.
           </div>
         ) : (
           parts.map((part) => (
-            <div key={part.id} className="bg-white rounded-xl shadow p-4 flex flex-col items-center relative">
+            <div
+              key={part.id}
+              className="bg-white rounded-2xl shadow-xl p-5 flex flex-col items-center relative border border-transparent hover:border-blue-400 hover:shadow-2xl hover:scale-105 transition-all duration-200 group"
+              style={{ minHeight: 340 }}
+            >
               {part.image ? (
                 <img
                   src={part.image}
                   alt={part.name}
-                  className="w-24 h-24 object-contain rounded shadow mb-3"
+                  className="w-28 h-28 object-contain rounded-xl shadow mb-4 bg-gray-50 group-hover:scale-110 transition"
                 />
               ) : (
-                <div className="w-24 h-24 flex items-center justify-center bg-gray-100 rounded mb-3 text-gray-400 italic">
+                <div className="w-28 h-28 flex items-center justify-center bg-gray-100 rounded-xl mb-4 text-gray-400 italic">
                   Không có ảnh
                 </div>
               )}
-              <div className="font-semibold text-blue-900 text-lg mb-1">{part.name}</div>
-              <div className="text-gray-700 mb-1">Số lượng: <span className="font-medium">{part.quantity}</span></div>
-              <div className="text-blue-700 font-bold mb-1">
+              <div className="font-bold text-blue-900 text-lg mb-1 text-center">{part.name}</div>
+              <div className="text-gray-700 mb-1 text-center">Số lượng: <span className="font-semibold">{part.quantity}</span></div>
+              <div className="text-blue-700 font-extrabold text-xl mb-1 text-center">
                 {part.price.toLocaleString("vi-VN", { style: "currency", currency: "VND" })}
               </div>
               <div className="text-gray-500 text-sm mb-1">Đơn vị: {part.unit}</div>
-              <div className="text-gray-500 text-sm mb-2">Hãng: {getBrandName(part.brandId)}</div>
-              <div className="flex gap-2 mt-2">
+              <div className="text-gray-500 text-sm mb-2">Hãng: <span className="font-semibold text-blue-600">{getBrandName(part.brandId)}</span></div>
+              <div className="flex gap-2 mt-auto">
                 <button
                   onClick={() => setSelectedPart(part)}
-                  className="bg-blue-500 hover:bg-blue-700 text-white px-3 py-1 rounded transition shadow"
+                  className="bg-blue-500 hover:bg-blue-700 text-white px-3 py-1 rounded-lg transition shadow font-semibold"
                   title="Chi tiết"
                 >
                   Chi tiết
                 </button>
                 <button
                   onClick={() => setShowForm({ type: "edit", part })}
-                  className="bg-yellow-500 hover:bg-yellow-700 text-white px-3 py-1 rounded transition shadow"
+                  className="bg-yellow-500 hover:bg-yellow-700 text-white px-3 py-1 rounded-lg transition shadow font-semibold"
                   title="Sửa"
                 >
                   Sửa
                 </button>
                 <button
                   onClick={() => handleDelete(part.id)}
-                  className="bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded transition shadow"
+                  className="bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded-lg transition shadow font-semibold"
                   title="Xóa"
                 >
                   Xóa

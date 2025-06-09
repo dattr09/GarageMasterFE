@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getAllBrands, createBrand, updateBrand, deleteBrand } from "../../services/BrandApi";
+import { getAllBrands, deleteBrand } from "../../services/BrandApi";
 import { getAllParts } from "../../services/PartsApi";
 import Swal from "sweetalert2";
 import AddBrandForm from "./AddBrandForm";
@@ -13,11 +13,10 @@ export default function BrandList() {
   const [editing, setEditing] = useState(null);
   const [showDetail, setShowDetail] = useState(false);
   const [detailBrand, setDetailBrand] = useState(null);
-  const [error, setError] = useState("");
 
   // Load danh sách brand và parts
   useEffect(() => {
-    getAllBrands().then(setBrands).catch(() => setError("Không tải được danh sách hãng xe"));
+    getAllBrands().then(setBrands).catch(() => { });
     getAllParts().then(setParts);
   }, []);
 
@@ -25,7 +24,6 @@ export default function BrandList() {
   const openForm = (brand = null) => {
     setEditing(brand);
     setShowForm(true);
-    setError("");
   };
 
   // Đóng form
@@ -55,7 +53,6 @@ export default function BrandList() {
     });
     if (result.isConfirmed) {
       await deleteBrand(id);
-      // Gọi lại API để lấy danh sách mới nhất
       const list = await getAllBrands();
       setBrands(list);
       Swal.fire("Đã xóa!", "Hãng xe đã được xóa.", "success");
