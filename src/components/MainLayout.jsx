@@ -4,6 +4,7 @@ import Header from "./Header";
 import Footer from "./Footer";
 import PartsList from "./Parts/PartsList";
 import BrandList from "./Brands/BrandList";
+import CustomerList from "./Customers/CustomerList";
 import HomePage from "./HomePage";
 
 const HEADER_HEIGHT = 64;
@@ -22,6 +23,8 @@ const MainLayout = () => {
           <Route path="/" element={<HomePage />} />
           <Route path="brands" element={<BrandList />} />
           <Route path="parts" element={<PartsList />} />
+          <Route path="customers" element={<CustomerList />} />
+          {/* Add more routes as needed */} 
         </Routes>
         <Outlet />
       </main>
