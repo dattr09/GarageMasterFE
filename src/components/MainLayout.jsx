@@ -1,11 +1,12 @@
 import React from "react";
-import { Outlet, Routes, Route } from "react-router-dom";
+import { Routes, Route, Outlet } from "react-router-dom";
+import HomePage from "./HomePage";
+import BrandList from "./Brands/BrandList";
+import PartsList from "./Parts/PartsList";
+import CustomerList from "./Customers/CustomerList";
+import MotoList from "./Motos/MotoList"; // Thêm import
 import Header from "./Header";
 import Footer from "./Footer";
-import PartsList from "./Parts/PartsList";
-import BrandList from "./Brands/BrandList";
-import CustomerList from "./Customers/CustomerList";
-import HomePage from "./HomePage";
 
 const HEADER_HEIGHT = 64;
 
@@ -24,6 +25,7 @@ const MainLayout = () => {
           <Route path="brands" element={<BrandList />} />
           <Route path="parts" element={<PartsList />} />
           <Route path="customers" element={<CustomerList />} />
+          <Route path="motos" element={<MotoList />} /> {/* Thêm route mới */}
           {/* Add more routes as needed */} 
         </Routes>
         <Outlet />
