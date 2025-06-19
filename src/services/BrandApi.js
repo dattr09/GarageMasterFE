@@ -1,37 +1,62 @@
 const API_URL = "http://localhost:5119/api/brand";
 
 export async function getAllBrands() {
-  const res = await fetch(API_URL);
+  const token = localStorage.getItem("token");
+  const res = await fetch("http://localhost:5119/api/brand", {
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json"
+    }
+  });
   if (!res.ok) throw new Error("Không lấy được danh sách hãng xe");
   return res.json();
 }
 
 export async function createBrand(data) {
+  const token = localStorage.getItem("token");
   const res = await fetch(API_URL, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    },
     body: JSON.stringify(data),
   });
   if (!res.ok) throw new Error("Tạo hãng xe thất bại");
   return res.json();
 }
 
-export async function updateBrand(id, data) {
-  const res = await fetch(`${API_URL}/${id}`, {
+export async function updateBrand(id, brand) {
+  const token = localStorage.getItem("token");
+  const res = await fetch(`http://localhost:5119/api/brand/${id}`, {
     method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(brand)
   });
-  if (!res.ok) throw new Error("Cập nhật hãng xe thất bại");
-  // Không cần return res.json() vì backend trả về 204
-  return;
+  let data = null;
+  if (res.status !== 204) {
+    data = await res.json();
+  }
+  if (!res.ok) throw new Error(data?.message || "Cập nhật hãng xe thất bại");
+  return data;
 }
 
 export async function deleteBrand(id) {
-  const res = await fetch(`${API_URL}/${id}`, {
+  const token = localStorage.getItem("token");
+  const res = await fetch(`http://localhost:5119/api/brand/${id}`, {
     method: "DELETE",
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json"
+    }
   });
-  if (!res.ok) throw new Error("Xóa hãng xe thất bại");
-  // Không cần return res.json() vì backend trả về 204
-  return;
+  let data = null;
+  if (res.status !== 204) {
+    data = await res.json();
+  }
+  if (!res.ok) throw new Error(data?.message || "Xóa hãng xe thất bại");
+  return data;
 }

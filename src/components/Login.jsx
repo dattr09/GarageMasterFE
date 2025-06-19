@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { login } from "../services/api";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+
+const API_BASE_URL = "http://localhost:5119/api/auth";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -14,24 +16,41 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => setMessage(""), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
+
   const handleLogin = async (e) => {
     e.preventDefault();
-    setMessage("");
     setLoading(true);
-
+    setMessage("");
     try {
-      const data = await login({ email, password });
+      const response = await fetch('http://localhost:5119/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        setMessage(data.message || "Đăng nhập thất bại.");
+        setLoading(false);
+        return;
+      }
+
+      localStorage.setItem("token", data.token); // <-- Thêm dòng này
       setMessage(data.message || "Đăng nhập thành công.");
       setToken(data.token);
       localStorage.setItem("token", data.token);
 
-      // ✅ Chuyển sang trang chủ sau khi đăng nhập
-      navigate("/"); // hoặc "/" nếu bạn dùng route mặc định trong MainLayout
+      // Chuyển hướng hoặc reload
+      navigate("/");
     } catch (error) {
-      setMessage(error.message || "Đăng nhập thất bại.");
-      setToken(null);
+      setMessage("Có lỗi xảy ra, vui lòng thử lại.");
     }
-
     setLoading(false);
   };
 
@@ -319,7 +338,7 @@ export default function Login() {
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth="2"
-              d="M13 16h-1v-4h-1m1-4h.01"
+              d="M13 16h-1v-4h-1m-1-4h.01"
             />
           </svg>
           <span className="whitespace-pre-line">{oauthMessage}</span>

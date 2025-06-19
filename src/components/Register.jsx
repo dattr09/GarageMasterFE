@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { register } from "../services/api";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -43,14 +43,18 @@ export default function Register() {
     setPasswordChecks(checkPasswordDetail(value));
   };
 
-  const handleSubmit = async (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
-    setMessage("");
     setLoading(true);
-
+    setMessage("");
     try {
-      const res = await register({ email, password, username, dob });
-      setMessage(res.message || "Đăng ký thành công.");
+      await register({
+        Email: email,
+        Password: password,
+        username,
+        DateOfBirth: dob,
+      });
+      setMessage("Đăng ký thành công! Vui lòng kiểm tra email để xác thực.");
 
       // Sau khi đăng ký thành công:
       localStorage.setItem("pendingEmail", email);
@@ -66,6 +70,13 @@ export default function Register() {
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => setMessage(""), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
 
   return (
     <motion.div
@@ -142,7 +153,7 @@ export default function Register() {
       <h2 className="text-3xl font-extrabold text-blue-800 text-center mb-8 tracking-wide drop-shadow">
         Đăng ký
       </h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleRegister} className="space-y-4">
         {/* Tên người dùng */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

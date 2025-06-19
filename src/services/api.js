@@ -22,6 +22,12 @@ async function apiRequest(
       },
     };
 
+    // Thêm token vào header nếu có
+    const token = localStorage.getItem("token");
+    if (token) {
+      options.headers["Authorization"] = `Bearer ${token}`;
+    }
+
     if (data) {
       options.body = JSON.stringify(data);
     }
@@ -34,7 +40,7 @@ async function apiRequest(
     const result = await response.json();
 
     if (!response.ok) {
-      throw result || { message: "Unknown error occurred" }; // Thêm thông báo lỗi mặc định
+      throw result || { message: "Unknown error occurred" };
     }
 
     return result;

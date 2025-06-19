@@ -75,8 +75,8 @@ export default function ConfirmEmail() {
 
   const handleConfirm = async (e) => {
     e.preventDefault();
-    setMessage("");
     setLoading(true);
+    setMessage("");
     const code = codeArr.join("");
     if (code.length !== CODE_LENGTH) {
       setMessage("Vui lòng nhập đủ mã xác nhận.");
@@ -89,20 +89,25 @@ export default function ConfirmEmail() {
       return;
     }
     try {
-      await confirmEmail({ email, code });
-      const loginRes = await login({ email, password: localStorage.getItem("pendingPassword") });
-      localStorage.setItem("token", loginRes.token);
-      localStorage.removeItem("pendingEmail");
-      localStorage.removeItem("pendingPassword");
-      setMessage("Xác thực thành công!");
-      setTimeout(() => {
-        navigate("/login");
-      }, 2000);
+      const res = await confirmEmail({ email, code });
+      setMessage(res.message || "Xác thực thành công!");
+      if (res.token) {
+        localStorage.setItem("token", res.token);
+        // Chuyển hướng hoặc reload
+        setTimeout(() => navigate("/login"), 1500);
+      }
     } catch (error) {
       setMessage(error.message || "Xác nhận thất bại.");
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => setMessage(""), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
 
   return (
     <motion.div

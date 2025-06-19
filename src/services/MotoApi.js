@@ -2,7 +2,13 @@ const API_URL = "http://localhost:5119/api/motos";
 
 // Lấy tất cả xe
 export async function getAllMotos() {
-  const res = await fetch(API_URL);
+  const token = localStorage.getItem("token");
+  const res = await fetch("http://localhost:5119/api/motos", {
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json"
+    }
+  });
   if (!res.ok) throw new Error("Không lấy được danh sách xe");
   return res.json();
 }
@@ -16,9 +22,13 @@ export async function getMotoById(licensePlate) {
 
 // Thêm xe mới
 export async function createMoto(data) {
+  const token = localStorage.getItem("token");
   const res = await fetch(API_URL, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    },
     body: JSON.stringify(data),
   });
   if (!res.ok) throw new Error("Thêm xe thất bại");
@@ -26,27 +36,38 @@ export async function createMoto(data) {
 }
 
 // Sửa xe
-export async function updateMoto(licensePlate, data) {
-  const res = await fetch(`${API_URL}/${licensePlate}`, {
+export async function updateMoto(licensePlate, moto) {
+  const token = localStorage.getItem("token");
+  const res = await fetch(`http://localhost:5119/api/motos/${licensePlate}`, {
     method: "PUT",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
     },
-    body: JSON.stringify(data)
+    body: JSON.stringify(moto)
   });
-
-  if (!res.ok) {
-    throw new Error("Cập nhật xe thất bại");
+  let data = null;
+  if (res.status !== 204) {
+    data = await res.json();
   }
-
-  // Kiểm tra nếu response không rỗng thì mới parse JSON
-  const text = await res.text();
-  return text ? JSON.parse(text) : null;
+  if (!res.ok) throw new Error(data?.message || "Cập nhật xe thất bại");
+  return data;
 }
 
 // Xóa xe
 export async function deleteMoto(licensePlate) {
-  const res = await fetch(`${API_URL}/${licensePlate}`, { method: "DELETE" });
-  if (!res.ok) throw new Error("Xóa xe thất bại");
-  return true;
+  const token = localStorage.getItem("token");
+  const res = await fetch(`http://localhost:5119/api/motos/${licensePlate}`, {
+    method: "DELETE",
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json"
+    }
+  });
+  let data = null;
+  if (res.status !== 204) {
+    data = await res.json();
+  }
+  if (!res.ok) throw new Error(data?.message || "Xóa xe thất bại");
+  return data;
 }

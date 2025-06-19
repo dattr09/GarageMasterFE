@@ -26,14 +26,17 @@ export default function MotoDetails({ moto, brands, customers, onClose }) {
         </h3>
         <div className="grid grid-cols-1 gap-4 text-gray-700 text-base">
           <DetailRow label="Biển số" value={moto.licensePlate} />
-          <DetailRow label="Model" value={moto.model} />
+          <DetailRow label="Tên Xe" value={moto.model} />
           <DetailRow label="Hãng xe" value={getBrandName(moto.brandId)} />
           <DetailRow label="Chủ xe" value={getCustomerName(moto.customerId)} />
           <DetailRow
             label="Ngày gửi"
             value={new Date(moto.dateOfSent).toLocaleDateString("vi-VN")}
           />
-          <DetailRow label="Ghi chú" value={moto.notes || "Không có"} />
+          <DetailRow
+            label="Ghi chú"
+            value={moto.notes && moto.notes.trim() !== "" ? moto.notes : "Không có"}
+          />
         </div>
         <div className="flex justify-center mt-8">
           <button
