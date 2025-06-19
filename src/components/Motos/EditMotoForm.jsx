@@ -65,11 +65,11 @@ export default function EditMotoForm({ moto, brands, customers, onClose, onSaved
               name="licensePlate"
               value={form.licensePlate}
               disabled
-              className="px-4 py-2 border-2 border-gray-200 rounded-xl w-full bg-gray-100"
+              className="px-4 py-2 border-2 border-gray-200 rounded-xl w-full focus:ring-2 focus:ring-blue-400"
             />
           </div>
           <div>
-            <label className="block font-semibold mb-1 text-gray-700">Model</label>
+            <label className="block font-semibold mb-1 text-gray-700">Tên Xe</label>
             <input
               name="model"
               value={form.model}

@@ -24,7 +24,15 @@ export default function AddMotoForm({ brands, customers, onClose, onSaved }) {
       return;
     }
     try {
-      await createMoto(form);
+      // Chuyển đổi tên trường sang PascalCase nếu backend yêu cầu
+      await createMoto({
+        LicensePlate: form.licensePlate,
+        Model: form.model,
+        BrandId: form.brandId,
+        CustomerId: form.customerId,
+        DateOfSent: form.dateOfSent,
+        Notes: form.notes
+      });
       onSaved();
     } catch (err) {
       setError(err.message || "Có lỗi xảy ra!");
@@ -59,7 +67,7 @@ export default function AddMotoForm({ brands, customers, onClose, onSaved }) {
             />
           </div>
           <div>
-            <label className="block font-semibold mb-1 text-gray-700">Model</label>
+            <label className="block font-semibold mb-1 text-gray-700">Tên xe</label>
             <input
               name="model"
               value={form.model}

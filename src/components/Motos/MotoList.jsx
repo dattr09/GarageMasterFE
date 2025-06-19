@@ -118,7 +118,7 @@ export default function MotoList() {
             <thead>
               <tr className="bg-gray-100">
                 <th className="py-3 px-4 text-left">Biển số</th>
-                <th className="py-3 px-4 text-left">Model</th>
+                <th className="py-3 px-4 text-left">Tên Xe</th>
                 <th className="py-3 px-4 text-left">Hãng xe</th>
                 <th className="py-3 px-4 text-left">Chủ xe</th>
                 <th className="py-3 px-4 text-left">Ngày gửi</th>
