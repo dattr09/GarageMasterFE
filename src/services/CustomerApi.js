@@ -54,7 +54,7 @@ export async function updateCustomer(id, customer) {
     body: JSON.stringify({
       userId: customer.userId,
       name: customer.name,
-      email: customer.email,  // thêm dòng này
+      email: customer.email,
       phone: customer.phone,
       address: customer.address
     })

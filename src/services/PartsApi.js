@@ -75,12 +75,3 @@ export async function deletePart(id) {
   if (!res.ok) throw new Error(data?.message || "Xóa phụ tùng thất bại");
   return data;
 }
-
-const token = localStorage.getItem("token");
-const res = await fetch(API_URL, {
-  method: "GET", // hoặc "POST", "PUT", "DELETE"
-  headers: {
-    "Authorization": `Bearer ${token}`,
-    "Content-Type": "application/json"
-  }
-});

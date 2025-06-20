@@ -31,9 +31,17 @@ export default function CustomerAdd({ onClose, onSaved }) {
       return;
     }
     try {
+      console.log({
+        userId,
+        name: form.name,
+        email: form.email,
+        phone: form.phone,
+        address: form.address,
+      });
       await createCustomer({
         userId,
         name: form.name,
+        email: form.email,
         phone: form.phone,
         address: form.address,
       });

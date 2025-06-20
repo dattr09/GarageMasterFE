@@ -27,8 +27,9 @@ export default function CustomerEdit({ customer, onClose, onSaved }) {
       const userId = userInfo?.id || userInfo?._id;
 
       await updateCustomer(customer.id, {
-        userId, // phải có
+        userId,
         name: form.name,
+        email: form.email,
         phone: form.phone,
         address: form.address
       });
