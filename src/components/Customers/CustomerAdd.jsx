@@ -23,8 +23,20 @@ export default function CustomerAdd({ onClose, onSaved }) {
       setError("Vui lòng nhập đầy đủ tên và email!");
       return;
     }
+    // Lấy userInfo từ localStorage
+    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+    const userId = userInfo?.id || userInfo?._id;
+    if (!userId) {
+      setError("Không tìm thấy userId. Vui lòng đăng nhập lại!");
+      return;
+    }
     try {
-      await createCustomer(form);
+      await createCustomer({
+        userId,
+        name: form.name,
+        phone: form.phone,
+        address: form.address,
+      });
       onSaved();
     } catch (err) {
       setError(err.message || "Có lỗi xảy ra!");
