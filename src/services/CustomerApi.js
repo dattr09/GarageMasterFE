@@ -24,13 +24,19 @@ export async function getCustomerById(id) {
 // Thêm khách hàng mới
 export async function createCustomer(data) {
   const token = localStorage.getItem("token");
-  const res = await fetch(API_URL, {
+  const res = await fetch("http://localhost:5119/api/customers", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       "Authorization": `Bearer ${token}`
     },
-    body: JSON.stringify(data),
+    body: JSON.stringify({
+      userId: data.userId,
+      name: data.name,
+      email: data.email,      // thêm dòng này
+      phone: data.phone,
+      address: data.address
+    })
   });
   if (!res.ok) throw new Error("Thêm khách hàng thất bại");
   return res.json();
@@ -45,11 +51,17 @@ export async function updateCustomer(id, customer) {
       "Content-Type": "application/json",
       "Authorization": `Bearer ${token}`
     },
-    body: JSON.stringify(customer)
+    body: JSON.stringify({
+      userId: customer.userId,
+      name: customer.name,
+      email: customer.email,
+      phone: customer.phone,
+      address: customer.address
+    })
   });
 
   let data = null;
-  if (res.status !== 204) { // 204 là No Content
+  if (res.status !== 204) {
     data = await res.json();
   }
 

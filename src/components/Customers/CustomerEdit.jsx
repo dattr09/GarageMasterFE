@@ -22,7 +22,17 @@ export default function CustomerEdit({ customer, onClose, onSaved }) {
       return;
     }
     try {
-      await updateCustomer(customer.id, form);
+      // Lấy userInfo từ localStorage
+      const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+      const userId = userInfo?.id || userInfo?._id;
+
+      await updateCustomer(customer.id, {
+        userId,
+        name: form.name,
+        email: form.email,
+        phone: form.phone,
+        address: form.address
+      });
       onSaved();
     } catch (err) {
       setError(err.message || "Có lỗi xảy ra!");
