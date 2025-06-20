@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { confirmEmail, login } from "../services/api";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 
 const CODE_LENGTH = 6;
@@ -14,15 +14,25 @@ export default function ConfirmEmail() {
   const [secondsLeft, setSecondsLeft] = useState(EXPIRE_SECONDS);
   const inputRefs = useRef([]);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
-    const savedEmail = localStorage.getItem("pendingEmail");
-    if (savedEmail) {
-      setEmail(savedEmail);
+    // Ưu tiên lấy email từ query string
+    const params = new URLSearchParams(location.search);
+    const queryEmail = params.get("email");
+    if (queryEmail) {
+      setEmail(queryEmail);
+      localStorage.setItem("pendingEmail", queryEmail); // Lưu lại để dự phòng
     } else {
-      setMessage("Không tìm thấy email cần xác nhận.");
+      // Nếu không có, lấy từ localStorage
+      const savedEmail = localStorage.getItem("pendingEmail");
+      if (savedEmail) {
+        setEmail(savedEmail);
+      } else {
+        setMessage("Không tìm thấy email cần xác nhận.");
+      }
     }
-  }, []);
+  }, [location.search]);
 
   // Đếm ngược thời gian
   useEffect(() => {
@@ -93,7 +103,7 @@ export default function ConfirmEmail() {
       setMessage(res.message || "Xác thực thành công!");
       if (res.token) {
         localStorage.setItem("token", res.token);
-        // Chuyển hướng hoặc reload
+        localStorage.removeItem("pendingEmail"); // Xóa email đã xác nhận
         setTimeout(() => navigate("/login"), 1500);
       }
     } catch (error) {
