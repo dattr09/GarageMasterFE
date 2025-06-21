@@ -19,7 +19,7 @@ const HEADER_HEIGHT = 64;
 
 const MainLayout = () => {
   return (
-    <div className="main-layout animated-gradient flex flex-col min-h-screen">
+    <div className="main-layout bg-gradient-to-tr from-blue-200 via-white to-blue-100 flex flex-col min-h-screen">
       <div
         className="fixed top-0 left-0 w-full z-50 bg-white/80 shadow"
         style={{ height: HEADER_HEIGHT }}

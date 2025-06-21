@@ -6,6 +6,13 @@ import Swal from "sweetalert2";
 import AddMotoForm from "./AddMotoForm";
 import EditMotoForm from "./EditMotoForm";
 import MotoDetails from "./MotoDetails";
+import {
+  Eye,
+  Pencil,
+  Trash2,
+  PlusCircle,
+  Info,
+} from "lucide-react";
 
 export default function MotoList() {
   const [motos, setMotos] = useState([]);
@@ -32,7 +39,6 @@ export default function MotoList() {
       setBrands(brandsData);
       setCustomers(customersData);
     } catch (error) {
-      console.error("Error fetching data:", error);
       Swal.fire("Lỗi!", "Không thể tải dữ liệu", "error");
     }
   };
@@ -59,19 +65,6 @@ export default function MotoList() {
     }
   };
 
-  const handleSearch = () => {
-    if (!search.trim()) {
-      fetchData();
-      return;
-    }
-    const filtered = motos.filter(
-      (m) =>
-        m.licensePlate.toLowerCase().includes(search.toLowerCase()) ||
-        m.model.toLowerCase().includes(search.toLowerCase())
-    );
-    setMotos(filtered);
-  };
-
   const getBrandName = (brandId) => {
     const brand = brands.find((b) => b.id === brandId);
     return brand ? brand.name : "N/A";
@@ -82,97 +75,109 @@ export default function MotoList() {
     return customer ? customer.name : "N/A";
   };
 
+  // Lọc danh sách theo biển số hoặc tên chủ xe
+  const filteredMotos = motos.filter((moto) => {
+    const customerName = getCustomerName(moto.customerId);
+    return (
+      moto.licensePlate.toLowerCase().includes(search.toLowerCase()) ||
+      customerName.toLowerCase().includes(search.toLowerCase())
+    );
+  });
+
   return (
-    <div className="max-w-6xl mx-auto p-6">
-      <div className="bg-white rounded-3xl shadow-xl p-8">
-        <h2 className="text-3xl font-extrabold text-blue-700 mb-8 text-center tracking-wide drop-shadow">
-          Quản lý xe máy
-        </h2>
+    <div className="max-w-5xl mx-auto bg-white rounded-xl shadow-xl p-6 mt-6 animate-fade-in">
+      <h2 className="text-3xl font-extrabold text-center text-blue-800 mb-6 drop-shadow-md">
+        🛵 Danh sách xe máy
+      </h2>
 
-        <div className="flex flex-col md:flex-row gap-4 mb-6">
-          <input
-            className="flex-1 px-4 py-2 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
-            placeholder="Tìm theo biển số..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-          <button
-            onClick={handleSearch}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl shadow transition"
-          >
-            Tìm kiếm
-          </button>
-          <button
-            onClick={() => {
-              setEditing(null);
-              setShowForm(true);
-            }}
-            className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-xl shadow transition"
-          >
-            Thêm mới
-          </button>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white rounded-xl shadow">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="py-3 px-4 text-left">Biển số</th>
-                <th className="py-3 px-4 text-left">Tên Xe</th>
-                <th className="py-3 px-4 text-left">Hãng xe</th>
-                <th className="py-3 px-4 text-left">Chủ xe</th>
-                <th className="py-3 px-4 text-left">Ngày gửi</th>
-                <th className="py-3 px-4 text-center">Thao tác</th>
-              </tr>
-            </thead>
-            <tbody>
-              {motos.map((moto, index) => (
-                <tr
-                  key={moto.licensePlate}
-                  className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
-                >
-                  <td className="py-2 px-4">{moto.licensePlate}</td>
-                  <td className="py-2 px-4">{moto.model}</td>
-                  <td className="py-2 px-4">{getBrandName(moto.brandId)}</td>
-                  <td className="py-2 px-4">{getCustomerName(moto.customerId)}</td>
-                  <td className="py-2 px-4">
-                    {new Date(moto.dateOfSent).toLocaleDateString("vi-VN")}
-                  </td>
-                  <td className="py-2 px-4">
-                    <div className="flex justify-center gap-2">
-                      <button
-                        onClick={() => {
-                          setDetailMoto(moto);
-                          setShowDetail(true);
-                        }}
-                        className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded"
-                      >
-                        Chi tiết
-                      </button>
-                      <button
-                        onClick={() => {
-                          setEditing(moto);
-                          setShowForm(true);
-                        }}
-                        className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded"
-                      >
-                        Sửa
-                      </button>
-                      <button
-                        onClick={() => handleDelete(moto.licensePlate)}
-                        className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
-                      >
-                        Xóa
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+      <div className="flex flex-col sm:flex-row gap-3 items-center justify-between mb-6">
+        <input
+          type="text"
+          className="flex-1 px-4 py-2 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+          placeholder="Tìm theo biển số hoặc chủ xe..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <button
+          onClick={() => {
+            setEditing(null);
+            setShowForm(true);
+          }}
+          className="flex items-center gap-2 bg-green-600 hover:bg-green-800 text-white font-bold px-4 py-2 rounded-xl transition shadow"
+        >
+          <PlusCircle size={20} /> Thêm mới
+        </button>
       </div>
 
+      <div className="overflow-x-auto rounded-xl border border-gray-200 shadow">
+        <table className="min-w-full divide-y divide-gray-200 text-sm text-gray-700">
+          <thead className="bg-blue-100 text-blue-900">
+            <tr>
+              <th className="px-6 py-3 text-center font-semibold">Biển số</th>
+              <th className="px-6 py-3 text-center font-semibold">Tên xe</th>
+              <th className="px-6 py-3 text-center font-semibold">Hãng xe</th>
+              <th className="px-6 py-3 text-center font-semibold">Chủ xe</th>
+              <th className="px-6 py-3 text-center font-semibold">Ngày gửi</th>
+              <th className="px-6 py-3 text-center font-semibold">Thao tác</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredMotos.length > 0 ? (
+              filteredMotos.map((moto, idx) => (
+                <tr
+                  key={moto.licensePlate}
+                  className={`transition ${idx % 2 === 0 ? "bg-white" : "bg-blue-50"} hover:bg-blue-100`}
+                >
+                  <td className="px-6 py-4 text-center">{moto.licensePlate}</td>
+                  <td className="px-6 py-4 text-center">{moto.model}</td>
+                  <td className="px-6 py-4 text-center">{getBrandName(moto.brandId)}</td>
+                  <td className="px-6 py-4 text-center">{getCustomerName(moto.customerId)}</td>
+                  <td className="px-6 py-4 text-center">
+                    {new Date(moto.dateOfSent).toLocaleDateString("vi-VN")}
+                  </td>
+                  <td className="px-6 py-4 text-center flex flex-wrap justify-center gap-2">
+                    <button
+                      onClick={() => {
+                        setDetailMoto(moto);
+                        setShowDetail(true);
+                      }}
+                      className="flex items-center gap-1 bg-blue-500 hover:bg-blue-700 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
+                      title="Chi tiết"
+                    >
+                      <Info size={16} /> Chi tiết
+                    </button>
+                    <button
+                      onClick={() => {
+                        setEditing(moto);
+                        setShowForm(true);
+                      }}
+                      className="flex items-center gap-1 bg-yellow-400 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
+                      title="Sửa"
+                    >
+                      <Pencil size={16} /> Sửa
+                    </button>
+                    <button
+                      onClick={() => handleDelete(moto.licensePlate)}
+                      className="flex items-center gap-1 bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
+                      title="Xóa"
+                    >
+                      <Trash2 size={16} /> Xóa
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={6} className="text-center py-6 text-gray-400 italic">
+                  Không có xe máy nào.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Form Thêm/Sửa */}
       {showForm &&
         (editing ? (
           <EditMotoForm
@@ -197,6 +202,7 @@ export default function MotoList() {
           />
         ))}
 
+      {/* Chi tiết xe */}
       {showDetail && detailMoto && (
         <MotoDetails
           moto={detailMoto}

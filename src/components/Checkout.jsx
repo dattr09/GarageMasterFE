@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createOrder } from "../services/OrderApi";
+import { ShoppingBag, Mail, Phone, MapPin, StickyNote, User } from "lucide-react";
 
 export default function Checkout() {
   const navigate = useNavigate();
@@ -9,15 +10,13 @@ export default function Checkout() {
     phone: "",
     address: "",
     note: "",
+    email: "",
   });
   const [cart, setCart] = useState([]);
 
   useEffect(() => {
-    // Lấy user từ localStorage
     const userStr = localStorage.getItem("user");
-    let name = "";
-    let email = "";
-    let phone = "";
+    let name = "", email = "", phone = "";
     if (userStr) {
       try {
         const user = JSON.parse(userStr);
@@ -26,14 +25,8 @@ export default function Checkout() {
         phone = user.phone || "";
       } catch { }
     }
-    setInfo(info => ({
-      ...info,
-      name: name,
-      phone: phone,
-      email: email
-    }));
+    setInfo((info) => ({ ...info, name, phone, email }));
 
-    // Lấy giỏ hàng
     const data = JSON.parse(localStorage.getItem("cart") || "[]");
     setCart(data);
   }, []);
@@ -44,9 +37,7 @@ export default function Checkout() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // KHÔNG cần kiểm tra userId ở đây nữa
     const userId = localStorage.getItem("userId");
-    const token = localStorage.getItem("token");
     const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const order = {
       userId,
@@ -57,7 +48,6 @@ export default function Checkout() {
       items: cart,
       total,
     };
-    console.log("Order gửi lên:", order);
     try {
       const res = await createOrder(order);
       localStorage.removeItem("cart");
@@ -69,107 +59,91 @@ export default function Checkout() {
     }
   };
 
-  // Tính tổng tiền
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   return (
-    <div className="max-w-5xl mx-auto mt-8 flex flex-col md:flex-row gap-8">
-      {/* Form nhập thông tin */}
-      <div className="flex-1 bg-white rounded-2xl shadow-xl p-8">
-        <h2 className="text-2xl font-bold text-blue-800 mb-6 text-center drop-shadow">Thông tin giao hàng</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block font-semibold mb-1">Họ tên</label>
-            <input
-              name="name"
-              value={info.name}
-              onChange={handleChange}
-              required
-              className="w-full border rounded px-3 py-2"
-              placeholder="Nhập họ tên"
-            />
-          </div>
-          <div>
-            <label className="block font-semibold mb-1">Số điện thoại</label>
-            <input
-              name="phone"
-              value={info.phone}
-              onChange={handleChange}
-              required
-              className="w-full border rounded px-3 py-2"
-              placeholder="Nhập số điện thoại"
-            />
-          </div>
-          <div>
-            <label className="block font-semibold mb-1">Địa chỉ giao hàng</label>
-            <input
-              name="address"
-              value={info.address}
-              onChange={handleChange}
-              required
-              className="w-full border rounded px-3 py-2"
-              placeholder="Nhập địa chỉ"
-            />
-          </div>
-          <div>
-            <label className="block font-semibold mb-1">Ghi chú (nếu có)</label>
+    <div className="max-w-6xl mx-auto mt-12 px-4 md:px-6 lg:px-8 flex flex-col md:flex-row gap-10 animate-fade-in">
+      {/* FORM */}
+      <div className="flex-1 bg-white rounded-3xl shadow-lg p-10">
+        <h2 className="text-3xl font-extrabold text-blue-700 mb-8 text-center drop-shadow flex items-center justify-center gap-2">
+          <ShoppingBag className="w-8 h-8" />
+          Thông tin giao hàng
+        </h2>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {[
+            { icon: <User />, name: "name", placeholder: "Họ tên" },
+            { icon: <Phone />, name: "phone", placeholder: "Số điện thoại" },
+            { icon: <MapPin />, name: "address", placeholder: "Địa chỉ giao hàng" },
+            { icon: <Mail />, name: "email", placeholder: "Email liên hệ", type: "email" },
+          ].map(({ icon, name, placeholder, type }) => (
+            <div key={name} className="relative">
+              <div className="absolute left-3 top-3 text-blue-600">{icon}</div>
+              <input
+                type={type || "text"}
+                name={name}
+                value={info[name]}
+                onChange={handleChange}
+                placeholder={placeholder}
+                required
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-400 outline-none"
+              />
+            </div>
+          ))}
+          <div className="relative">
+            <div className="absolute left-3 top-3 text-blue-600">
+              <StickyNote />
+            </div>
             <textarea
               name="note"
               value={info.note}
               onChange={handleChange}
-              className="w-full border rounded px-3 py-2"
-              placeholder="Ghi chú cho đơn hàng"
-              rows={2}
-            />
-          </div>
-          <div>
-            <label className="block font-semibold mb-1">Email</label>
-            <input
-              name="email"
-              value={info.email || ""}
-              onChange={handleChange}
-              required
-              className="w-full border rounded px-3 py-2"
-              placeholder="Nhập email"
-              type="email"
+              placeholder="Ghi chú đơn hàng (nếu có)"
+              rows={3}
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-400 outline-none"
             />
           </div>
           <button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-800 text-white px-8 py-2 rounded-xl font-bold shadow transition"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-md transition transform hover:scale-105"
           >
             Xác nhận đặt hàng
           </button>
         </form>
       </div>
-      {/* Chi tiết sản phẩm giỏ hàng */}
-      <div className="w-full md:w-96 bg-white rounded-2xl shadow-xl p-6 h-fit">
-        <h3 className="text-xl font-bold text-blue-700 mb-4 text-center">Sản phẩm trong giỏ</h3>
+
+      {/* CART */}
+      <div className="w-full md:w-96 bg-white rounded-3xl shadow-lg p-6 h-fit">
+        <h3 className="text-2xl font-bold text-blue-700 mb-5 text-center flex items-center justify-center gap-2">
+          <ShoppingBag className="w-6 h-6" />
+          Giỏ hàng
+        </h3>
         {cart.length === 0 ? (
-          <div className="text-gray-400 italic text-center">Không có sản phẩm nào.</div>
+          <p className="text-center text-gray-400 italic py-6">Không có sản phẩm nào.</p>
         ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-blue-700 font-bold border-b">
-                <th className="py-1">Tên</th>
-                <th>SL</th>
-                <th>Giá</th>
-              </tr>
-            </thead>
-            <tbody>
-              {cart.map(item => (
-                <tr key={item.id} className="border-b">
-                  <td className="py-1">{item.name}</td>
-                  <td className="text-center">{item.quantity}</td>
-                  <td className="text-right">{(item.price * item.quantity).toLocaleString()} đ</td>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-blue-700 font-semibold border-b">
+                  <th className="py-2 text-left">Sản phẩm</th>
+                  <th className="text-center">SL</th>
+                  <th className="text-right">Tạm tính</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {cart.map((item) => (
+                  <tr key={item.id} className="border-b hover:bg-gray-50 transition">
+                    <td className="py-2">{item.name}</td>
+                    <td className="text-center">{item.quantity}</td>
+                    <td className="text-right">{(item.price * item.quantity).toLocaleString()} đ</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <div className="text-right font-bold text-blue-800 mt-4 text-lg">
+              Tổng cộng: {total.toLocaleString()} đ
+            </div>
+          </div>
         )}
-        <div className="text-right font-bold text-blue-700 mt-4">
-          Tổng: {total.toLocaleString()} đ
-        </div>
       </div>
     </div>
   );

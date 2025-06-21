@@ -1,10 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { getAllParts, deletePart, searchPartsByName } from "../../services/PartsApi";
+import {
+  getAllParts,
+  deletePart,
+} from "../../services/PartsApi";
 import { getAllBrands } from "../../services/BrandApi";
 import AddPartForm from "./AddPartForm";
 import EditPartForm from "./EditPartForm";
 import PartDetails from "./PartDetails";
 import Swal from "sweetalert2";
+import {
+  Trash2,
+  Pencil,
+  ShoppingCart,
+  PlusCircle,
+} from "lucide-react";
 
 export default function PartsList() {
   const [parts, setParts] = useState([]);
@@ -12,6 +21,19 @@ export default function PartsList() {
   const [search, setSearch] = useState("");
   const [selectedPart, setSelectedPart] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [sortPrice, setSortPrice] = useState(""); // "", "asc", "desc"
+  const [brandFilter, setBrandFilter] = useState(""); // "" hoặc id hãng
+
+  // Animation style
+  const fadeInStyle = `
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: scale(0.98);}
+      100% { opacity: 1; transform: scale(1);}
+    }
+    .animate-fade-in {
+      animation: fadeIn 0.6s ease-in-out;
+    }
+  `;
 
   useEffect(() => {
     getAllParts().then(setParts);
@@ -36,16 +58,6 @@ export default function PartsList() {
     }
   };
 
-  const handleSearch = async () => {
-    if (search.trim() === "") {
-      getAllParts().then(setParts);
-    } else {
-      const result = await searchPartsByName(search);
-      setParts(result);
-    }
-  };
-
-  // Hàm lấy tên brand từ id
   const getBrandName = (brandId) => {
     const brand = brands.find((b) => b.id === brandId);
     return brand ? brand.name : brandId;
@@ -53,7 +65,7 @@ export default function PartsList() {
 
   const handleAddToCart = (item) => {
     const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-    const idx = cart.findIndex(i => i.id === item.id);
+    const idx = cart.findIndex((i) => i.id === item.id);
     if (idx >= 0) {
       cart[idx].quantity += 1;
     } else {
@@ -64,121 +76,183 @@ export default function PartsList() {
     alert(`Đã thêm ${item.name} vào giỏ hàng!`);
   };
 
+  // Lọc, tìm kiếm, sắp xếp
+  let filteredParts = [...parts];
+
+  // Search theo tên (tự động)
+  if (search.trim()) {
+    filteredParts = filteredParts.filter((p) =>
+      p.name.toLowerCase().includes(search.trim().toLowerCase())
+    );
+  }
+
+  // Lọc theo hãng
+  if (brandFilter) {
+    filteredParts = filteredParts.filter(
+      (p) => String(p.brandId) === String(brandFilter)
+    );
+  }
+
+  // Sắp xếp theo giá
+  if (sortPrice === "asc") {
+    filteredParts.sort((a, b) => a.price - b.price);
+  } else if (sortPrice === "desc") {
+    filteredParts.sort((a, b) => b.price - a.price);
+  }
+
   return (
-    <div className="max-w-6xl mx-auto bg-white rounded-xl shadow-lg p-8 mt-8">
-      <h2 className="text-2xl font-bold text-blue-800 mb-6 text-center drop-shadow">Danh sách phụ tùng</h2>
-      <div className="flex flex-col md:flex-row items-center gap-4 mb-6">
-        <input
-          className="flex-1 px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
-          placeholder="Tìm theo tên..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-        />
-        <button
-          onClick={handleSearch}
-          className="bg-blue-600 hover:bg-blue-800 text-white font-semibold px-6 py-2 rounded-lg shadow transition"
-        >
-          Tìm
-        </button>
-        <button
-          onClick={() => setShowForm({ type: "add" })}
-          className="bg-green-600 hover:bg-green-800 text-white font-semibold px-6 py-2 rounded-lg shadow transition"
-        >
-          Thêm mới
-        </button>
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-        {parts.length === 0 ? (
-          <div className="col-span-full text-center text-gray-400 italic py-8">
-            Không có phụ tùng nào.
-          </div>
-        ) : (
-          parts.map((part) => (
-            <div
-              key={part.id}
-              className="bg-white rounded-2xl shadow-xl p-5 flex flex-col items-center relative border border-transparent hover:border-blue-400 hover:shadow-2xl hover:scale-105 transition-all duration-200 group"
-              style={{ minHeight: 340 }}
-            >
-              {part.image ? (
-                <img
-                  src={part.image}
-                  alt={part.name}
-                  className="w-28 h-28 object-contain rounded-xl shadow mb-4 bg-gray-50 group-hover:scale-110 transition"
-                />
-              ) : (
-                <div className="w-28 h-28 flex items-center justify-center bg-gray-100 rounded-xl mb-4 text-gray-400 italic">
-                  Không có ảnh
-                </div>
-              )}
-              <div className="font-bold text-blue-900 text-lg mb-1 text-center">{part.name}</div>
-              <div className="text-gray-700 mb-1 text-center">Số lượng: <span className="font-semibold">{part.quantity}</span></div>
-              <div className="text-blue-700 font-extrabold text-xl mb-1 text-center">
-                {part.price.toLocaleString("vi-VN", { style: "currency", currency: "VND" })}
-              </div>
-              <div className="text-gray-500 text-sm mb-1">Đơn vị: {part.unit}</div>
-              <div className="text-gray-500 text-sm mb-2">Hãng: <span className="font-semibold text-blue-600">{getBrandName(part.brandId)}</span></div>
-              <div className="flex gap-2 mt-auto">
-                <button
-                  onClick={() => setSelectedPart(part)}
-                  className="bg-blue-500 hover:bg-blue-700 text-white px-3 py-1 rounded-lg transition shadow font-semibold"
-                  title="Chi tiết"
-                >
-                  Chi tiết
-                </button>
-                <button
-                  onClick={() => setShowForm({ type: "edit", part })}
-                  className="bg-yellow-500 hover:bg-yellow-700 text-white px-3 py-1 rounded-lg transition shadow font-semibold"
-                  title="Sửa"
-                >
-                  Sửa
-                </button>
-                <button
-                  onClick={() => handleDelete(part.id)}
-                  className="bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded-lg transition shadow font-semibold"
-                  title="Xóa"
-                >
-                  Xóa
-                </button>
-                {/* Nút thêm giỏ hàng */}
-                <button
-                  onClick={() => handleAddToCart(part)}
-                  className="bg-green-600 hover:bg-green-800 text-white px-3 py-1 rounded-lg transition shadow font-semibold"
-                  title="Thêm giỏ hàng"
-                >
-                  Thêm giỏ hàng
-                </button>
-              </div>
+    <>
+      <style>{fadeInStyle}</style>
+      <div className="max-w-7xl mx-auto bg-white rounded-xl shadow-xl p-6 mt-6 animate-fade-in">
+        <h2 className="text-3xl font-extrabold text-center text-blue-800 mb-6 drop-shadow-md">
+          🧰 Danh sách phụ tùng
+        </h2>
+
+        <div className="flex flex-col sm:flex-row gap-3 items-center mb-6">
+          <input
+            className="flex-1 px-4 py-2 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+            placeholder="🔍 Tìm theo tên..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <button
+            onClick={() => setShowForm({ type: "add" })}
+            className="flex items-center gap-2 bg-green-600 hover:bg-green-800 text-white font-bold px-4 py-2 rounded-xl transition shadow"
+          >
+            <PlusCircle size={20} /> Thêm mới
+          </button>
+          <select
+            className="border rounded-xl px-3 py-2"
+            value={sortPrice}
+            onChange={(e) => setSortPrice(e.target.value)}
+          >
+            <option value="">Sắp xếp giá</option>
+            <option value="asc">Giá tăng dần</option>
+            <option value="desc">Giá giảm dần</option>
+          </select>
+          <select
+            className="border rounded-xl px-3 py-2"
+            value={brandFilter}
+            onChange={(e) => setBrandFilter(e.target.value)}
+          >
+            <option value="">Tất cả hãng</option>
+            {brands.map((b) => (
+              <option key={b.id} value={b.id}>
+                {b.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {filteredParts.length === 0 ? (
+            <div className="col-span-full text-center text-gray-400 italic py-8">
+              Không có phụ tùng nào.
             </div>
-          ))
+          ) : (
+            filteredParts.map((part) => (
+              <div
+                key={part.id}
+                className="bg-gradient-to-br from-white to-blue-50 rounded-2xl shadow-lg p-5 flex flex-col items-center relative transform transition-all duration-300 hover:scale-105 hover:shadow-2xl group border border-gray-200"
+                style={{ minHeight: 340 }}
+              >
+                {part.image ? (
+                  <img
+                    src={part.image}
+                    alt={part.name}
+                    className="w-28 h-28 object-contain rounded-xl shadow mb-3 bg-white transition-transform duration-200 group-hover:scale-110"
+                  />
+                ) : (
+                  <div className="w-28 h-28 flex items-center justify-center bg-gray-200 rounded-xl mb-3 text-gray-500 italic">
+                    Không có ảnh
+                  </div>
+                )}
+
+                <div
+                  className="font-bold text-lg text-blue-900 mb-1 text-center cursor-pointer hover:underline hover:text-blue-600 transition"
+                  onClick={() => setSelectedPart(part)}
+                >
+                  {part.name}
+                </div>
+
+                <div className="text-gray-700 text-sm mb-1">
+                  Số lượng:{" "}
+                  <span className="font-semibold text-black">
+                    {part.quantity}
+                  </span>
+                </div>
+
+                <div className="text-blue-800 font-bold text-xl mb-1">
+                  {part.price.toLocaleString("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  })}
+                </div>
+
+                <div className="text-sm text-gray-500 mb-1">Đơn vị: {part.unit}</div>
+                <div className="text-sm text-gray-500 mb-2">
+                  Hãng:{" "}
+                  <span className="text-blue-600 font-semibold">
+                    {getBrandName(part.brandId)}
+                  </span>
+                </div>
+
+                <div className="flex gap-2 mt-auto flex-wrap justify-center">
+                  <button
+                    onClick={() => setShowForm({ type: "edit", part })}
+                    className="flex items-center gap-1 bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
+                    title="Sửa"
+                  >
+                    <Pencil size={16} /> Sửa
+                  </button>
+                  <button
+                    onClick={() => handleDelete(part.id)}
+                    className="flex items-center gap-1 bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
+                    title="Xóa"
+                  >
+                    <Trash2 size={16} /> Xóa
+                  </button>
+                  <button
+                    onClick={() => handleAddToCart(part)}
+                    className="flex items-center gap-1 bg-green-600 hover:bg-green-800 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
+                    title="Thêm giỏ hàng"
+                  >
+                    <ShoppingCart size={16} /> Giỏ hàng
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        {showForm &&
+          (showForm.type === "add" ? (
+            <AddPartForm
+              onClose={() => setShowForm(false)}
+              onSaved={() => {
+                getAllParts().then(setParts);
+                setShowForm(false);
+              }}
+            />
+          ) : (
+            <EditPartForm
+              part={showForm.part}
+              onClose={() => setShowForm(false)}
+              onSaved={() => {
+                getAllParts().then(setParts);
+                setShowForm(false);
+              }}
+            />
+          ))}
+
+        {selectedPart && (
+          <PartDetails
+            part={selectedPart}
+            brands={brands}
+            onClose={() => setSelectedPart(null)}
+          />
         )}
       </div>
-      {showForm && (
-        showForm.type === "add" ? (
-          <AddPartForm
-            onClose={() => setShowForm(false)}
-            onSaved={() => {
-              getAllParts().then(setParts);
-              setShowForm(false);
-            }}
-          />
-        ) : (
-          <EditPartForm
-            part={showForm.part}
-            onClose={() => setShowForm(false)}
-            onSaved={() => {
-              getAllParts().then(setParts);
-              setShowForm(false);
-            }}
-          />
-        )
-      )}
-      {selectedPart && (
-        <PartDetails
-          part={selectedPart}
-          brands={brands}
-          onClose={() => setSelectedPart(null)}
-        />
-      )}
-    </div>
+    </>
   );
 }

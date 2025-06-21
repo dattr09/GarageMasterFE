@@ -1,5 +1,13 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useLocation } from "react-router-dom";
+import {
+  User,
+  ClipboardList,
+  CreditCard,
+  Printer,
+  XCircle,
+  DollarSign,
+} from "lucide-react";
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);
@@ -19,43 +27,27 @@ export default function PrintInvoice(props) {
   const [invoice, setInvoice] = useState(null);
   const printRef = useRef();
 
-  useEffect(() => {
-    setSelectedCustomer(customerId || "");
-  }, [customerId]);
-  useEffect(() => {
-    setSelectedOrder(repairOrderId || "");
-  }, [repairOrderId]);
-  useEffect(() => {
-    setSelectedPayment(paymentMethod || "Cash");
-  }, [paymentMethod]);
+  useEffect(() => setSelectedCustomer(customerId || ""), [customerId]);
+  useEffect(() => setSelectedOrder(repairOrderId || ""), [repairOrderId]);
+  useEffect(() => setSelectedPayment(paymentMethod || "Cash"), [paymentMethod]);
 
-  // Lấy danh sách khách hàng
   useEffect(() => {
     const token = localStorage.getItem("token");
     fetch("http://localhost:5119/api/customers", {
-      headers: token ? { "Authorization": `Bearer ${token}` } : {},
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
     })
-      .then(res => {
-        if (res.status === 204) return null;
-        if (!res.ok) throw new Error("Không lấy được danh sách khách hàng");
-        return res.json();
-      })
+      .then(res => (res.status === 204 ? null : res.json()))
       .then(setCustomers)
       .catch(console.error);
   }, []);
 
-  // Lấy danh sách phiếu sửa của khách đã chọn
   useEffect(() => {
     if (selectedCustomer) {
       const token = localStorage.getItem("token");
       fetch(`http://localhost:5119/api/repairorders?customerId=${selectedCustomer}`, {
-        headers: token ? { "Authorization": `Bearer ${token}` } : {},
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
       })
-        .then(res => {
-          if (res.status === 204 || res.status === 404) return [];
-          if (!res.ok) throw new Error("Không lấy được danh sách phiếu sửa");
-          return res.json();
-        })
+        .then(res => (res.status >= 400 ? [] : res.json()))
         .then(data => setRepairOrders((data || []).filter(o => o.status === "Completed")))
         .catch(console.error);
     } else {
@@ -63,21 +55,16 @@ export default function PrintInvoice(props) {
     }
   }, [selectedCustomer]);
 
-  // Lấy danh sách nhân viên
   useEffect(() => {
     const token = localStorage.getItem("token");
     fetch("http://localhost:5119/api/employees", {
-      headers: token ? { "Authorization": `Bearer ${token}` } : {},
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
     })
-      .then(res => {
-        if (!res.ok) throw new Error("Không lấy được danh sách nhân viên");
-        return res.json();
-      })
+      .then(res => res.json())
       .then(setEmployees)
       .catch(console.error);
   }, []);
 
-  // Tạo hóa đơn khi chọn đủ thông tin
   const handleCreateInvoice = async () => {
     if (!selectedCustomer || !selectedOrder) {
       alert("Bạn phải chọn khách hàng và phiếu sửa chữa!");
@@ -89,14 +76,12 @@ export default function PrintInvoice(props) {
       repairOrderId: selectedOrder,
       paymentMethod: selectedPayment,
     };
-    console.log("Dữ liệu gửi lên:", body);
-
     try {
       const res = await fetch("http://localhost:5119/api/invoices", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify(body),
       });
@@ -104,19 +89,16 @@ export default function PrintInvoice(props) {
       if (res.ok) {
         const data = await res.json();
         setInvoice(data);
-        if (props.onCreated) props.onCreated(data); // <-- Đảm bảo dòng này có
+        if (props.onCreated) props.onCreated(data);
       } else {
         const err = await res.text();
-        console.error("Lỗi tạo hóa đơn:", err);
         alert("Tạo hóa đơn thất bại!\n" + err);
       }
     } catch (error) {
-      console.error("Lỗi kết nối:", error);
       alert("Không kết nối được tới server!");
     }
   };
 
-  // In hóa đơn
   const handlePrint = () => {
     if (!invoice) return;
     const printContents = printRef.current.innerHTML;
@@ -127,30 +109,30 @@ export default function PrintInvoice(props) {
   };
 
   const getEmployeeName = (id) => {
-    if (!id || !employees.length) return "Chưa có";
     const emp = employees.find(e => String(e.id) === String(id));
-    if (!emp) return "Không tìm thấy";
-    if (emp.name) return emp.name;
-    if (emp.fullName) return emp.fullName;
-    return `${emp.firstName || ""} ${emp.lastName || ""}`.trim();
+    return emp?.name || emp?.fullName || `${emp?.firstName || ""} ${emp?.lastName || ""}`.trim() || "Không tìm thấy";
   };
 
   return (
-    <div className="max-w-xl mx-auto bg-white rounded-xl shadow-lg p-8 relative">
+    <div className="max-w-xl mx-auto bg-white rounded-3xl shadow-2xl p-8 relative animate-fade-in">
       <button
-        className="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-2xl font-bold transition"
-        onClick={() => props.onCreated && props.onCreated()}
+        className="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition text-2xl"
+        onClick={() => props.onCreated?.()}
         title="Đóng"
-        type="button"
       >
-        ×
+        <XCircle />
       </button>
-      <h2 className="text-2xl font-bold text-blue-800 mb-6 text-center drop-shadow">Tạo/In hóa đơn</h2>
-      <div className="space-y-4">
+      <h2 className="text-2xl font-bold text-blue-800 mb-6 text-center drop-shadow">
+        <ClipboardList className="inline mr-2" /> Tạo/In hóa đơn
+      </h2>
+
+      <div className="space-y-4 text-sm sm:text-base">
         <div>
-          <label className="block font-semibold mb-1">Chọn khách hàng</label>
+          <label className="font-semibold flex items-center gap-2 mb-1">
+            <User size={18} /> Chọn khách hàng
+          </label>
           <select
-            className="w-full border rounded-lg px-3 py-2"
+            className="w-full border rounded-xl px-4 py-2 shadow-sm focus:ring-2 focus:ring-blue-300"
             value={selectedCustomer}
             onChange={e => {
               setSelectedCustomer(e.target.value);
@@ -164,10 +146,13 @@ export default function PrintInvoice(props) {
             ))}
           </select>
         </div>
+
         <div>
-          <label className="block font-semibold mb-1">Chọn phiếu sửa chữa</label>
+          <label className="font-semibold flex items-center gap-2 mb-1">
+            <ClipboardList size={18} /> Chọn phiếu sửa chữa
+          </label>
           <select
-            className="w-full border rounded-lg px-3 py-2"
+            className="w-full border rounded-xl px-4 py-2 shadow-sm focus:ring-2 focus:ring-blue-300"
             value={selectedOrder}
             onChange={e => {
               setSelectedOrder(e.target.value);
@@ -178,15 +163,18 @@ export default function PrintInvoice(props) {
             <option value="">-- Chọn phiếu sửa --</option>
             {repairOrders.map(o => (
               <option key={o.id} value={o.id}>
-                {o.id} - {o.description} ({o.status})
+                {o.id} - {o.description}
               </option>
             ))}
           </select>
         </div>
+
         <div>
-          <label className="block font-semibold mb-1">Hình thức thanh toán</label>
+          <label className="font-semibold flex items-center gap-2 mb-1">
+            <CreditCard size={18} /> Hình thức thanh toán
+          </label>
           <select
-            className="w-full border rounded-lg px-3 py-2"
+            className="w-full border rounded-xl px-4 py-2 shadow-sm focus:ring-2 focus:ring-blue-300"
             value={selectedPayment}
             onChange={e => setSelectedPayment(e.target.value)}
           >
@@ -194,28 +182,36 @@ export default function PrintInvoice(props) {
             <option value="BankTransfer">Chuyển khoản</option>
           </select>
         </div>
+
         <button
-          className="w-full bg-blue-600 hover:bg-blue-800 text-white px-8 py-2 rounded-lg font-bold shadow transition"
+          className="w-full bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white px-6 py-2 rounded-xl font-bold shadow-md transition"
           onClick={handleCreateInvoice}
           disabled={!selectedCustomer || !selectedOrder}
         >
-          Tạo hóa đơn
+          <DollarSign className="inline mr-1" size={18} /> Tạo hóa đơn
         </button>
       </div>
+
       {invoice && (
         <div className="mt-8 border-t pt-6" ref={printRef}>
-          <h3 className="text-xl font-bold text-blue-700 mb-2 text-center">HÓA ĐƠN THANH TOÁN</h3>
-          <div className="mb-2"><b>Mã hóa đơn:</b> {`HD${String(invoice.id).padStart(4, "0")}`}</div>
-          <div className="mb-2"><b>Khách hàng:</b> {invoice.customerName}</div>
-          <div className="mb-2"><b>Nhân viên sửa chữa:</b> {getEmployeeName(invoice.employeeId)}</div> {/* Thêm dòng này */}
-          <div className="mb-2"><b>Ngày tạo:</b> {new Date(invoice.checkOut).toLocaleString("vi-VN")}</div>
-          <div className="mb-2"><b>Phương thức thanh toán:</b> {invoice.paymentMethod === "Cash" ? "Tiền mặt" : "Chuyển khoản"}</div>
-          <div className="mb-2"><b>Tổng tiền:</b> <span className="font-bold text-blue-700">{Number(invoice.totalCost).toLocaleString()} đ</span></div>
+          <h3 className="text-xl font-bold text-blue-700 text-center mb-4">
+            HÓA ĐƠN THANH TOÁN
+          </h3>
+          <div className="grid grid-cols-1 gap-2 text-sm sm:text-base whitespace-nowrap">
+            <div><b>Mã hóa đơn:</b> HD{String(invoice.id).padStart(4, "0")}</div>
+            <div><b>Khách hàng:</b> {invoice.customerName}</div>
+            <div><b>Nhân viên sửa chữa:</b> {getEmployeeName(invoice.employeeId)}</div>
+            <div><b>Ngày tạo:</b> {new Date(invoice.checkOut).toLocaleString("vi-VN")}</div>
+            <div><b>Phương thức thanh toán:</b> {invoice.paymentMethod === "Cash" ? "Tiền mặt" : "Chuyển khoản"}</div>
+            <div>
+              <b>Tổng tiền:</b> <span className="font-bold text-blue-700">{Number(invoice.totalCost).toLocaleString()} đ</span>
+            </div>
+          </div>
           <button
-            className="mt-4 bg-green-600 hover:bg-green-800 text-white px-6 py-2 rounded-lg font-bold shadow transition w-full"
+            className="mt-6 w-full bg-green-600 hover:bg-green-800 text-white px-6 py-2 rounded-xl font-bold shadow-md transition flex items-center justify-center gap-2"
             onClick={handlePrint}
           >
-            In hóa đơn
+            <Printer size={18} /> In hóa đơn
           </button>
         </div>
       )}

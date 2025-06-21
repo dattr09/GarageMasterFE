@@ -1,5 +1,16 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { ShoppingCart, ChevronDown, LogOut } from "lucide-react";
+
+const fadeInUpStyle = `
+@keyframes fadeInUp {
+  0% { opacity: 0; transform: translateY(10px);}
+  100% { opacity: 1; transform: translateY(0);}
+}
+.animate-fade-in-up {
+  animation: fadeInUp 0.4s ease-out both;
+}
+`;
 
 export default function Header() {
   const navigate = useNavigate();
@@ -15,10 +26,9 @@ export default function Header() {
 
   const dropdownRef = useRef(null);
 
-  // Đóng dropdown khi click ra ngoài
   useEffect(() => {
-    function handleClickOutside(event) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+    function handleClickOutside(e) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setOpen(false);
       }
     }
@@ -26,7 +36,6 @@ export default function Header() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Cập nhật số lượng sản phẩm trong giỏ hàng
   useEffect(() => {
     function updateCartCount() {
       const cart = JSON.parse(localStorage.getItem("cart") || "[]");
@@ -34,13 +43,8 @@ export default function Header() {
       setCartCount(count);
     }
     updateCartCount();
-
-    // Lắng nghe sự kiện storage để cập nhật khi tab khác thay đổi giỏ hàng
     window.addEventListener("storage", updateCartCount);
-
-    // Nếu bạn muốn cập nhật realtime khi thêm/xóa sản phẩm, có thể phát custom event và lắng nghe ở đây
     window.addEventListener("cartChanged", updateCartCount);
-
     return () => {
       window.removeEventListener("storage", updateCartCount);
       window.removeEventListener("cartChanged", updateCartCount);
@@ -53,74 +57,226 @@ export default function Header() {
     navigate("/login");
   };
 
+  // Search logic
+  const [search, setSearch] = useState("");
+  const [searchType, setSearchType] = useState("parts");
+  const [suggestions, setSuggestions] = useState([]);
+  const searchInputRef = useRef(null);
+
+  const partsList = ["Nhớt động cơ", "Bugi", "Lốp xe", "Ắc quy", "Phanh đĩa", "Đèn pha", "Lọc gió"];
+  const brandsList = ["Honda", "Yamaha", "Suzuki", "SYM", "Piaggio", "Kawasaki", "Ducati"];
+
+  useEffect(() => {
+    const data = searchType === "parts"
+      ? partsList.filter(item => item.toLowerCase().includes(search.toLowerCase()))
+      : brandsList.filter(item => item.toLowerCase().includes(search.toLowerCase()));
+    setSuggestions(search ? data.slice(0, 5) : []);
+  }, [search, searchType]);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    const route = searchType === "parts" ? "/parts" : "/brands";
+    navigate(`${route}?search=${encodeURIComponent(search)}`);
+    setSearch("");
+    setSuggestions([]);
+    searchInputRef.current?.blur();
+  };
+
   return (
-    <nav className="fixed top-0 left-0 w-full bg-transparent shadow-none z-50 px-8 py-3">
-      <div className="flex items-center justify-between w-full">
-        {/* Trái: Logo + tìm kiếm */}
-        <div className="flex items-center gap-3 flex-shrink-0">
-          <img src="/Logo_Garage_DatHoangTu.png" alt="Logo" className="h-10 w-10" />
-          <input
-            type="text"
-            placeholder="Tìm kiếm..."
-            className="ml-3 px-3 py-1 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-300"
-          />
-        </div>
-        {/* Giữa: Menu */}
-        <div className="flex-1 flex justify-center items-center gap-6">
-          <Link to="/" className="hover:text-blue-600 font-medium text-gray-700">Trang chủ</Link>
-          <Link to="/customers" className="hover:text-blue-600 font-medium text-gray-700">Khách hàng</Link>
-          <Link to="/parts" className="hover:text-blue-600 font-medium text-gray-700">Phụ tùng</Link>
-          <Link to="/brands" className="hover:text-blue-600 font-medium text-gray-700">Hãng xe</Link>
-          <Link to="/motos" className="hover:text-blue-600 font-medium text-gray-700">Quản lý xe</Link>
-          <Link to="/repair-orders" className="hover:text-blue-600 font-medium text-gray-700">Đơn sửa chữa</Link>
-          <Link to="/employees" className="hover:text-blue-600 font-medium text-gray-700">Nhân viên</Link>
-          <Link to="/invoices" className="hover:text-blue-600 font-medium text-gray-700">Hóa đơn</Link>
-        </div>
-        {/* Phải: Giỏ hàng + đăng nhập/đăng xuất */}
-        <div className="flex items-center gap-4 flex-shrink-0">
-          {/* Giỏ hàng */}
-          <Link to="/cart" className="relative group">
-            <span className="sr-only">Giỏ hàng</span>
-            <span className="inline-flex items-center justify-center rounded-full bg-blue-100 group-hover:bg-blue-200 transition p-2">
-              {/* Heroicons shopping-cart */}
-              <svg className="w-6 h-6 text-blue-700" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.35 2.7A1 1 0 007 17h10a1 1 0 00.95-.68L21 13M7 13V6a1 1 0 011-1h5a1 1 0 011 1v7" />
-              </svg>
-              {/* Badge số lượng sản phẩm */}
-              {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full px-1.5 py-0.5 shadow">
-                  {cartCount}
-                </span>
-              )}
-            </span>
-          </Link>
-          {!user ? (
-            <Link to="/login" className="hover:text-blue-600 font-medium text-gray-700">Đăng nhập</Link>
-          ) : (
-            <div className="relative" ref={dropdownRef}>
-              <button
-                onClick={() => setOpen((v) => !v)}
-                className="flex items-center gap-1 text-gray-700 font-semibold hover:text-blue-700 focus:outline-none"
+    <>
+      <style>{fadeInUpStyle}</style>
+      <nav className="fixed top-0 left-0 w-full bg-white shadow-md z-50 px-6 md:px-10 py-3">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          {/* Logo + Search */}
+          <div className="flex items-center gap-4">
+            <Link to="/" className="flex items-center">
+              <img
+                src="/Logo_Garage_DatHoangTu.png"
+                alt="Logo"
+                className="h-10 w-10 rounded-full cursor-pointer"
+                style={{ boxShadow: "none", border: "none" }}
+              />
+            </Link>
+            <form
+              onSubmit={handleSearch}
+              className="relative flex items-center bg-white rounded-xl shadow focus-within:ring-2 focus-within:ring-blue-300"
+              autoComplete="off"
+            >
+              <select
+                value={searchType}
+                onChange={(e) => setSearchType(e.target.value)}
+                className="h-10 px-3 rounded-l-xl bg-blue-50 text-blue-700 font-semibold border-none outline-none focus:ring-0"
+                style={{ minWidth: 110 }}
               >
-                Chào! {user.username || user.name || user.email}
-                <svg className={`w-4 h-4 ml-1 transition-transform ${open ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                <option value="parts">Phụ tùng</option>
+                <option value="brands">Hãng xe</option>
+              </select>
+              <input
+                ref={searchInputRef}
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder={searchType === "parts" ? "Tìm phụ tùng..." : "Tìm hãng xe..."}
+                className="h-10 px-4 pr-10 rounded-r-xl bg-transparent outline-none text-gray-700 w-44 md:w-64"
+              />
+              <button
+                type="submit"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-blue-600 hover:text-blue-800"
+                aria-label="Tìm kiếm"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="M21 21l-3.5-3.5" />
                 </svg>
               </button>
-              {open && (
-                <div className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border border-gray-100 z-50 animate-fade-in">
+              {suggestions.length > 0 && (
+                <ul className="absolute left-0 top-full mt-1 w-full bg-white border border-blue-100 rounded-xl shadow-lg z-50 animate-fade-in-up">
+                  {suggestions.map((item, idx) => (
+                    <li
+                      key={item}
+                      className={`px-4 py-2 cursor-pointer hover:bg-blue-50 ${idx === 0 ? "rounded-t-xl" : ""} ${idx === suggestions.length - 1 ? "rounded-b-xl" : ""}`}
+                      onMouseDown={() => {
+                        setSearch(item);
+                        setSuggestions([]);
+                        setTimeout(() => handleSearch({ preventDefault: () => { } }), 100);
+                      }}
+                    >
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </form>
+          </div>
+
+          {/* Main Menu */}
+          <div className="hidden md:flex gap-6 text-gray-700 font-medium">
+            <Link to="/" className="hover:text-blue-600 transition">Trang chủ</Link>
+            <Link to="/customers" className="hover:text-blue-600 transition">Khách hàng</Link>
+            <Link to="/parts" className="hover:text-blue-600 transition">Phụ tùng</Link>
+
+            {/* Dropmenu Quản lý xe */}
+            <div className="relative">
+              <button
+                type="button"
+                className="flex items-center gap-1 hover:text-blue-600 transition font-medium focus:outline-none whitespace-nowrap"
+                onClick={() => setOpen(open === "car" ? false : "car")}
+              >
+                Quản lý xe
+                <ChevronDown className="w-4 h-4" />
+              </button>
+              {open === "car" && (
+                <div className="absolute left-0 mt-2 min-w-[180px] bg-white border border-gray-100 rounded-xl shadow-lg z-50 animate-fade-in-up">
                   <button
-                    onClick={handleLogout}
-                    className="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 rounded-b-lg font-semibold"
+                    onMouseDown={e => {
+                      e.preventDefault();
+                      setOpen(false);
+                      navigate("/brands");
+                    }}
+                    className="block w-full text-left px-5 py-2 hover:bg-blue-50 rounded-t-xl text-gray-700 hover:text-blue-700 transition whitespace-nowrap"
+                    type="button"
                   >
-                    Đăng xuất
+                    Hãng xe
+                  </button>
+                  <button
+                    onMouseDown={e => {
+                      e.preventDefault();
+                      setOpen(false);
+                      navigate("/motos");
+                    }}
+                    className="block w-full text-left px-5 py-2 hover:bg-blue-50 rounded-b-xl text-gray-700 hover:text-blue-700 transition whitespace-nowrap"
+                    type="button"
+                  >
+                    Quản lý xe
                   </button>
                 </div>
               )}
             </div>
-          )}
+
+            <Link to="/employees" className="hover:text-blue-600 transition whitespace-nowrap">Nhân viên</Link>
+
+            {/* Dropmenu Quản lý dịch vụ */}
+            <div className="relative">
+              <button
+                type="button"
+                className="flex items-center gap-1 hover:text-blue-600 transition font-medium focus:outline-none whitespace-nowrap"
+                onClick={() => setOpen(open === "service" ? false : "service")}
+              >
+                Quản lý dịch vụ
+                <ChevronDown className="w-4 h-4" />
+              </button>
+              {open === "service" && (
+                <div className="absolute left-0 mt-2 min-w-[180px] bg-white border border-gray-100 rounded-xl shadow-lg z-50 animate-fade-in-up">
+                  <button
+                    onMouseDown={e => {
+                      e.preventDefault();
+                      setOpen(false);
+                      navigate("/repair-orders");
+                    }}
+                    className="block w-full text-left px-5 py-2 hover:bg-blue-50 rounded-t-xl text-gray-700 hover:text-blue-700 transition whitespace-nowrap"
+                    type="button"
+                  >
+                    Đơn sửa chữa
+                  </button>
+                  <button
+                    onMouseDown={e => {
+                      e.preventDefault();
+                      setOpen(false);
+                      navigate("/invoices");
+                    }}
+                    className="block w-full text-left px-5 py-2 hover:bg-blue-50 rounded-b-xl text-gray-700 hover:text-blue-700 transition whitespace-nowrap"
+                    type="button"
+                  >
+                    Hóa đơn
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Cart + User */}
+          <div className="flex items-center gap-4">
+            <Link to="/cart" className="relative group">
+              <ShoppingCart className="w-6 h-6 text-blue-700" />
+              {cartCount > 0 && (
+                <span className="absolute -top-1.5 -right-2 bg-red-600 text-white text-xs font-bold rounded-full px-1.5 py-0.5 shadow">
+                  {cartCount}
+                </span>
+              )}
+            </Link>
+
+            {!user ? (
+              <Link to="/login" className="hover:text-blue-600 font-medium text-gray-700">
+                Đăng nhập
+              </Link>
+            ) : (
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => setOpen(open === "user" ? false : "user")}
+                  className="flex items-center gap-1 text-gray-700 font-semibold hover:text-blue-700 focus:outline-none"
+                >
+                  <div className="w-8 h-8 rounded-full bg-blue-200 text-blue-800 font-bold flex items-center justify-center shadow">
+                    {user.username?.[0] || "U"}
+                  </div>
+                  <span>{user.username || user.name || user.email}</span>
+                  <ChevronDown className={`w-4 h-4 transition-transform ${open === "user" ? "rotate-180" : ""}`} />
+                </button>
+                {open === "user" && (
+                  <div className="absolute right-0 mt-2 w-44 bg-white border border-gray-100 rounded-xl shadow-lg z-50 animate-fade-in-up">
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center gap-2 w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 rounded-b-xl font-semibold"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Đăng xuất
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-    </nav>
+      </nav>
+    </>
   );
 }

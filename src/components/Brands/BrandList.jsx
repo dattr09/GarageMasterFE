@@ -5,6 +5,7 @@ import Swal from "sweetalert2";
 import AddBrandForm from "./AddBrandForm";
 import EditBrandForm from "./EditBrandForm";
 import BrandDetails from "./BrandDetails";
+import { PlusCircle, Pencil, Trash2, Info } from "lucide-react";
 
 export default function BrandList() {
   const [brands, setBrands] = useState([]);
@@ -14,32 +15,27 @@ export default function BrandList() {
   const [showDetail, setShowDetail] = useState(false);
   const [detailBrand, setDetailBrand] = useState(null);
 
-  // Load danh sách brand và parts
   useEffect(() => {
     getAllBrands().then(setBrands).catch(() => { });
     getAllParts().then(setParts);
   }, []);
 
-  // Mở form thêm/sửa
   const openForm = (brand = null) => {
     setEditing(brand);
     setShowForm(true);
   };
 
-  // Đóng form
   const closeForm = () => {
     setShowForm(false);
     setEditing(null);
   };
 
-  // Xử lý lưu brand mới hoặc đã sửa
   const handleSaved = async () => {
     const list = await getAllBrands();
     setBrands(list);
     closeForm();
   };
 
-  // Xóa brand với SweetAlert2
   const handleDelete = async (id) => {
     const result = await Swal.fire({
       title: "Bạn chắc chắn muốn xóa hãng xe này?",
@@ -59,43 +55,46 @@ export default function BrandList() {
     }
   };
 
-  // Hiển thị chi tiết hãng xe
   const handleShowDetail = (brand) => {
     setDetailBrand(brand);
     setShowDetail(true);
   };
 
-  // Đóng chi tiết hãng xe
   const closeDetail = () => {
     setShowDetail(false);
     setDetailBrand(null);
   };
 
   return (
-    <div>
-      <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-lg p-8 mt-8">
-        <h2 className="text-2xl font-bold text-blue-800 mb-6 text-center drop-shadow">Danh sách hãng xe</h2>
-        <div className="flex justify-end mb-4">
+    <>
+      <div className="max-w-5xl mx-auto bg-white rounded-xl shadow-xl p-6 mt-6 animate-fade-in">
+        <h2 className="text-3xl font-extrabold text-center text-blue-800 mb-6 drop-shadow-md">
+          🏍️ Danh sách hãng xe
+        </h2>
+
+        <div className="flex flex-col sm:flex-row gap-3 items-center justify-between mb-6">
+          <span className="text-gray-600 text-sm italic">Tổng có {brands.length} hãng xe</span>
           <button
             onClick={() => openForm()}
-            className="bg-green-600 hover:bg-green-800 text-white font-semibold px-6 py-2 rounded-lg shadow transition"
+            className="flex items-center gap-2 bg-green-600 hover:bg-green-800 text-white font-bold px-4 py-2 rounded-xl transition shadow"
           >
-            Thêm mới
+            <PlusCircle size={20} /> Thêm mới
           </button>
         </div>
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white rounded-xl shadow border border-gray-200">
-            <thead>
-              <tr className="bg-gradient-to-r from-blue-200 to-blue-100 text-blue-900">
-                <th className="py-3 px-4 text-center font-bold text-base tracking-wide rounded-tl-xl">Tên hãng xe</th>
-                <th className="py-3 px-4 text-center font-bold text-base tracking-wide">Ảnh</th>
-                <th className="py-3 px-4 text-center font-bold text-base tracking-wide rounded-tr-xl">Thao tác</th>
+
+        <div className="overflow-x-auto rounded-xl border border-gray-200 shadow">
+          <table className="min-w-full divide-y divide-gray-200 text-sm text-gray-700">
+            <thead className="bg-blue-100 text-blue-900">
+              <tr>
+                <th className="px-6 py-3 text-center font-semibold">Tên hãng xe</th>
+                <th className="px-6 py-3 text-center font-semibold">Ảnh</th>
+                <th className="px-6 py-3 text-center font-semibold">Thao tác</th>
               </tr>
             </thead>
             <tbody>
               {brands.length === 0 ? (
                 <tr>
-                  <td colSpan={3} className="py-8 text-center text-gray-400 italic bg-gray-50 rounded-b-xl">
+                  <td colSpan={3} className="text-center py-6 text-gray-400 italic">
                     Không có hãng xe nào.
                   </td>
                 </tr>
@@ -103,35 +102,42 @@ export default function BrandList() {
                 brands.map((brand, idx) => (
                   <tr
                     key={brand.id}
-                    className={`transition ${idx % 2 === 0 ? "bg-white" : "bg-blue-50"} hover:bg-blue-100`}
+                    className={`transition ${idx % 2 === 0 ? "bg-white" : "bg-blue-50"
+                      } hover:bg-blue-100`}
                   >
-                    <td className="py-3 px-4 text-center align-middle font-medium">{brand.name}</td>
-                    <td className="py-3 px-4 text-center">
-                      {brand.image && (
-                        <img src={brand.image} alt={brand.name} className="h-10 w-10 object-contain mx-auto" />
+                    <td className="px-6 py-4 text-center font-medium">{brand.name}</td>
+                    <td className="px-6 py-4 text-center">
+                      {brand.image ? (
+                        <img
+                          src={brand.image}
+                          alt={brand.name}
+                          className="h-10 w-10 object-contain mx-auto"
+                        />
+                      ) : (
+                        <span className="text-gray-400 italic">Không có ảnh</span>
                       )}
                     </td>
-                    <td className="py-3 px-4 flex justify-center items-center gap-2 align-middle">
+                    <td className="px-6 py-4 text-center flex flex-wrap justify-center gap-2">
                       <button
                         onClick={() => handleShowDetail(brand)}
-                        className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-1 rounded-lg shadow font-semibold transition"
+                        className="flex items-center gap-1 bg-blue-500 hover:bg-blue-700 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
                         title="Chi tiết"
                       >
-                        Chi tiết
+                        <Info size={16} /> Chi tiết
                       </button>
                       <button
                         onClick={() => openForm(brand)}
-                        className="bg-yellow-400 hover:bg-yellow-600 text-white px-4 py-1 rounded-lg shadow font-semibold transition"
+                        className="flex items-center gap-1 bg-yellow-400 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
                         title="Sửa"
                       >
-                        Sửa
+                        <Pencil size={16} /> Sửa
                       </button>
                       <button
                         onClick={() => handleDelete(brand.id)}
-                        className="bg-red-500 hover:bg-red-700 text-white px-4 py-1 rounded-lg shadow font-semibold transition"
+                        className="flex items-center gap-1 bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
                         title="Xóa"
                       >
-                        Xóa
+                        <Trash2 size={16} /> Xóa
                       </button>
                     </td>
                   </tr>
@@ -140,22 +146,16 @@ export default function BrandList() {
             </tbody>
           </table>
         </div>
-        {/* Popup Form */}
-        {showForm && (
-          editing ? (
-            <EditBrandForm
-              brand={editing}
-              onClose={closeForm}
-              onSaved={handleSaved}
-            />
+
+        {/* Form Thêm/Sửa */}
+        {showForm &&
+          (editing ? (
+            <EditBrandForm brand={editing} onClose={closeForm} onSaved={handleSaved} />
           ) : (
-            <AddBrandForm
-              onClose={closeForm}
-              onSaved={handleSaved}
-            />
-          )
-        )}
-        {/* Popup Chi tiết */}
+            <AddBrandForm onClose={closeForm} onSaved={handleSaved} />
+          ))}
+
+        {/* Chi tiết hãng */}
         {showDetail && detailBrand && (
           <BrandDetails
             brand={detailBrand}
@@ -164,6 +164,6 @@ export default function BrandList() {
           />
         )}
       </div>
-    </div>
+    </>
   );
 }

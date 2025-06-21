@@ -4,6 +4,7 @@ import { getAllCustomers, deleteCustomer } from "../../services/CustomerApi";
 import CustomerAdd from "./CustomerAdd";
 import CustomerEdit from "./CustomerEdit";
 import CustomerDetails from "./CustomerDetails";
+import { PlusCircle, Pencil, Trash2, Info } from "lucide-react";
 
 export default function CustomerList() {
   const [customers, setCustomers] = useState([]);
@@ -19,7 +20,7 @@ export default function CustomerList() {
 
   const fetchCustomers = async () => {
     const list = await getAllCustomers();
-    setCustomers(list);
+    setCustomers(list.reverse());
   };
 
   const handleDelete = async (id) => {
@@ -39,97 +40,116 @@ export default function CustomerList() {
     }
   };
 
-  // Nếu backend có API search thì import và dùng, nếu không thì filter local:
-  const handleSearch = async () => {
-    if (!search.trim()) {
-      fetchCustomers();
-      return;
-    }
-    // Nếu có API search:
-    // const list = await searchCustomerByName(search);
-    // setCustomers(list);
-
-    // Nếu không có API search:
-    setCustomers(
-      customers.filter((c) =>
-        c.name.toLowerCase().includes(search.trim().toLowerCase())
-      )
-    );
-  };
+  // Sửa lại filteredCustomers để lọc theo search realtime
+  const filteredCustomers = customers.filter((c) => {
+    if (!search.trim()) return true;
+    const nameParts = c.name.trim().toLowerCase().split(" ");
+    const lastName = nameParts[nameParts.length - 1];
+    return lastName.includes(search.trim().toLowerCase());
+  });
 
   return (
-    <div className="max-w-5xl mx-auto bg-white rounded-3xl shadow-2xl p-10 mt-8 border border-blue-100">
-      <h2 className="text-3xl font-extrabold text-blue-700 mb-8 text-center tracking-wide drop-shadow">
-        Danh sách khách hàng
-      </h2>
-      <div className="flex flex-col md:flex-row items-center gap-4 mb-6">
-        <input
-          className="flex-1 px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
-          placeholder="Tìm theo tên..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-        />
+    <div className="max-w-7xl mx-auto p-6 mt-8 bg-white rounded-3xl shadow-xl border border-gray-200 animate-fade-in">
+      <h1 className="text-3xl font-extrabold text-blue-800 mb-6 text-center drop-shadow-md">
+        🧑‍💼 Danh sách khách hàng
+      </h1>
+
+      {/* Search + Add */}
+      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between mb-6">
+        <div className="flex w-full sm:w-auto sm:flex-1">
+          <input
+            type="text"
+            placeholder="Tìm khách hàng theo tên..."
+            className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-400 focus:outline-none"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            autoComplete="off"
+            list="customer-suggestions"
+          />
+          <datalist id="customer-suggestions">
+            {customers
+              .filter((c) => {
+                if (!search.trim()) return false;
+                const nameParts = c.name.trim().toLowerCase().split(" ");
+                const lastName = nameParts[nameParts.length - 1];
+                return lastName.includes(search.trim().toLowerCase());
+              })
+              .slice(0, 10)
+              .map((c) => (
+                <option key={c.id} value={c.name} />
+              ))}
+          </datalist>
+        </div>
         <button
-          onClick={handleSearch}
-          className="bg-blue-600 hover:bg-blue-800 text-white font-semibold px-6 py-2 rounded-lg shadow transition"
+          onClick={() => {
+            setEditing(null);
+            setShowForm(true);
+          }}
+          className="flex items-center gap-2 bg-green-600 hover:bg-green-800 text-white font-bold px-4 py-2 rounded-xl transition shadow"
         >
-          Tìm
-        </button>
-        <button
-          onClick={() => { setEditing(null); setShowForm(true); }}
-          className="bg-green-600 hover:bg-green-800 text-white font-semibold px-6 py-2 rounded-lg shadow transition"
-        >
-          Thêm mới
+          <PlusCircle size={20} /> Thêm mới
         </button>
       </div>
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-white rounded-xl shadow border border-gray-200">
-          <thead>
-            <tr className="bg-gradient-to-r from-blue-200 to-blue-100 text-blue-900">
-              <th className="py-3 px-4 text-center font-bold text-base tracking-wide rounded-tl-xl">Tên</th>
-              <th className="py-3 px-4 text-center font-bold text-base tracking-wide">Email</th>
-              <th className="py-3 px-4 text-center font-bold text-base tracking-wide">SĐT</th>
-              <th className="py-3 px-4 text-center font-bold text-base tracking-wide">Địa chỉ</th>
-              <th className="py-3 px-4 text-center font-bold text-base tracking-wide rounded-tr-xl">Thao tác</th>
+
+      {/* Table */}
+      <div className="overflow-x-auto rounded-xl border border-gray-200 shadow">
+        <table className="min-w-full divide-y divide-gray-200 text-sm text-gray-700">
+          <thead className="bg-blue-100 text-blue-900">
+            <tr className="text-center">
+              <th className="px-6 py-3 font-semibold">Tên</th>
+              <th className="px-6 py-3 font-semibold">Email</th>
+              <th className="px-6 py-3 font-semibold">SĐT</th>
+              <th className="px-6 py-3 font-semibold">Địa chỉ</th>
+              <th className="px-6 py-3 font-semibold">Thao tác</th>
             </tr>
           </thead>
           <tbody>
-            {customers.length === 0 ? (
+            {filteredCustomers.length === 0 ? (
               <tr>
-                <td colSpan={5} className="py-8 text-center text-gray-400 italic bg-gray-50 rounded-b-xl">
+                <td colSpan={5} className="text-center py-6 text-gray-400 italic">
                   Không có khách hàng nào.
                 </td>
               </tr>
             ) : (
-              customers.map((c, idx) => (
-                <tr key={c.id}
-                  className={`transition ${idx % 2 === 0 ? "bg-white" : "bg-blue-50"} hover:bg-blue-100`}>
-                  <td className="py-3 px-4 text-center font-medium">{c.name}</td>
-                  <td className="py-3 px-4 text-center">{c.email}</td>
-                  <td className="py-3 px-4 text-center">{c.phone}</td>
-                  <td className="py-3 px-4 text-center">{c.address}</td>
-                  <td className="py-3 px-4 flex justify-center items-center gap-2 align-middle">
-                    <button
-                      onClick={() => { setDetailCustomer(c); setShowDetail(true); }}
-                      className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-1 rounded-lg shadow font-semibold transition"
-                      title="Chi tiết"
-                    >
-                      Chi tiết
-                    </button>
-                    <button
-                      onClick={() => { setEditing(c); setShowForm(true); }}
-                      className="bg-yellow-400 hover:bg-yellow-600 text-white px-4 py-1 rounded-lg shadow font-semibold transition"
-                      title="Sửa"
-                    >
-                      Sửa
-                    </button>
-                    <button
-                      onClick={() => handleDelete(c.id)}
-                      className="bg-red-500 hover:bg-red-700 text-white px-4 py-1 rounded-lg shadow font-semibold transition"
-                      title="Xóa"
-                    >
-                      Xóa
-                    </button>
+              filteredCustomers.map((c, idx) => (
+                <tr
+                  key={c.id}
+                  className={`transition text-center ${idx % 2 === 0 ? "bg-white" : "bg-gray-50"} hover:bg-blue-50`}
+                >
+                  <td className="py-3 px-4 font-medium truncate max-w-[150px]">{c.name}</td>
+                  <td className="py-3 px-4 truncate max-w-[180px]">{c.email}</td>
+                  <td className="py-3 px-4">{c.phone}</td>
+                  <td className="py-3 px-4 truncate max-w-[200px]">{c.address}</td>
+                  <td className="py-3 px-4">
+                    <div className="flex justify-center flex-wrap gap-2">
+                      <button
+                        onClick={() => {
+                          setDetailCustomer(c);
+                          setShowDetail(true);
+                        }}
+                        className="flex items-center gap-1 bg-blue-500 hover:bg-blue-700 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
+                        title="Chi tiết"
+                      >
+                        <Info size={16} /> Chi tiết
+                      </button>
+                      <button
+                        onClick={() => {
+                          setEditing(c);
+                          setShowForm(true);
+                        }}
+                        className="flex items-center gap-1 bg-yellow-400 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
+                        title="Sửa"
+                      >
+                        <Pencil size={16} /> Sửa
+                      </button>
+                      <button
+                        onClick={() => handleDelete(c.id)}
+                        className="flex items-center gap-1 bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
+                        title="Xóa"
+                      >
+                        <Trash2 size={16} /> Xóa
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))
@@ -137,22 +157,29 @@ export default function CustomerList() {
           </tbody>
         </table>
       </div>
-      {/* Popup Form */}
-      {showForm && (
-        editing ? (
+
+      {/* Form Thêm/Sửa */}
+      {showForm &&
+        (editing ? (
           <CustomerEdit
             customer={editing}
             onClose={() => setShowForm(false)}
-            onSaved={() => { setShowForm(false); fetchCustomers(); }}
+            onSaved={() => {
+              setShowForm(false);
+              fetchCustomers();
+            }}
           />
         ) : (
           <CustomerAdd
             onClose={() => setShowForm(false)}
-            onSaved={() => { setShowForm(false); fetchCustomers(); }}
+            onSaved={() => {
+              setShowForm(false);
+              fetchCustomers();
+            }}
           />
-        )
-      )}
-      {/* Popup Chi tiết */}
+        ))}
+
+      {/* Chi tiết khách hàng */}
       {showDetail && detailCustomer && (
         <CustomerDetails
           customer={detailCustomer}
