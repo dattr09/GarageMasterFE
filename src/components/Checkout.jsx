@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { createOrder } from "../services/OrderApi";
 
 export default function Checkout() {
   const navigate = useNavigate();
@@ -12,6 +13,27 @@ export default function Checkout() {
   const [cart, setCart] = useState([]);
 
   useEffect(() => {
+    // Lấy user từ localStorage
+    const userStr = localStorage.getItem("user");
+    let name = "";
+    let email = "";
+    let phone = "";
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        name = user.fullName || user.name || user.username || "";
+        email = user.email || "";
+        phone = user.phone || "";
+      } catch { }
+    }
+    setInfo(info => ({
+      ...info,
+      name: name,
+      phone: phone,
+      email: email
+    }));
+
+    // Lấy giỏ hàng
     const data = JSON.parse(localStorage.getItem("cart") || "[]");
     setCart(data);
   }, []);
@@ -20,12 +42,31 @@ export default function Checkout() {
     setInfo({ ...info, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Sinh mã hóa đơn ngẫu nhiên
-    const orderId = "HD" + Date.now();
-    localStorage.removeItem("cart");
-    navigate("/order-success", { state: { orderId } });
+    // KHÔNG cần kiểm tra userId ở đây nữa
+    const userId = localStorage.getItem("userId");
+    const token = localStorage.getItem("token");
+    const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const order = {
+      userId,
+      customerName: info.name,
+      phone: info.phone,
+      address: info.address,
+      note: info.note,
+      items: cart,
+      total,
+    };
+    console.log("Order gửi lên:", order);
+    try {
+      const res = await createOrder(order);
+      localStorage.removeItem("cart");
+      setCart([]);
+      window.dispatchEvent(new Event("cartChanged"));
+      navigate("/order-success", { state: { orderId: res.id } });
+    } catch (err) {
+      alert("Đặt hàng thất bại!");
+    }
   };
 
   // Tính tổng tiền
@@ -79,6 +120,18 @@ export default function Checkout() {
               className="w-full border rounded px-3 py-2"
               placeholder="Ghi chú cho đơn hàng"
               rows={2}
+            />
+          </div>
+          <div>
+            <label className="block font-semibold mb-1">Email</label>
+            <input
+              name="email"
+              value={info.email || ""}
+              onChange={handleChange}
+              required
+              className="w-full border rounded px-3 py-2"
+              placeholder="Nhập email"
+              type="email"
             />
           </div>
           <button

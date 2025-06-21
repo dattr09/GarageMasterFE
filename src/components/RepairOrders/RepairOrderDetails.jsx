@@ -3,10 +3,12 @@ import { getRepairOrderById } from "../../services/RepairOrderApi";
 import { getAllCustomers } from "../../services/CustomerApi";
 import { getRepairDetailsByOrderId } from "../../services/RepairDetailApi";
 import { getAllParts } from "../../services/PartsApi";
+import { getAllEmployees } from "../../services/EmployeeApi"; // Thêm dòng này nếu có API lấy nhân viên
 
 export default function RepairOrderDetails({ orderId, orderIndex, onClose, refreshKey }) {
   const [order, setOrder] = useState(null);
   const [customers, setCustomers] = useState([]);
+  const [Employees, setEmployees] = useState([]); // Thêm state này
   const [details, setDetails] = useState([]);
   const [parts, setParts] = useState([]);
   const [error, setError] = useState("");
@@ -14,10 +16,9 @@ export default function RepairOrderDetails({ orderId, orderIndex, onClose, refre
   useEffect(() => {
     fetchOrder();
     getAllCustomers().then(setCustomers);
-    getRepairDetailsByOrderId(orderId).then((data) => {
-      setDetails(data);
-    });
+    getRepairDetailsByOrderId(orderId).then(setDetails);
     getAllParts().then(setParts);
+    getAllEmployees().then(setEmployees); // Lấy danh sách nhân viên
   }, [orderId, refreshKey]);
 
   const fetchOrder = async () => {
@@ -32,6 +33,11 @@ export default function RepairOrderDetails({ orderId, orderIndex, onClose, refre
   const getCustomerName = (customerId) => {
     const customer = customers.find((c) => c.id === customerId);
     return customer ? customer.name : customerId;
+  };
+
+  const getEmployeeName = (employeeId) => {
+    const employee = Employees.find((m) => m.id === employeeId);
+    return employee ? employee.name : employeeId || "Chưa có";
   };
 
   const getPartInfo = (partId) => {
@@ -69,6 +75,7 @@ export default function RepairOrderDetails({ orderId, orderIndex, onClose, refre
           </div>
           <div><b>Biển số xe:</b> {order.licensePlate}</div>
           <div><b>Khách hàng:</b> {getCustomerName(order.customerId)}</div>
+          <div><b>Nhân viên sửa chữa:</b> {getEmployeeName(order.employeeId)}</div>
           <div><b>Trạng thái:</b> {statusMap[order.status] || order.status}</div>
           <div>
             <b>Ngày tạo:</b>{" "}

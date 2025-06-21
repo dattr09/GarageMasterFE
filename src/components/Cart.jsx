@@ -2,14 +2,19 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function Cart() {
-  // Lưu giỏ hàng trong localStorage, mỗi item: {id, name, price, quantity, image}
   const [cart, setCart] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      alert("Bạn cần đăng nhập để xem giỏ hàng!");
+      navigate("/login");
+      return;
+    }
     const data = JSON.parse(localStorage.getItem("cart") || "[]");
     setCart(data);
-  }, []);
+  }, [navigate]);
 
   // Xóa sản phẩm khỏi giỏ
   const removeItem = (id) => {
@@ -94,7 +99,15 @@ export default function Cart() {
             </button>
             <button
               className="bg-blue-600 hover:bg-blue-800 text-white px-8 py-2 rounded-xl font-bold shadow transition"
-              onClick={() => navigate("/checkout")}
+              onClick={() => {
+                const token = localStorage.getItem("token");
+                if (!token) {
+                  alert("Bạn cần đăng nhập để tiếp tục mua hàng!");
+                  navigate("/login");
+                  return;
+                }
+                navigate("/checkout");
+              }}
             >
               Tiếp tục mua sắm
             </button>
