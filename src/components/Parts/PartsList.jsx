@@ -51,6 +51,19 @@ export default function PartsList() {
     return brand ? brand.name : brandId;
   };
 
+  const handleAddToCart = (item) => {
+    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+    const idx = cart.findIndex(i => i.id === item.id);
+    if (idx >= 0) {
+      cart[idx].quantity += 1;
+    } else {
+      cart.push({ ...item, quantity: 1 });
+    }
+    localStorage.setItem("cart", JSON.stringify(cart));
+    window.dispatchEvent(new Event("cartChanged"));
+    alert(`Đã thêm ${item.name} vào giỏ hàng!`);
+  };
+
   return (
     <div className="max-w-6xl mx-auto bg-white rounded-xl shadow-lg p-8 mt-8">
       <h2 className="text-2xl font-bold text-blue-800 mb-6 text-center drop-shadow">Danh sách phụ tùng</h2>
@@ -125,6 +138,14 @@ export default function PartsList() {
                   title="Xóa"
                 >
                   Xóa
+                </button>
+                {/* Nút thêm giỏ hàng */}
+                <button
+                  onClick={() => handleAddToCart(part)}
+                  className="bg-green-600 hover:bg-green-800 text-white px-3 py-1 rounded-lg transition shadow font-semibold"
+                  title="Thêm giỏ hàng"
+                >
+                  Thêm giỏ hàng
                 </button>
               </div>
             </div>

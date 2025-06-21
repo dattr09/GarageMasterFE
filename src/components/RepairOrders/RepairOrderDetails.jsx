@@ -4,7 +4,7 @@ import { getAllCustomers } from "../../services/CustomerApi";
 import { getRepairDetailsByOrderId } from "../../services/RepairDetailApi";
 import { getAllParts } from "../../services/PartsApi";
 
-export default function RepairOrderDetails({ orderId, orderIndex, onClose }) {
+export default function RepairOrderDetails({ orderId, orderIndex, onClose, refreshKey }) {
   const [order, setOrder] = useState(null);
   const [customers, setCustomers] = useState([]);
   const [details, setDetails] = useState([]);
@@ -16,11 +16,9 @@ export default function RepairOrderDetails({ orderId, orderIndex, onClose }) {
     getAllCustomers().then(setCustomers);
     getRepairDetailsByOrderId(orderId).then((data) => {
       setDetails(data);
-      console.log("Repair details:", data); // Thêm dòng này để kiểm tra
     });
     getAllParts().then(setParts);
-    // eslint-disable-next-line
-  }, [orderId]);
+  }, [orderId, refreshKey]);
 
   const fetchOrder = async () => {
     try {

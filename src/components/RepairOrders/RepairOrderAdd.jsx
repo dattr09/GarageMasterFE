@@ -4,6 +4,7 @@ import { getAllMotos } from "../../services/MotoApi";
 import { getAllCustomers } from "../../services/CustomerApi";
 import { getAllParts } from "../../services/PartsApi";
 import { createRepairDetail } from "../../services/RepairDetailApi";
+import { getAllEmployees } from "../../services/EmployeeApi"; // Thêm dòng này
 
 export default function RepairOrderAdd({ onSaved, onClose }) {
   const [form, setForm] = useState({
@@ -13,10 +14,12 @@ export default function RepairOrderAdd({ onSaved, onClose }) {
     year: "",
     description: "",
     status: "Pending",
+    employeeId: "", // Thêm dòng này
   });
   const [motos, setMotos] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [parts, setParts] = useState([]);
+  const [employees, setEmployees] = useState([]); // Thêm dòng này
   const [selectedParts, setSelectedParts] = useState({});
   const [error, setError] = useState("");
 
@@ -24,6 +27,7 @@ export default function RepairOrderAdd({ onSaved, onClose }) {
     getAllMotos().then(setMotos);
     getAllCustomers().then(setCustomers);
     getAllParts().then(setParts);
+    getAllEmployees().then(setEmployees); // Thêm dòng này
   }, []);
 
   // Đồng bộ model và year khi licensePlate thay đổi
@@ -104,6 +108,7 @@ export default function RepairOrderAdd({ onSaved, onClose }) {
       description: form.description,
       status: form.status,
       totalCost,
+      employeeId: form.employeeId, // Thêm dòng này
     };
 
     try {
@@ -293,12 +298,31 @@ export default function RepairOrderAdd({ onSaved, onClose }) {
                   <option value="Cancelled">Đã hủy</option>
                 </select>
               </div>
+              {/* Chọn nhân viên sửa chữa */}
               <div>
-                <label className="block font-semibold mb-1 text-gray-700">Tổng tiền</label>
+                <label className="block font-semibold mb-1 text-gray-700">Nhân viên sửa chữa</label>
+                <select
+                  name="employeeId"
+                  value={form.employeeId || ""}
+                  onChange={handleChange}
+                  className="border-2 border-gray-200 rounded-xl px-4 py-2 w-full"
+                  required
+                >
+                  <option value="">-- Chọn nhân viên --</option>
+                  {employees.map((e) => (
+                    <option key={e.id} value={e.id}>
+                      {e.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex flex-col items-center justify-center my-4 mx-auto" style={{ maxWidth: 400 }}>
+                <label className="block font-semibold mb-2 text-gray-700 text-lg text-center">Tổng tiền</label>
                 <input
-                  value={totalCost.toLocaleString() + " đ"}
+                  value={totalCost.toLocaleString() + " VNĐ"}
                   disabled
-                  className="border-2 border-gray-200 rounded-xl px-4 py-2 w-full bg-gray-100 font-bold text-blue-700"
+                  className="text-2xl font-bold text-green-600 text-center bg-gray-100 border-2 border-gray-200 rounded-xl px-4 py-3 shadow w-full"
+                  style={{ maxWidth: 320 }}
                 />
               </div>
             </div>
