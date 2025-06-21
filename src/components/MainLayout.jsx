@@ -12,6 +12,8 @@ import EmployeeList from "./Employees/EmployeeList";
 import Cart from "./Cart"; // Import the Cart component
 import Checkout from "./Checkout"; // Import the Checkout component
 import OrderSuccess from "./OrderSuccess"; // Import the OrderSuccess component
+import PrintInvoice from "./Invoices/InvoiceList"; // Import the PrintInvoice component
+import InvoiceList from "./Invoices/InvoiceList";
 
 const HEADER_HEIGHT = 64;
 
@@ -36,6 +38,7 @@ const MainLayout = () => {
           <Route path="/cart" element={<Cart />} /> {/* Add the Cart route */}
           <Route path="/checkout" element={<Checkout />} /> {/* Add the Checkout route */}
           <Route path="/order-success" element={<OrderSuccess />} /> {/* Add the OrderSuccess route */}
+          <Route path="/invoices" element={<InvoiceList />} />
           {/* Add more routes as needed */}
         </Routes>
         <Outlet />

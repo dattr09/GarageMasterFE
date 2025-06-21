@@ -46,6 +46,7 @@ export default function Login() {
       setToken(data.token);
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user)); // <-- Thêm dòng này
+      localStorage.setItem("userId", data.user.Id || data.user.id); // Thêm dòng này
 
       // Chuyển hướng hoặc reload
       navigate("/");

@@ -179,6 +179,19 @@ export default function RepairOrderList() {
                     >
                       Xóa
                     </button>
+                    {order.status === "Hoàn thành" || order.status === "Completed" ? (
+                      <button
+                        className="bg-green-600 hover:bg-green-800 text-white px-3 py-1 rounded"
+                        onClick={() => {
+                          // Chuyển hướng sang trang hóa đơn và truyền dữ liệu
+                          window.location.href = `/invoices?customerId=${order.customerId}&repairOrderId=${order.id}`;
+                        }}
+                      >
+                        Tạo hóa đơn
+                      </button>
+                    ) : (
+                      <span className="text-gray-400 italic">Chưa hoàn thành</span>
+                    )}
                   </td>
                 </tr>
               ))

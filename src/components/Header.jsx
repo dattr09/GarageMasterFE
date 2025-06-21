@@ -74,6 +74,7 @@ export default function Header() {
           <Link to="/motos" className="hover:text-blue-600 font-medium text-gray-700">Quản lý xe</Link>
           <Link to="/repair-orders" className="hover:text-blue-600 font-medium text-gray-700">Đơn sửa chữa</Link>
           <Link to="/employees" className="hover:text-blue-600 font-medium text-gray-700">Nhân viên</Link>
+          <Link to="/invoices" className="hover:text-blue-600 font-medium text-gray-700">Hóa đơn</Link>
         </div>
         {/* Phải: Giỏ hàng + đăng nhập/đăng xuất */}
         <div className="flex items-center gap-4 flex-shrink-0">
