@@ -61,3 +61,12 @@ export async function getRepairDetailsByOrderId(orderId) {
   if (!res.ok) throw new Error("Không lấy được chi tiết sửa chữa");
   return res.json();
 }
+
+export async function updateRepairDetails(orderId, details) {
+  // Gửi PUT hoặc POST lên backend, ví dụ:
+  return fetch(`/api/repair-details/${orderId}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(details),
+  });
+}

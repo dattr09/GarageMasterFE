@@ -24,14 +24,7 @@ function App() {
         <Route path="/confirm-email" element={<ConfirmEmail />} />
 
         {/* Route bảo vệ - tất cả path con nằm trong MainLayout */}
-        <Route
-          path="/*"
-          element={
-            <PrivateRoute>
-              <MainLayout />
-            </PrivateRoute>
-          }
-        />
+        <Route path="/*" element={<MainLayout />} />
       </Routes>
     </BrowserRouter>
   );

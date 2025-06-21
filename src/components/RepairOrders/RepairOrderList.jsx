@@ -14,11 +14,14 @@ export default function RepairOrderList() {
   const [customers, setCustomers] = useState([]);
   const [error, setError] = useState("");
   const [showForm, setShowForm] = useState(null);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [selectedOrderId, setSelectedOrderId] = useState(null);
+  const [selectedOrderIndex, setSelectedOrderIndex] = useState(null);
 
   useEffect(() => {
     fetchOrders();
     fetchCustomers();
-  }, []);
+  }, [refreshKey]);
 
   const fetchOrders = async () => {
     try {
@@ -54,9 +57,14 @@ export default function RepairOrderList() {
     });
     if (result.isConfirmed) {
       await deleteRepairOrder(id);
-      fetchOrders();
+      setRefreshKey(prev => prev + 1);
       Swal.fire("Đã xóa!", "Đơn sửa chữa đã được xóa.", "success");
     }
+  };
+
+  const handleEditSaved = () => {
+    setRefreshKey(prev => prev + 1);
+    // Đóng popup sửa, mở lại popup chi tiết nếu cần
   };
 
   // Map trạng thái sang tiếng Việt
@@ -130,7 +138,7 @@ export default function RepairOrderList() {
                   <td className="py-3 px-4 text-center align-middle font-medium">
                     {order.licensePlate}
                   </td>
-                  <td className="py-3 px-4 text-center">
+                  <td className="py-3 px-4 text-center align-middle">
                     {getCustomerName(order.customerId)}
                   </td>
                   <td className="py-3 px-4 text-center">
@@ -147,7 +155,11 @@ export default function RepairOrderList() {
                   </td>
                   <td className="py-3 px-4 flex justify-center items-center gap-2 align-middle">
                     <button
-                      onClick={() => setShowForm({ type: "detail", id: order.id })}
+                      onClick={() => {
+                        setShowForm({ type: "detail", id: order.id });
+                        setSelectedOrderId(order.id);
+                        setSelectedOrderIndex(idx);
+                      }}
                       className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-1 rounded-lg shadow font-semibold transition"
                       title="Chi tiết"
                     >
@@ -181,24 +193,28 @@ export default function RepairOrderList() {
           onSaved={() => {
             setShowForm(null);
             fetchOrders();
+            setRefreshKey(prev => prev + 1); // Thêm dòng này
           }}
         />
       )}
       {showForm && showForm.type === "edit" && (
         <RepairOrderEdit
+          key={`${showForm.id}-${refreshKey}`} // Remount mỗi lần sửa khác hoặc sau khi lưu
           orderId={showForm.id}
           onClose={() => setShowForm(null)}
           onSaved={() => {
+            setRefreshKey(prev => prev + 1); // Trigger update + remount
             setShowForm(null);
-            fetchOrders();
           }}
         />
       )}
       {showForm && showForm.type === "detail" && (
         <RepairOrderDetails
-          orderId={showForm.id}
-          orderIndex={orders.findIndex(o => o.id === showForm.id)}
+          key={`${selectedOrderId}-${refreshKey}`} // Force remount để lấy lại dữ liệu mới
+          orderId={selectedOrderId}
+          orderIndex={selectedOrderIndex}
           onClose={() => setShowForm(null)}
+          refreshKey={refreshKey}
         />
       )}
       {error && <div className="text-red-500 mt-4">{error}</div>}

@@ -9,6 +9,9 @@ import Header from "./Header";
 import Footer from "./Footer";
 import RepairOrderList from "./RepairOrders/RepairOrderList";
 import EmployeeList from "./Employees/EmployeeList";
+import Cart from "./Cart"; // Import the Cart component
+import Checkout from "./Checkout"; // Import the Checkout component
+import OrderSuccess from "./OrderSuccess"; // Import the OrderSuccess component
 
 const HEADER_HEIGHT = 64;
 
@@ -30,6 +33,9 @@ const MainLayout = () => {
           <Route path="motos" element={<MotoList />} />
           <Route path="repair-orders" element={<RepairOrderList />} />
           <Route path="employees" element={<EmployeeList />} />
+          <Route path="/cart" element={<Cart />} /> {/* Add the Cart route */}
+          <Route path="/checkout" element={<Checkout />} /> {/* Add the Checkout route */}
+          <Route path="/order-success" element={<OrderSuccess />} /> {/* Add the OrderSuccess route */}
           {/* Add more routes as needed */}
         </Routes>
         <Outlet />
