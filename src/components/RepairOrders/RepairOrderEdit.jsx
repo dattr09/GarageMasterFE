@@ -5,6 +5,17 @@ import { getAllCustomers } from "../../services/CustomerApi";
 import { getAllParts } from "../../services/PartsApi";
 import { getRepairDetailsByOrderId, updateRepairDetails } from "../../services/RepairDetailApi";
 import { getAllEmployees } from "../../services/EmployeeApi";
+import { Save, XCircle, Wrench } from "lucide-react";
+
+const fadeInStyle = `
+@keyframes fadeIn {
+  0% { opacity: 0; transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-in-out;
+}
+`;
 
 export default function RepairOrderEdit({ orderId, onSaved, onClose }) {
   const [form, setForm] = useState({
@@ -30,17 +41,15 @@ export default function RepairOrderEdit({ orderId, onSaved, onClose }) {
     getAllParts().then(setParts);
     getAllEmployees().then(setEmployees);
     fetchRepairDetails();
-    // eslint-disable-next-line
   }, [orderId]);
 
-  // Đồng bộ model và year khi licensePlate thay đổi
   useEffect(() => {
     if (form.licensePlate) {
       const moto = motos.find((m) => m.licensePlate === form.licensePlate);
       setForm((prev) => ({
         ...prev,
-        model: moto ? moto.model : "",
-        year: moto ? moto.year : "",
+        model: moto?.model || "",
+        year: moto?.year || "",
       }));
     }
   }, [form.licensePlate, motos]);
@@ -69,7 +78,6 @@ export default function RepairOrderEdit({ orderId, onSaved, onClose }) {
     setSelectedParts(selected);
   };
 
-  // Khi chọn khách hàng, reset biển số xe và model
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name === "customerId") {
@@ -85,40 +93,32 @@ export default function RepairOrderEdit({ orderId, onSaved, onClose }) {
       setForm((prev) => ({
         ...prev,
         licensePlate: value,
-        model: moto ? moto.model : "",
-        year: moto ? moto.year : "",
+        model: moto?.model || "",
+        year: moto?.year || "",
       }));
     } else {
       setForm((prev) => ({ ...prev, [name]: value }));
     }
   };
 
-  // Lọc danh sách xe theo khách hàng đã chọn
   const filteredMotos = form.customerId
     ? motos.filter((m) => m.customerId === form.customerId)
     : [];
 
-  // Tính tổng tiền động
   const selectedPartsArray = Object.entries(selectedParts)
-    .filter(([partId, quantity]) => partId && quantity > 0)
-    .map(([partId, quantity]) => ({
-      partId,
-      quantity,
-    }));
+    .filter(([_, qty]) => qty > 0)
+    .map(([partId, quantity]) => ({ partId, quantity }));
 
-  const totalCost = selectedPartsArray.reduce((sum, item) => {
-    const part = parts.find((p) => p.id === item.partId);
-    return sum + (part ? part.price * item.quantity : 0);
+  const totalCost = selectedPartsArray.reduce((sum, { partId, quantity }) => {
+    const part = parts.find((p) => p.id === partId);
+    return sum + (part?.price || 0) * quantity;
   }, 0);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     try {
-      const payload = {
-        ...form,
-        totalCost,
-      };
+      const payload = { ...form, totalCost };
       await updateRepairOrder(orderId, payload);
       await updateRepairDetails(orderId, selectedPartsArray);
       onSaved && onSaved();
@@ -128,202 +128,200 @@ export default function RepairOrderEdit({ orderId, onSaved, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-3xl shadow-2xl p-10 w-full max-w-4xl border border-blue-100 relative overflow-y-auto" style={{ maxHeight: "80vh" }}>
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-2xl font-bold transition"
-          title="Đóng"
-          type="button"
-        >
-          ×
-        </button>
-        <h3 className="text-3xl font-extrabold text-blue-700 mb-8 text-center tracking-wide drop-shadow">
-          Sửa đơn sửa chữa
-        </h3>
-        {error && (
-          <div className="mb-4 text-red-600 text-center font-semibold">{error}</div>
-        )}
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-2 gap-8">
-            {/* Cột trái: Thông tin xe */}
-            <div className="space-y-6">
-              {/* Chọn khách hàng */}
-              <div>
-                <label className="block font-semibold mb-1 text-gray-700">Khách hàng</label>
-                <select
-                  name="customerId"
-                  value={form.customerId}
-                  onChange={handleChange}
-                  className="border-2 border-gray-200 rounded-xl px-4 py-2 w-full"
-                  required
-                >
-                  <option value="">-- Chọn khách hàng --</option>
-                  {customers.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              {/* Chọn biển số xe */}
-              {form.customerId && (
+    <>
+      <style>{fadeInStyle}</style>
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div className="bg-white rounded-3xl shadow-2xl p-10 w-full max-w-5xl border border-blue-100 relative animate-fade-in overflow-y-auto max-h-[90vh]">
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition"
+            title="Đóng"
+            type="button"
+          >
+            <XCircle className="w-7 h-7" />
+          </button>
+
+          <div className="flex items-center justify-center gap-3 mb-6">
+            <Wrench className="text-blue-700 w-8 h-8" />
+            <h3 className="text-3xl font-extrabold text-blue-700 text-center tracking-wide drop-shadow">
+              Sửa đơn sửa chữa
+            </h3>
+          </div>
+
+          {error && <div className="mb-4 text-red-600 text-center font-semibold">{error}</div>}
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+              {/* Cột 1 */}
+              <div className="space-y-6">
                 <div>
-                  <label className="block font-semibold mb-1 text-gray-700">Biển số xe</label>
+                  <label className="font-semibold text-gray-700 block mb-1">Khách hàng</label>
                   <select
-                    name="licensePlate"
-                    value={form.licensePlate}
+                    name="customerId"
+                    value={form.customerId}
                     onChange={handleChange}
-                    className="border-2 border-gray-200 rounded-xl px-4 py-2 w-full"
                     required
+                    className="w-full px-4 py-2 rounded-xl border-2 border-gray-200"
                   >
-                    <option value="">-- Chọn xe --</option>
-                    {filteredMotos.map((m) => (
-                      <option key={m.licensePlate} value={m.licensePlate}>
-                        {m.licensePlate}
-                      </option>
+                    <option value="">-- Chọn khách hàng --</option>
+                    {customers.map((c) => (
+                      <option key={c.id} value={c.id}>{c.name}</option>
                     ))}
                   </select>
                 </div>
-              )}
-              {/* Hiển thị tên xe */}
-              {form.licensePlate && (
+                {form.customerId && (
+                  <div>
+                    <label className="font-semibold text-gray-700 block mb-1">Biển số xe</label>
+                    <select
+                      name="licensePlate"
+                      value={form.licensePlate}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-2 rounded-xl border-2 border-gray-200"
+                    >
+                      <option value="">-- Chọn xe --</option>
+                      {filteredMotos.map((m) => (
+                        <option key={m.licensePlate} value={m.licensePlate}>{m.licensePlate}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+                {form.licensePlate && (
+                  <div>
+                    <label className="font-semibold text-gray-700 block mb-1">Tên xe</label>
+                    <input
+                      disabled
+                      value={form.model}
+                      className="w-full px-4 py-2 rounded-xl border-2 border-gray-200 bg-gray-100"
+                    />
+                  </div>
+                )}
+                {form.licensePlate && (
+                  <div>
+                    <label className="font-semibold text-gray-700 block mb-1">Năm sản xuất</label>
+                    <input
+                      type="number"
+                      name="year"
+                      value={form.year}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-2 rounded-xl border-2 border-gray-200"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Cột 2 */}
+              <div className="space-y-6">
                 <div>
-                  <label className="block font-semibold mb-1 text-gray-700">Tên xe</label>
-                  <input
-                    value={form.model || ""}
-                    disabled
-                    className="border-2 border-gray-200 rounded-xl px-4 py-2 w-full bg-gray-100"
-                  />
-                </div>
-              )}
-              {/* Năm sản xuất */}
-              {form.licensePlate && (
-                <div>
-                  <label className="block font-semibold mb-1 text-gray-700">Năm sản xuất</label>
-                  <input
-                    name="year"
-                    type="number"
-                    value={form.year || ""}
+                  <label className="font-semibold text-gray-700 block mb-1">Tình trạng</label>
+                  <textarea
+                    name="description"
+                    value={form.description}
                     onChange={handleChange}
-                    className="border-2 border-gray-200 rounded-xl px-4 py-2 w-full"
-                    placeholder="Nhập năm sản xuất"
-                    required
+                    className="w-full px-4 py-2 rounded-xl border-2 border-gray-200"
                   />
                 </div>
-              )}
-              {/* Mô tả */}
-              <div>
-                <label className="block font-semibold mb-1 text-gray-700">Tình trạng</label>
-                <textarea
-                  name="description"
-                  value={form.description}
-                  onChange={handleChange}
-                  className="border-2 border-gray-200 rounded-xl px-4 py-2 w-full"
-                />
-              </div>
-            </div>
-            {/* Cột phải: Phụ tùng, trạng thái, nhân viên, tổng tiền */}
-            <div className="space-y-6 flex flex-col">
-              <div>
-                <label className="block font-semibold mb-1 text-gray-700">Phụ tùng thay thế</label>
-                <div className="max-h-64 overflow-y-auto border rounded-xl p-2 bg-gray-50">
-                  {parts.map((part) => (
-                    <div key={part.id} className="flex items-center gap-3 mb-2">
-                      <input
-                        type="checkbox"
-                        checked={!!selectedParts[part.id]}
-                        onChange={(e) => {
-                          setSelectedParts((prev) => {
-                            const copy = { ...prev };
-                            if (e.target.checked) {
-                              copy[part.id] = 1;
-                            } else {
-                              delete copy[part.id];
-                            }
-                            return copy;
-                          });
-                        }}
-                      />
-                      <span className="w-40">{part.name} ({part.price?.toLocaleString()}đ)</span>
-                      {selectedParts[part.id] && (
-                        <input
-                          type="number"
-                          min={1}
-                          value={selectedParts[part.id]}
-                          onChange={(e) => {
-                            const value = Math.max(1, Number(e.target.value));
-                            setSelectedParts((prev) => ({ ...prev, [part.id]: value }));
-                          }}
-                          className="border rounded px-2 py-1 w-20"
-                          placeholder="Số lượng"
-                        />
-                      )}
-                    </div>
-                  ))}
+                <div>
+                  <label className="font-semibold text-gray-700 block mb-1">Trạng thái</label>
+                  <select
+                    name="status"
+                    value={form.status}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-2 rounded-xl border-2 border-gray-200"
+                  >
+                    <option value="Pending">Chờ xử lý</option>
+                    <option value="InProgress">Đang sửa</option>
+                    <option value="Completed">Hoàn thành</option>
+                    <option value="Cancelled">Đã hủy</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="font-semibold text-gray-700 block mb-1">Nhân viên sửa chữa</label>
+                  <select
+                    name="employeeId"
+                    value={form.employeeId}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-2 rounded-xl border-2 border-gray-200"
+                  >
+                    <option value="">-- Chọn nhân viên --</option>
+                    {employees.map((e) => (
+                      <option key={e.id} value={e.id}>{e.name}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
-              <div>
-                <label className="block font-semibold mb-1 text-gray-700">Trạng thái</label>
-                <select
-                  name="status"
-                  value={form.status}
-                  onChange={handleChange}
-                  className="border-2 border-gray-200 rounded-xl px-4 py-2 w-full"
-                  required
-                >
-                  <option value="Pending">Chờ xử lý</option>
-                  <option value="InProgress">Đang sửa</option>
-                  <option value="Completed">Hoàn thành</option>
-                  <option value="Cancelled">Đã hủy</option>
-                </select>
-              </div>
-              {/* Chọn nhân viên sửa chữa */}
-              <div>
-                <label className="block font-semibold mb-1 text-gray-700">Nhân viên sửa chữa</label>
-                <select
-                  name="employeeId"
-                  value={form.employeeId || ""}
-                  onChange={handleChange}
-                  className="border-2 border-gray-200 rounded-xl px-4 py-2 w-full"
-                  required
-                >
-                  <option value="">-- Chọn nhân viên --</option>
-                  {employees.map((e) => (
-                    <option key={e.id} value={e.id}>
-                      {e.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="flex flex-col items-center justify-center my-4 mx-auto" style={{ maxWidth: 400 }}>
-                <label className="block font-semibold mb-2 text-gray-700 text-lg text-center">Tổng tiền</label>
-                <input
-                  value={totalCost.toLocaleString() + " VNĐ"}
-                  disabled
-                  className="text-2xl font-bold text-green-600 text-center bg-gray-100 border-2 border-gray-200 rounded-xl px-4 py-3 shadow w-full"
-                  style={{ maxWidth: 320 }}
-                />
+
+              {/* Cột 3 */}
+              <div className="space-y-6">
+                <div>
+                  <label className="font-semibold text-gray-700 block mb-1">Phụ tùng thay thế</label>
+                  <div className="bg-gray-100 p-3 rounded-xl max-h-64 overflow-y-auto">
+                    {parts.map((part) => (
+                      <div key={part.id} className="flex items-center gap-3 mb-2">
+                        <input
+                          type="checkbox"
+                          checked={!!selectedParts[part.id]}
+                          onChange={(e) => {
+                            setSelectedParts((prev) => {
+                              const copy = { ...prev };
+                              if (e.target.checked) {
+                                copy[part.id] = 1;
+                              } else {
+                                delete copy[part.id];
+                              }
+                              return copy;
+                            });
+                          }}
+                        />
+                        <span className="w-40">{part.name} ({part.price?.toLocaleString()}đ)</span>
+                        {selectedParts[part.id] && (
+                          <input
+                            type="number"
+                            min={1}
+                            value={selectedParts[part.id]}
+                            onChange={(e) => {
+                              const qty = Math.max(1, +e.target.value);
+                              setSelectedParts((prev) => ({ ...prev, [part.id]: qty }));
+                            }}
+                            className="border rounded px-2 py-1 w-20"
+                          />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="text-center">
+                  <label className="font-semibold text-lg text-gray-700 block mb-1">Tổng tiền</label>
+                  <div className="text-2xl font-bold text-green-600 bg-gray-100 px-4 py-3 rounded-xl border border-gray-200 shadow inline-block">
+                    {totalCost.toLocaleString()} đ
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-          <div className="flex gap-6 justify-center mt-8">
-            <button
-              type="submit"
-              className="bg-blue-600 hover:bg-blue-800 text-white font-bold px-12 py-3 rounded-2xl shadow-xl transition text-lg tracking-wide"
-            >
-              Lưu
-            </button>
-            <button
-              type="button"
-              onClick={onClose}
-              className="bg-gray-300 hover:bg-gray-500 text-gray-800 font-bold px-12 py-3 rounded-2xl shadow-xl transition text-lg tracking-wide"
-            >
-              Hủy
-            </button>
-          </div>
-        </form>
+
+            <div className="flex justify-center gap-6 mt-8">
+              <button
+                type="submit"
+                className="bg-blue-600 hover:bg-blue-800 text-white font-bold px-10 py-3 rounded-2xl shadow-xl transition text-lg tracking-wide flex items-center gap-2"
+              >
+                <Save className="w-5 h-5" />
+                Lưu
+              </button>
+              <button
+                type="button"
+                onClick={onClose}
+                className="bg-gray-300 hover:bg-gray-500 text-gray-800 font-bold px-10 py-3 rounded-2xl shadow-xl transition text-lg tracking-wide flex items-center gap-2"
+              >
+                <XCircle className="w-5 h-5" />
+                Hủy
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

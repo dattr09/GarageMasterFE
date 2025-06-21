@@ -3,6 +3,8 @@ import { useLocation } from "react-router-dom";
 import PrintInvoice from "./PrintInvoice";
 import { getAllInvoices } from "../../services/InvoiceApi";
 import { getAllEmployees } from "../../services/EmployeeApi";
+import { getRepairOrderById } from "../../services/RepairOrderApi";
+import { FileText, Printer, XCircle } from "lucide-react";
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);
@@ -25,67 +27,46 @@ export default function InvoiceList() {
 
   useEffect(() => {
     if (customerId && repairOrderId) {
-      setInvoiceData({
-        customerId,
-        repairOrderId,
-        paymentMethod: "Cash"
-      });
+      setInvoiceData({ customerId, repairOrderId, paymentMethod: "Cash" });
       setShowPrintInvoice(true);
     }
   }, [customerId, repairOrderId]);
 
   const getEmployeeName = (id) => {
-    if (!id || !employees.length) return "Chưa có";
+    if (id === undefined || id === null || id === "" || !employees.length) return "Chưa có";
     const employee = employees.find(emp => String(emp.id) === String(id));
     if (employee) {
-      if (employee.name) return employee.name;
-      if (employee.fullName) return employee.fullName;
-      if (employee.firstName || employee.lastName)
-        return `${employee.firstName || ""} ${employee.lastName || ""}`.trim();
-      return employee.id;
+      return employee.name || employee.fullName || `${employee.firstName || ""} ${employee.lastName || ""}`.trim();
     }
     return "Không tìm thấy";
   };
 
-  if (selected) {
-    return (
-      <InvoiceDetail
-        invoice={selected}
-        onClose={() => setSelected(null)}
-        getEmployeeName={getEmployeeName}
-        employees={employees} // truyền thêm nếu cần debug
-      />
-    );
-  }
-
   return (
-    <div className="max-w-5xl mx-auto bg-white rounded-xl shadow-lg p-8 mt-8">
-      <h2 className="text-2xl font-bold text-blue-800 mb-6 text-center drop-shadow">Danh sách hóa đơn</h2>
+    <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-xl p-6 mt-8 animate-fade-in">
+      <h2 className="text-3xl font-extrabold text-blue-800 mb-6 text-center drop-shadow">
+        <FileText className="inline mr-2" /> Danh sách hóa đơn
+      </h2>
       <div className="flex justify-end mb-4">
         <button
-          className="bg-purple-600 hover:bg-purple-800 text-white font-semibold px-6 py-2 rounded-lg shadow transition"
+          className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-semibold px-6 py-2 rounded-xl shadow-md hover:shadow-lg transition flex items-center gap-2"
           onClick={() => {
-            setInvoiceData({
-              customerId: "",
-              repairOrderId: "",
-              paymentMethod: "Cash"
-            });
+            setInvoiceData({ customerId: "", repairOrderId: "", paymentMethod: "Cash" });
             setShowPrintInvoice(true);
           }}
         >
-          Tạo/In hóa đơn
+          <Printer size={18} /> Tạo/In hóa đơn
         </button>
       </div>
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-white rounded-xl shadow border border-gray-200">
+      <div className="overflow-x-auto rounded-xl border border-gray-200">
+        <table className="min-w-full bg-white text-sm text-gray-700">
           <thead>
-            <tr className="bg-gradient-to-r from-blue-200 to-blue-100 text-blue-900">
-              <th className="py-3 px-4 text-center font-bold text-base tracking-wide rounded-tl-xl">Mã hóa đơn</th>
-              <th className="py-3 px-4 text-center font-bold text-base tracking-wide">Khách hàng</th>
-              <th className="py-3 px-4 text-center font-bold text-base tracking-wide">Ngày tạo</th>
-              <th className="py-3 px-4 text-center font-bold text-base tracking-wide">Thanh toán</th>
-              <th className="py-3 px-4 text-center font-bold text-base tracking-wide">Tổng tiền</th>
-              <th className="py-3 px-4 text-center font-bold text-base tracking-wide rounded-tr-xl"></th>
+            <tr className="bg-gradient-to-r from-blue-200 to-blue-100 text-blue-900 text-center">
+              <th className="py-3 px-4 font-bold tracking-wide rounded-tl-xl whitespace-nowrap">Mã hóa đơn</th>
+              <th className="py-3 px-4 font-bold tracking-wide whitespace-nowrap">Khách hàng</th>
+              <th className="py-3 px-4 font-bold tracking-wide whitespace-nowrap">Ngày tạo</th>
+              <th className="py-3 px-4 font-bold tracking-wide whitespace-nowrap">Thanh toán</th>
+              <th className="py-3 px-4 font-bold tracking-wide whitespace-nowrap">Tổng tiền</th>
+              <th className="py-3 px-4 font-bold tracking-wide rounded-tr-xl whitespace-nowrap"></th>
             </tr>
           </thead>
           <tbody>
@@ -99,28 +80,28 @@ export default function InvoiceList() {
               [...invoices].reverse().map((inv, idx) => (
                 <tr
                   key={inv.id}
-                  className={`transition ${idx % 2 === 0 ? "bg-white" : "bg-blue-50"} hover:bg-blue-100`}
+                  className={`transition text-center text-sm ${idx % 2 === 0 ? "bg-white" : "bg-blue-50"} hover:bg-blue-100`}
                 >
-                  <td className="py-3 px-4 text-center align-middle font-medium">
+                  <td className="py-3 px-4 font-medium whitespace-nowrap">
                     {`HD${String(inv.id).padStart(4, "0")}`}
                   </td>
-                  <td className="py-3 px-4 text-center">{inv.customerName}</td>
-                  <td className="py-3 px-4 text-center">
+                  <td className="py-3 px-4 whitespace-nowrap">{inv.customerName}</td>
+                  <td className="py-3 px-4 whitespace-nowrap">
                     {new Date(inv.checkOut).toLocaleDateString("vi-VN")}<br />
-                    {new Date(inv.checkOut).toLocaleTimeString("vi-VN", { hour12: false })}
+                    <span className="text-gray-500 text-xs">{new Date(inv.checkOut).toLocaleTimeString("vi-VN", { hour12: false })}</span>
                   </td>
-                  <td className="py-3 px-4 text-center">
+                  <td className="py-3 px-4 whitespace-nowrap">
                     {inv.paymentMethod === "Cash" ? "Tiền mặt" : "Chuyển khoản"}
                   </td>
-                  <td className="py-3 px-4 text-right font-bold text-blue-700">
+                  <td className="py-3 px-4 text-right font-bold text-blue-700 whitespace-nowrap">
                     {Number(inv.totalCost).toLocaleString()} đ
                   </td>
-                  <td className="py-3 px-4 text-center">
+                  <td className="py-3 px-4 whitespace-nowrap">
                     <button
-                      className="text-blue-600 hover:underline font-semibold"
+                      className="text-blue-600 hover:text-blue-800 font-semibold transition hover:underline"
                       onClick={() => setSelected(inv)}
                     >
-                      Chi tiết
+                      <FileText size={16} className="inline mr-1" /> Chi tiết
                     </button>
                   </td>
                 </tr>
@@ -129,7 +110,7 @@ export default function InvoiceList() {
           </tbody>
         </table>
       </div>
-      {/* Popup giao diện in hóa đơn */}
+
       {showPrintInvoice && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <PrintInvoice
@@ -143,13 +124,30 @@ export default function InvoiceList() {
           />
         </div>
       )}
+
+      {/* Hiện popup chi tiết hóa đơn đè lên */}
+      {selected && (
+        <InvoiceDetail
+          invoice={selected}
+          onClose={() => setSelected(null)}
+          getEmployeeName={getEmployeeName}
+        />
+      )}
     </div>
   );
 }
 
 function InvoiceDetail({ invoice, onClose, getEmployeeName }) {
+  const [repairOrder, setRepairOrder] = React.useState(null);
+
+  React.useEffect(() => {
+    if (invoice.repairOrderId) {
+      getRepairOrderById(invoice.repairOrderId).then(setRepairOrder);
+    }
+  }, [invoice.repairOrderId]);
+
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 animate-fade-in">
       <div className="bg-white rounded-3xl shadow-2xl p-10 w-full max-w-xl border border-blue-100 relative">
         <button
           onClick={onClose}
@@ -157,17 +155,45 @@ function InvoiceDetail({ invoice, onClose, getEmployeeName }) {
           title="Đóng"
           type="button"
         >
-          ×
+          <XCircle />
         </button>
-        <h3 className="text-xl font-bold text-blue-700 mb-4 text-center">Chi tiết hóa đơn</h3>
-        <div className="mb-2"><b>Mã hóa đơn:</b> {invoice.id}</div>
-        <div className="mb-2"><b>Khách hàng:</b> {invoice.customerName}</div>
-        <div className="mb-2"><b>Nhân viên sửa chữa:</b> {getEmployeeName(invoice.employeeId)}</div>
-        <div className="mb-2"><b>Ngày tạo:</b> {new Date(invoice.checkOut).toLocaleDateString("vi-VN")} {new Date(invoice.checkOut).toLocaleTimeString("vi-VN", { hour12: false })}</div>
-        <div className="mb-2"><b>Phương thức thanh toán:</b> {invoice.paymentMethod === "Cash" ? "Tiền mặt" : "Chuyển khoản"}</div>
-        <div className="mb-2"><b>Tổng tiền:</b> <span className="font-bold text-blue-700">{Number(invoice.totalCost).toLocaleString()} đ</span></div>
+        <h3 className="text-xl font-bold text-blue-700 mb-4 text-center">
+          <FileText className="inline mr-1" /> Chi tiết hóa đơn
+        </h3>
+        <div className="space-y-2 text-sm sm:text-base w-full flex flex-col">
+          <div className="flex justify-between">
+            <span><b>Mã hóa đơn:</b></span>
+            <span>HD{String(invoice.id).padStart(4, "0")}</span>
+          </div>
+          <div className="flex justify-between">
+            <span><b>Khách hàng:</b></span>
+            <span>{invoice.customerName}</span>
+          </div>
+          <div className="flex justify-between">
+            <span><b>Nhân viên sửa chữa:</b></span>
+            <span>
+              {repairOrder
+                ? getEmployeeName(repairOrder.employeeId)
+                : "Đang tải..."}
+            </span>
+          </div>
+          <div className="flex justify-between">
+            <span><b>Ngày tạo:</b></span>
+            <span>
+              {new Date(invoice.checkOut).toLocaleDateString("vi-VN")} {new Date(invoice.checkOut).toLocaleTimeString("vi-VN", { hour12: false })}
+            </span>
+          </div>
+          <div className="flex justify-between">
+            <span><b>Phương thức thanh toán:</b></span>
+            <span>{invoice.paymentMethod === "Cash" ? "Tiền mặt" : "Chuyển khoản"}</span>
+          </div>
+          <div className="flex justify-between">
+            <span><b>Tổng tiền:</b></span>
+            <span className="font-bold text-blue-700">{Number(invoice.totalCost).toLocaleString()} đ</span>
+          </div>
+        </div>
         <button
-          className="mt-4 bg-blue-600 hover:bg-blue-800 text-white px-6 py-2 rounded-xl font-bold shadow transition w-full"
+          className="mt-6 w-full bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white px-6 py-2 rounded-xl font-bold shadow-lg transition"
           onClick={onClose}
         >
           Đóng

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Trash2, ShoppingCart, ChevronLeft, CheckCircle, XCircle } from "lucide-react";
 
 export default function Cart() {
   const [cart, setCart] = useState([]);
@@ -16,17 +17,15 @@ export default function Cart() {
     setCart(data);
   }, [navigate]);
 
-  // Xóa sản phẩm khỏi giỏ
   const removeItem = (id) => {
-    const newCart = cart.filter(item => item.id !== id);
+    const newCart = cart.filter((item) => item.id !== id);
     setCart(newCart);
     localStorage.setItem("cart", JSON.stringify(newCart));
     window.dispatchEvent(new Event("cartChanged"));
   };
 
-  // Thay đổi số lượng
   const updateQuantity = (id, quantity) => {
-    const newCart = cart.map(item =>
+    const newCart = cart.map((item) =>
       item.id === id ? { ...item, quantity: Math.max(1, quantity) } : item
     );
     setCart(newCart);
@@ -34,71 +33,90 @@ export default function Cart() {
     window.dispatchEvent(new Event("cartChanged"));
   };
 
-  // Tổng tiền
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   return (
-    <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-8 mt-8">
-      <h2 className="text-2xl font-bold text-blue-800 mb-6 text-center drop-shadow">Giỏ hàng</h2>
+    <div className="max-w-5xl mx-auto mt-10 p-6 bg-gradient-to-br from-white via-slate-50 to-slate-100 rounded-3xl shadow-2xl animate-fade-in">
+      <div className="flex items-center justify-center gap-3 mb-6 text-blue-800">
+        <ShoppingCart className="w-8 h-8 drop-shadow-md" />
+        <h2 className="text-3xl font-extrabold tracking-tight drop-shadow-sm">Giỏ hàng</h2>
+      </div>
+
       {cart.length === 0 ? (
-        <div className="text-center text-gray-400 italic py-8">Giỏ hàng trống.</div>
+        <div className="text-center text-gray-400 italic py-10 text-lg">
+          <XCircle className="mx-auto mb-2 w-10 h-10 text-gray-300" />
+          Giỏ hàng trống.
+        </div>
       ) : (
         <>
-          <table className="w-full mb-6">
-            <thead>
-              <tr className="text-blue-700 font-bold border-b">
-                <th className="py-2">Ảnh</th>
-                <th>Tên</th>
-                <th>Đơn giá</th>
-                <th>Số lượng</th>
-                <th>Thành tiền</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {cart.map(item => (
-                <tr key={item.id} className="border-b">
-                  <td className="py-2">
-                    <img src={item.image} alt={item.name} className="w-12 h-12 object-contain rounded" />
-                  </td>
-                  <td>{item.name}</td>
-                  <td>{item.price.toLocaleString()} đ</td>
-                  <td>
-                    <input
-                      type="number"
-                      min={1}
-                      value={item.quantity}
-                      onChange={e => updateQuantity(item.id, Number(e.target.value))}
-                      className="w-16 border rounded px-2 py-1"
-                    />
-                  </td>
-                  <td>{(item.price * item.quantity).toLocaleString()} đ</td>
-                  <td>
-                    <button
-                      onClick={() => removeItem(item.id)}
-                      className="text-red-500 hover:underline"
-                    >
-                      Xóa
-                    </button>
-                  </td>
+          <div className="overflow-x-auto rounded-xl shadow-inner mb-6">
+            <table className="w-full table-auto text-sm md:text-base">
+              <thead>
+                <tr className="bg-blue-100 text-blue-800 font-semibold">
+                  <th className="p-3">Ảnh</th>
+                  <th className="p-3 text-left">Tên</th>
+                  <th className="p-3 text-right">Đơn giá</th>
+                  <th className="p-3 text-center">Số lượng</th>
+                  <th className="p-3 text-right">Thành tiền</th>
+                  <th className="p-3 text-center">Xoá</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-          <div className="text-right font-bold text-lg text-blue-700 mb-4">
-            Tổng: {total.toLocaleString()} đ
+              </thead>
+              <tbody className="bg-white">
+                {cart.map((item) => (
+                  <tr key={item.id} className="hover:bg-slate-50 transition">
+                    <td className="p-3">
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="w-14 h-14 object-contain rounded-lg shadow-sm transform hover:scale-105 duration-300"
+                      />
+                    </td>
+                    <td className="p-3 font-medium">{item.name}</td>
+                    <td className="p-3 text-right text-blue-700 font-semibold">
+                      {item.price.toLocaleString()} đ
+                    </td>
+                    <td className="p-3 text-center">
+                      <input
+                        type="number"
+                        min={1}
+                        value={item.quantity}
+                        onChange={(e) => updateQuantity(item.id, Number(e.target.value))}
+                        className="w-20 px-3 py-1 border border-gray-300 rounded-lg text-center focus:ring-2 focus:ring-blue-300"
+                      />
+                    </td>
+                    <td className="p-3 text-right font-semibold text-blue-600">
+                      {(item.price * item.quantity).toLocaleString()} đ
+                    </td>
+                    <td className="p-3 text-center">
+                      <button
+                        onClick={() => removeItem(item.id)}
+                        className="text-red-500 hover:text-red-700 transition"
+                        title="Xóa sản phẩm"
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-          <div className="flex justify-end gap-3">
+
+          <div className="flex justify-center items-center mb-6">
+            <span className="text-xl font-bold text-blue-800 drop-shadow-sm">
+              Tổng cộng: <span className="text-2xl">{total.toLocaleString()} đ</span>
+            </span>
+          </div>
+
+          <div className="flex flex-col sm:flex-row justify-end gap-4">
             <button
-              className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-xl font-bold shadow transition"
-              onClick={() => {
-                navigate("/");
-              }}
+              onClick={() => navigate("/")}
+              className="flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-2 rounded-xl font-semibold shadow-md transition"
             >
-              Huỷ
+              <ChevronLeft className="w-4 h-4" />
+              Tiếp tục mua sắm
             </button>
             <button
-              className="bg-blue-600 hover:bg-blue-800 text-white px-8 py-2 rounded-xl font-bold shadow transition"
               onClick={() => {
                 const token = localStorage.getItem("token");
                 if (!token) {
@@ -108,8 +126,10 @@ export default function Cart() {
                 }
                 navigate("/checkout");
               }}
+              className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-800 text-white px-6 py-2 rounded-xl font-semibold shadow-lg transition duration-300 transform hover:scale-105"
             >
-              Tiếp tục mua sắm
+              <CheckCircle className="w-5 h-5" />
+              Thanh toán
             </button>
           </div>
         </>

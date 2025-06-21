@@ -4,12 +4,14 @@ import EmployeeAdd from "./EmployeeAdd";
 import EmployeeDetails from "./EmployeeDetails";
 import EmployeeEdit from "./EmployeeEdit";
 import Swal from "sweetalert2";
+import { PlusCircle, Info, Pencil, Trash2 } from "lucide-react";
 
 export default function EmployeeList() {
   const [employees, setEmployees] = useState([]);
   const [showAdd, setShowAdd] = useState(false);
   const [detailEmployee, setDetailEmployee] = useState(null);
   const [editEmployee, setEditEmployee] = useState(null);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     fetchEmployees();
@@ -61,66 +63,81 @@ export default function EmployeeList() {
     }
   }
 
+  const filteredEmployees = employees.filter(e =>
+    e.name.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
-    <div className="max-w-5xl mx-auto bg-white rounded-xl shadow-lg p-8 mt-8">
-      <h2 className="text-2xl font-bold text-blue-800 mb-6 text-center drop-shadow">
-        Danh sách nhân viên
+    <div className="max-w-5xl mx-auto bg-white rounded-xl shadow-xl p-6 mt-6 animate-fade-in">
+      <h2 className="text-3xl font-extrabold text-center text-blue-800 mb-6 drop-shadow-md">
+        👨‍🔧 Danh sách nhân viên
       </h2>
-      <div className="flex justify-end mb-4">
+
+      <div className="flex flex-col sm:flex-row gap-3 items-center justify-between mb-6">
+        <input
+          type="text"
+          className="flex-1 px-4 py-2 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+          placeholder="Tìm theo tên nhân viên..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+        />
         <button
           onClick={() => setShowAdd(true)}
-          className="bg-green-600 hover:bg-green-800 text-white font-semibold px-6 py-2 rounded-lg shadow transition"
+          className="flex items-center gap-2 bg-green-600 hover:bg-green-800 text-white font-bold px-4 py-2 rounded-xl transition shadow"
         >
-          Thêm mới
+          <PlusCircle size={20} /> Thêm mới
         </button>
       </div>
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-white rounded-xl shadow border border-gray-200">
-          <thead>
-            <tr className="bg-gradient-to-r from-blue-200 to-blue-100 text-blue-900">
-              <th className="py-3 px-4 text-center font-bold text-base tracking-wide rounded-tl-xl">Tên</th>
-              <th className="py-3 px-4 text-center font-bold text-base tracking-wide">SĐT</th>
-              <th className="py-3 px-4 text-center font-bold text-base tracking-wide">Địa chỉ</th>
-              <th className="py-3 px-4 text-center font-bold text-base tracking-wide">Vai trò</th>
-              <th className="py-3 px-4 text-center font-bold text-base tracking-wide rounded-tr-xl">Thao tác</th>
+
+      <div className="overflow-x-auto rounded-xl border border-gray-200 shadow">
+        <table className="min-w-full divide-y divide-gray-200 text-sm text-gray-700">
+          <thead className="bg-blue-100 text-blue-900">
+            <tr>
+              <th className="px-6 py-3 text-center font-semibold">Tên</th>
+              <th className="px-6 py-3 text-center font-semibold">SĐT</th>
+              <th className="px-6 py-3 text-center font-semibold">Địa chỉ</th>
+              <th className="px-6 py-3 text-center font-semibold">Vai trò</th>
+              <th className="px-6 py-3 text-center font-semibold">Thao tác</th>
             </tr>
           </thead>
           <tbody>
-            {employees.length === 0 ? (
+            {filteredEmployees.length === 0 ? (
               <tr>
-                <td colSpan={5} className="py-8 text-center text-gray-400 italic bg-gray-50 rounded-b-xl">
+                <td colSpan={5} className="text-center py-6 text-gray-400 italic">
                   Không có nhân viên nào.
                 </td>
               </tr>
             ) : (
-              employees.map((e, idx) => (
-                <tr key={e.id}
-                  className={`transition ${idx % 2 === 0 ? "bg-white" : "bg-blue-50"} hover:bg-blue-100`}>
-                  <td className="py-3 px-4 text-center font-medium">{e.name}</td>
-                  <td className="py-3 px-4 text-center">{e.phone}</td>
-                  <td className="py-3 px-4 text-center">{e.address}</td>
-                  <td className="py-3 px-4 text-center">{getRoleName(e.employeeRole)}</td>
-                  <td className="py-3 px-4 flex justify-center items-center gap-2 align-middle">
+              filteredEmployees.map((e, idx) => (
+                <tr
+                  key={e.id}
+                  className={`transition ${idx % 2 === 0 ? "bg-white" : "bg-blue-50"} hover:bg-blue-100`}
+                >
+                  <td className="px-6 py-4 text-center font-medium">{e.name}</td>
+                  <td className="px-6 py-4 text-center">{e.phone}</td>
+                  <td className="px-6 py-4 text-center">{e.address}</td>
+                  <td className="px-6 py-4 text-center">{getRoleName(e.employeeRole)}</td>
+                  <td className="px-6 py-4 text-center flex flex-wrap justify-center gap-2">
                     <button
                       onClick={() => setDetailEmployee(e)}
-                      className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-1 rounded-lg shadow font-semibold transition"
+                      className="flex items-center gap-1 bg-blue-500 hover:bg-blue-700 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
                       title="Chi tiết"
                     >
-                      Chi tiết
+                      <Info size={16} /> Chi tiết
                     </button>
                     <button
                       onClick={() => setEditEmployee(e)}
-                      className="bg-yellow-500 hover:bg-yellow-700 text-white px-4 py-1 rounded-lg shadow font-semibold transition"
+                      className="flex items-center gap-1 bg-yellow-400 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
                       title="Sửa"
                     >
-                      Sửa
+                      <Pencil size={16} /> Sửa
                     </button>
                     <button
                       onClick={() => handleDelete(e.id)}
-                      className="bg-red-500 hover:bg-red-700 text-white px-4 py-1 rounded-lg shadow font-semibold transition"
-                      title="Xoá"
+                      className="flex items-center gap-1 bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
+                      title="Xóa"
                     >
-                      Xoá
+                      <Trash2 size={16} /> Xóa
                     </button>
                   </td>
                 </tr>
@@ -129,21 +146,27 @@ export default function EmployeeList() {
           </tbody>
         </table>
       </div>
+
+      {/* Popup thêm */}
       {showAdd && (
         <EmployeeAdd
           onClose={() => setShowAdd(false)}
           onSaved={() => {
             setShowAdd(false);
-            fetchEmployees(); // Phải gọi lại để load danh sách mới
+            fetchEmployees();
           }}
         />
       )}
+
+      {/* Popup chi tiết */}
       {detailEmployee && (
         <EmployeeDetails
           employee={detailEmployee}
           onClose={() => setDetailEmployee(null)}
         />
       )}
+
+      {/* Popup sửa */}
       {editEmployee && (
         <EmployeeEdit
           employee={editEmployee}
