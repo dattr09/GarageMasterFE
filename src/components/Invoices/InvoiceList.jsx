@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import PrintInvoice from "./PrintInvoice";
-import { getAllInvoices } from "../../services/InvoiceApi";
+import { getAllInvoices, getMyInvoices } from "../../services/InvoiceApi";
 import { getAllEmployees } from "../../services/EmployeeApi";
 import { getRepairOrderById } from "../../services/RepairOrderApi";
 import { FileText, Printer, XCircle } from "lucide-react";
@@ -21,7 +21,12 @@ export default function InvoiceList() {
   const [invoiceData, setInvoiceData] = useState({});
 
   useEffect(() => {
-    getAllInvoices().then(setInvoices).catch(console.error);
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (user?.role === "Admin" || user?.role === "Employee") {
+      getAllInvoices().then(setInvoices).catch(console.error);
+    } else if (user?.role === "Customer") {
+      getMyInvoices().then(setInvoices).catch(console.error);
+    }
     getAllEmployees().then(setEmployees).catch(console.error);
   }, []);
 

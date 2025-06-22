@@ -33,3 +33,10 @@ export async function getInvoiceById(id) {
   if (!res.ok) throw new Error("Lỗi lấy chi tiết hóa đơn");
   return res.json();
 }
+
+// Lấy hóa đơn của bạn
+export async function getMyInvoices() {
+  const res = await fetch(`${API_BASE}/my`, { headers: getAuthHeaders() });
+  if (!res.ok) throw new Error("Lỗi lấy hóa đơn của bạn");
+  return res.json();
+}
