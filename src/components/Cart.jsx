@@ -79,10 +79,17 @@ export default function Cart() {
                       <input
                         type="number"
                         min={1}
+                        max={item.maxQuantity || item.quantity} // Thêm max
                         value={item.quantity}
-                        onChange={(e) => updateQuantity(item.id, Number(e.target.value))}
+                        onChange={(e) => {
+                          const val = Math.min(Number(e.target.value), item.maxQuantity || item.quantity);
+                          updateQuantity(item.id, val);
+                        }}
                         className="w-20 px-3 py-1 border border-gray-300 rounded-lg text-center focus:ring-2 focus:ring-blue-300"
                       />
+                      {item.quantity > (item.maxQuantity || item.quantity) && (
+                        <div className="text-red-500 text-xs mt-1">Vượt quá tồn kho!</div>
+                      )}
                     </td>
                     <td className="p-3 text-right font-semibold text-blue-600">
                       {(item.price * item.quantity).toLocaleString()} đ

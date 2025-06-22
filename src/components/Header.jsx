@@ -59,24 +59,24 @@ export default function Header() {
 
   // Search logic
   const [search, setSearch] = useState("");
-  const [searchType, setSearchType] = useState("parts");
   const [suggestions, setSuggestions] = useState([]);
   const searchInputRef = useRef(null);
 
+  // Danh sách phụ tùng và hãng xe (có thể lấy từ props hoặc context nếu cần)
   const partsList = ["Nhớt động cơ", "Bugi", "Lốp xe", "Ắc quy", "Phanh đĩa", "Đèn pha", "Lọc gió"];
   const brandsList = ["Honda", "Yamaha", "Suzuki", "SYM", "Piaggio", "Kawasaki", "Ducati"];
 
+  // Gợi ý từ cả parts và brands
   useEffect(() => {
-    const data = searchType === "parts"
-      ? partsList.filter(item => item.toLowerCase().includes(search.toLowerCase()))
-      : brandsList.filter(item => item.toLowerCase().includes(search.toLowerCase()));
-    setSuggestions(search ? data.slice(0, 5) : []);
-  }, [search, searchType]);
+    const allList = [...partsList, ...brandsList];
+    const data = allList.filter(item => item.toLowerCase().includes(search.toLowerCase()));
+    setSuggestions(search ? data.slice(0, 7) : []);
+  }, [search]);
 
   const handleSearch = (e) => {
     e.preventDefault();
-    const route = searchType === "parts" ? "/parts" : "/brands";
-    navigate(`${route}?search=${encodeURIComponent(search)}`);
+    if (!search.trim()) return;
+    navigate(`/parts?search=${encodeURIComponent(search)}`);
     setSearch("");
     setSuggestions([]);
     searchInputRef.current?.blur();
@@ -102,22 +102,13 @@ export default function Header() {
               className="relative flex items-center bg-white rounded-xl shadow focus-within:ring-2 focus-within:ring-blue-300"
               autoComplete="off"
             >
-              <select
-                value={searchType}
-                onChange={(e) => setSearchType(e.target.value)}
-                className="h-10 px-3 rounded-l-xl bg-blue-50 text-blue-700 font-semibold border-none outline-none focus:ring-0"
-                style={{ minWidth: 110 }}
-              >
-                <option value="parts">Phụ tùng</option>
-                <option value="brands">Hãng xe</option>
-              </select>
               <input
                 ref={searchInputRef}
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder={searchType === "parts" ? "Tìm phụ tùng..." : "Tìm hãng xe..."}
-                className="h-10 px-4 pr-10 rounded-r-xl bg-transparent outline-none text-gray-700 w-44 md:w-64"
+                placeholder="Tìm phụ tùng..."
+                className="h-10 px-4 pr-10 rounded-xl bg-transparent outline-none text-gray-700 w-44 md:w-64"
               />
               <button
                 type="submit"
@@ -224,10 +215,21 @@ export default function Header() {
                       setOpen(false);
                       navigate("/invoices");
                     }}
-                    className="block w-full text-left px-5 py-2 hover:bg-blue-50 rounded-b-xl text-gray-700 hover:text-blue-700 transition whitespace-nowrap"
+                    className="block w-full text-left px-5 py-2 hover:bg-blue-50 text-gray-700 hover:text-blue-700 transition whitespace-nowrap"
                     type="button"
                   >
                     Hóa đơn
+                  </button>
+                  <button
+                    onMouseDown={e => {
+                      e.preventDefault();
+                      setOpen(false);
+                      navigate("/revenue-stats");
+                    }}
+                    className="block w-full text-left px-5 py-2 hover:bg-blue-50 rounded-b-xl text-gray-700 hover:text-blue-700 transition whitespace-nowrap"
+                    type="button"
+                  >
+                    Thống kê doanh thu
                   </button>
                 </div>
               )}
@@ -263,6 +265,12 @@ export default function Header() {
                 </button>
                 {open === "user" && (
                   <div className="absolute right-0 mt-2 w-44 bg-white border border-gray-100 rounded-xl shadow-lg z-50 animate-fade-in-up">
+                    <Link
+                      to="/order-history"
+                      className="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition"
+                    >
+                      Lịch sử mua hàng
+                    </Link>
                     <button
                       onClick={handleLogout}
                       className="flex items-center gap-2 w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 rounded-b-xl font-semibold"

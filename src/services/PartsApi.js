@@ -75,3 +75,18 @@ export async function deletePart(id) {
   if (!res.ok) throw new Error(data?.message || "Xóa phụ tùng thất bại");
   return data;
 }
+
+export async function updatePartQuantity(partId, quantityChange) {
+  const token = localStorage.getItem("token");
+  return fetch(`http://localhost:5119/api/parts/${partId}/quantity`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    },
+    body: JSON.stringify({ quantityChange }),
+  }).then(res => {
+    if (!res.ok) throw new Error("Cập nhật số lượng thất bại");
+    return res.json();
+  });
+}

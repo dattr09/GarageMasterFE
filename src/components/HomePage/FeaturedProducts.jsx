@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ShoppingCart, CreditCard, BadgeCheck, Handshake, Wrench, Truck, Target } from "lucide-react";
+import PartDetails from "../Parts/PartDetails"; // Thêm dòng này
 
 export default function FeaturedProducts({ parts = [], brands = [] }) {
   const PRODUCTS_PER_PAGE = 5;
   const featuredProducts = parts.slice(0, 10);
   const [page, setPage] = useState(0);
+  const [selectedPart, setSelectedPart] = useState(null); // Thêm state này
   const totalPages = Math.max(featuredProducts.length - PRODUCTS_PER_PAGE + 1, 1);
   const navigate = useNavigate();
 
@@ -50,7 +52,8 @@ export default function FeaturedProducts({ parts = [], brands = [] }) {
           {currentProducts.map((item) => (
             <div
               key={item.id || item.name}
-              className="flex flex-col items-center bg-white rounded-3xl shadow-lg hover:shadow-2xl p-5 transition-all duration-300 border border-transparent hover:border-blue-400 group transform hover:-translate-y-1"
+              className="flex flex-col items-center bg-white rounded-3xl shadow-lg hover:shadow-2xl p-5 transition-all duration-300 border border-transparent hover:border-blue-400 group transform hover:-translate-y-1 cursor-pointer"
+              onClick={() => setSelectedPart(item)} // Đổi navigate thành setSelectedPart
             >
               <img
                 src={item.image || item.img}
@@ -62,25 +65,42 @@ export default function FeaturedProducts({ parts = [], brands = [] }) {
                 {item.price ? item.price.toLocaleString("vi-VN") + " VND" : ""}
               </span>
               <span className="text-xs text-gray-500 mb-4">
-                Tồn kho: {item.quantity ?? item.stock}
+                Còn: {item.quantity ?? item.stock}
               </span>
               <div className="flex gap-2 mt-auto">
-                <button
-                  className="flex items-center gap-1 bg-blue-600 hover:bg-blue-800 text-white px-3 py-1.5 rounded-lg text-sm font-semibold shadow-md transition"
-                  onClick={() => handleBuy(item)}
-                >
-                  <CreditCard className="w-4 h-4" /> Mua ngay
-                </button>
-                <button
-                  className="flex items-center gap-1 bg-green-600 hover:bg-green-800 text-white px-3 py-1.5 rounded-lg text-sm font-semibold shadow-md transition"
-                  onClick={() => handleAddToCart(item)}
-                >
-                  <ShoppingCart className="w-4 h-4" /> Giỏ hàng
-                </button>
+                {item.quantity > 0 ? (
+                  <>
+                    <button
+                      className="flex items-center gap-1 bg-blue-600 hover:bg-blue-800 text-white px-3 py-1.5 rounded-lg text-sm font-semibold shadow-md transition"
+                      onClick={e => { e.stopPropagation(); handleBuy(item); }}
+                    >
+                      <CreditCard className="w-4 h-4" /> Mua ngay
+                    </button>
+                    <button
+                      onClick={() => handleAddToCart(item)}
+                      className="flex items-center gap-1 bg-green-600 hover:bg-green-800 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
+                      title="Thêm giỏ hàng"
+                    >
+                      <ShoppingCart size={16} /> Giỏ hàng
+                    </button>
+                  </>
+                ) : (
+                  <div className="w-full text-center bg-red-100 text-red-700 font-bold rounded-xl py-2 mt-2 shadow-inner border border-red-300 animate-pulse">
+                    Hết hàng
+                  </div>
+                )}
               </div>
             </div>
           ))}
         </div>
+        {/* Hiển thị popup chi tiết sản phẩm */}
+        {selectedPart && (
+          <PartDetails
+            part={selectedPart}
+            brands={brands}
+            onClose={() => setSelectedPart(null)}
+          />
+        )}
         {/* Indicator dots */}
         <div className="flex justify-center gap-2 absolute bottom-3 left-1/2 -translate-x-1/2">
           {Array.from({ length: totalPages }).map((_, idx) => (
@@ -108,7 +128,9 @@ export default function FeaturedProducts({ parts = [], brands = [] }) {
           {brands.slice(0, 10).map((brand) => (
             <div
               key={brand.id || brand.name}
-              className="flex flex-col items-center bg-white rounded-2xl shadow-md hover:shadow-xl p-4 transition-all duration-300 transform hover:-translate-y-1 hover:ring-2 hover:ring-blue-300 relative"
+              className="flex flex-col items-center bg-white rounded-2xl shadow-md hover:shadow-xl p-4 transition-all duration-300 transform hover:-translate-y-1 hover:ring-2 hover:ring-blue-300 relative cursor-pointer"
+              onClick={() => navigate(`/parts?brand=${encodeURIComponent(brand.name)}`)}
+              title={`Xem phụ tùng hãng ${brand.name}`}
             >
               {/* Icon góc phải trên */}
               <BadgeCheck className="absolute top-2 right-2 w-6 h-6 text-green-500 bg-white rounded-full shadow" />

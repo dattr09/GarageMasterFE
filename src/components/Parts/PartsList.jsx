@@ -14,15 +14,35 @@ import {
   ShoppingCart,
   PlusCircle,
 } from "lucide-react";
+import { useLocation } from "react-router-dom";
 
 export default function PartsList() {
+  const location = useLocation();
   const [parts, setParts] = useState([]);
   const [brands, setBrands] = useState([]);
   const [search, setSearch] = useState("");
   const [selectedPart, setSelectedPart] = useState(null);
   const [showForm, setShowForm] = useState(false);
-  const [sortPrice, setSortPrice] = useState(""); // "", "asc", "desc"
-  const [brandFilter, setBrandFilter] = useState(""); // "" hoặc id hãng
+  const [sortPrice, setSortPrice] = useState("");
+  const [brandFilter, setBrandFilter] = useState("");
+
+  // Lấy brand từ query string khi mount
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const brandName = params.get("brand");
+    if (brandName && brands.length > 0) {
+      // Tìm id hãng theo tên
+      const found = brands.find(b => b.name === brandName);
+      if (found) setBrandFilter(String(found.id));
+    }
+  }, [location.search, brands]);
+
+  // Tự động set search theo query param "name"
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const name = params.get("name");
+    if (name) setSearch(name);
+  }, [location.search]);
 
   // Animation style
   const fadeInStyle = `
@@ -64,16 +84,36 @@ export default function PartsList() {
   };
 
   const handleAddToCart = (item) => {
+    if (item.quantity <= 0) {
+      alert("Phụ tùng này đã hết hàng!");
+      return;
+    }
     const cart = JSON.parse(localStorage.getItem("cart") || "[]");
     const idx = cart.findIndex((i) => i.id === item.id);
+    const maxQuantity = item.quantity;
     if (idx >= 0) {
+      if (cart[idx].quantity >= maxQuantity) {
+        alert("Bạn đã thêm tối đa số lượng tồn kho!");
+        return;
+      }
       cart[idx].quantity += 1;
     } else {
-      cart.push({ ...item, quantity: 1 });
+      if (maxQuantity <= 0) {
+        alert("Phụ tùng này đã hết hàng!");
+        return;
+      }
+      cart.push({ ...item, quantity: 1, maxQuantity });
     }
     localStorage.setItem("cart", JSON.stringify(cart));
     window.dispatchEvent(new Event("cartChanged"));
     alert(`Đã thêm ${item.name} vào giỏ hàng!`);
+  };
+
+  const handleBuy = (item) => {
+    if (item.quantity <= 0) {
+      alert("Phụ tùng này đã hết hàng!");
+      return;
+    }
   };
 
   // Lọc, tìm kiếm, sắp xếp
@@ -111,7 +151,7 @@ export default function PartsList() {
         <div className="flex flex-col sm:flex-row gap-3 items-center mb-6">
           <input
             className="flex-1 px-4 py-2 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-            placeholder="🔍 Tìm theo tên..."
+            placeholder="Tìm theo tên..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -176,7 +216,7 @@ export default function PartsList() {
                 </div>
 
                 <div className="text-gray-700 text-sm mb-1">
-                  Số lượng:{" "}
+                  Còn:{" "}
                   <span className="font-semibold text-black">
                     {part.quantity}
                   </span>
@@ -216,10 +256,14 @@ export default function PartsList() {
                     onClick={() => handleAddToCart(part)}
                     className="flex items-center gap-1 bg-green-600 hover:bg-green-800 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
                     title="Thêm giỏ hàng"
+                    disabled={part.quantity <= 0}
                   >
                     <ShoppingCart size={16} /> Giỏ hàng
                   </button>
                 </div>
+                {part.quantity <= 0 && (
+                  <div className="text-red-600 font-bold mt-2">Hết hàng</div>
+                )}
               </div>
             ))
           )}

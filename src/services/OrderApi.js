@@ -18,9 +18,21 @@ export async function createOrder(order) {
 // Lấy danh sách đơn hàng theo user (nếu cần)
 export async function getOrdersByUser(userId) {
   const token = localStorage.getItem("token");
-  const res = await fetch(`${API_URL}/user/${userId}`, {
-    headers: { "Authorization": `Bearer ${token}` }
+  const res = await fetch(`http://localhost:5119/api/order/user/${userId}`, { 
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json"
+    }
   });
   if (!res.ok) throw new Error("Không lấy được đơn hàng");
+  return res.json();
+}
+
+export async function getAllOrders() {
+  const token = localStorage.getItem("token");
+  const res = await fetch(API_URL, {
+    headers: { "Authorization": `Bearer ${token}` }
+  });
+  if (!res.ok) throw new Error("Không lấy được danh sách đơn hàng");
   return res.json();
 }

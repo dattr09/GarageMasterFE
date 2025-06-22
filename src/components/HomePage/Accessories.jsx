@@ -1,11 +1,13 @@
 import React, { useState } from "react";
-import { ChevronDown, ChevronUp, Settings2 } from "lucide-react"; // thêm icon
+import { ChevronDown, ChevronUp, Settings2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const ITEMS_PER_ROW = 9;
 const ROWS_DEFAULT = 2;
 const DEFAULT_ITEMS = ITEMS_PER_ROW * ROWS_DEFAULT;
 
 export default function Accessories({ parts = [] }) {
+  const navigate = useNavigate();
   const categories = Array.from(
     new Map(parts.map(item => [item.name, { name: item.name, img: item.image }])).values()
   );
@@ -14,12 +16,25 @@ export default function Accessories({ parts = [] }) {
 
   return (
     <div className="relative bg-white/90 rounded-3xl shadow-xl p-6">
-      <h2 className="text-2xl font-bold mb-6 text-blue-700 drop-shadow-md flex items-center gap-2">
-        <Settings2 className="w-6 h-6 text-blue-500" />
-        Danh mục phụ tùng
-      </h2>
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
+        <h2 className="text-2xl font-bold text-blue-700 drop-shadow-md flex items-center gap-2 m-0">
+          <Settings2 className="w-6 h-6 text-blue-500" />
+          Danh mục phụ tùng
+        </h2>
 
-      <div className="grid grid-cols-3 sm:grid-cols-6 md:grid-cols-9 gap-4">
+        <button
+          onClick={() => navigate("/parts")}
+          className="px-6 py-2 rounded-full bg-gradient-to-br from-purple-500 to-blue-600 text-white font-semibold shadow-lg hover:shadow-2xl hover:scale-105 transform transition-all duration-300 text-sm active:scale-95"
+          style={{
+            boxShadow: "0 4px 8px rgba(0,0,0,0.15)",
+            textShadow: "0 1px 2px rgba(0,0,0,0.2)",
+          }}
+        >
+          🔧 Xem tất cả
+        </button>
+      </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-9 gap-4">
         {visibleAccessories.map((item, idx) => (
           <div
             key={idx}
@@ -28,6 +43,8 @@ export default function Accessories({ parts = [] }) {
               aspectRatio: "1/1",
               overflow: "hidden",
             }}
+            onClick={() => navigate(`/parts?name=${encodeURIComponent(item.name)}`)}
+            title={`Xem danh sách phụ tùng: ${item.name}`}
           >
             <div className="w-20 h-20 flex items-center justify-center">
               <img
@@ -53,7 +70,6 @@ export default function Accessories({ parts = [] }) {
         ))}
       </div>
 
-      {/* Nút xem thêm / thu gọn */}
       {categories.length > DEFAULT_ITEMS && (
         <button
           onClick={() => setShowAll((v) => !v)}
