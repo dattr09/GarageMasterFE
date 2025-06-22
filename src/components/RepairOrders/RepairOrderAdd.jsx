@@ -312,7 +312,7 @@ export default function RepairOrderAdd({ onSaved, onClose }) {
                           }}
                         />
                         <span className="w-40">
-                          {part.name} ({part.price?.toLocaleString()}đ)
+                          {part.name} ({part.price?.toLocaleString()}VNĐ)
                         </span>
                         {selectedParts[part.id] && (
                           <input
@@ -337,7 +337,7 @@ export default function RepairOrderAdd({ onSaved, onClose }) {
                     <Coins className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
                     <input
                       disabled
-                      value={totalCost.toLocaleString() + " đ"}
+                      value={totalCost.toLocaleString() + " VNĐ"}
                       className="text-2xl font-bold text-green-600 bg-gray-100 pl-10 pr-4 py-3 rounded-xl border border-gray-200 shadow w-full"
                       style={{ maxWidth: "320px" }}
                     />

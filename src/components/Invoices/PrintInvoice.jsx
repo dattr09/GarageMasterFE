@@ -198,7 +198,7 @@ export default function PrintInvoice(props) {
             HÓA ĐƠN THANH TOÁN
           </h3>
           <div className="grid grid-cols-1 gap-2 text-sm sm:text-base whitespace-nowrap">
-            <div><b>Mã hóa đơn:</b> HD{String(invoice.id).padStart(4, "0")}</div>
+            <div><b>Mã hóa đơn:</b> HD{String(invoice.id).padStart(3, "0")}</div>
             <div><b>Khách hàng:</b> {invoice.customerName}</div>
             <div><b>Nhân viên sửa chữa:</b> {getEmployeeName(invoice.employeeId)}</div>
             <div><b>Ngày tạo:</b> {new Date(invoice.checkOut).toLocaleString("vi-VN")}</div>

@@ -83,7 +83,7 @@ export default function InvoiceList() {
                   className={`transition text-center text-sm ${idx % 2 === 0 ? "bg-white" : "bg-blue-50"} hover:bg-blue-100`}
                 >
                   <td className="py-3 px-4 font-medium whitespace-nowrap">
-                    {`HD${String(inv.id).padStart(4, "0")}`}
+                    {`HD${String(inv.id).padStart(3, "0")}`}
                   </td>
                   <td className="py-3 px-4 whitespace-nowrap">{inv.customerName}</td>
                   <td className="py-3 px-4 whitespace-nowrap">
@@ -163,7 +163,7 @@ function InvoiceDetail({ invoice, onClose, getEmployeeName }) {
         <div className="space-y-2 text-sm sm:text-base w-full flex flex-col">
           <div className="flex justify-between">
             <span><b>Mã hóa đơn:</b></span>
-            <span>HD{String(invoice.id).padStart(4, "0")}</span>
+            <span>HD{String(invoice.id).padStart(3, "0")}</span>
           </div>
           <div className="flex justify-between">
             <span><b>Khách hàng:</b></span>

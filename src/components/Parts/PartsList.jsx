@@ -223,10 +223,9 @@ export default function PartsList() {
                 </div>
 
                 <div className="text-blue-800 font-bold text-xl mb-1">
-                  {part.price.toLocaleString("vi-VN", {
-                    style: "currency",
-                    currency: "VND",
-                  })}
+                  {part.price
+                    .toLocaleString("vi-VN", { style: "currency", currency: "VND" })
+                    .replace("₫", "VNĐ")}
                 </div>
 
                 <div className="text-sm text-gray-500 mb-1">Đơn vị: {part.unit}</div>

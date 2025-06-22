@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ShoppingCart, CreditCard, BadgeCheck, Handshake, Wrench, Truck, Target } from "lucide-react";
 import PartDetails from "../Parts/PartDetails"; // Thêm dòng này
+import Swal from "sweetalert2";
 
 export default function FeaturedProducts({ parts = [], brands = [] }) {
   const PRODUCTS_PER_PAGE = 5;
@@ -25,7 +26,14 @@ export default function FeaturedProducts({ parts = [], brands = [] }) {
     else cart.push({ ...item, quantity: 1 });
     localStorage.setItem("cart", JSON.stringify(cart));
     window.dispatchEvent(new Event("cartChanged"));
-    alert("Đã thêm sản phẩm vào giỏ hàng!");
+    // Thông báo đẹp, tự tắt sau 1.2s
+    Swal.fire({
+      icon: "success",
+      title: "Đã thêm vào giỏ hàng!",
+      showConfirmButton: false,
+      timer: 1200,
+      timerProgressBar: true,
+    });
   };
 
   const handleBuy = (item) => {
@@ -67,7 +75,7 @@ export default function FeaturedProducts({ parts = [], brands = [] }) {
               <span className="text-xs text-gray-500 mb-4">
                 Còn: {item.quantity ?? item.stock}
               </span>
-              <div className="flex gap-2 mt-auto">
+              <div className="flex gap-2 mt-auto flex-nowrap items-center">
                 {item.quantity > 0 ? (
                   <>
                     <button
@@ -77,7 +85,7 @@ export default function FeaturedProducts({ parts = [], brands = [] }) {
                       <CreditCard className="w-4 h-4" /> Mua ngay
                     </button>
                     <button
-                      onClick={() => handleAddToCart(item)}
+                      onClick={e => { e.stopPropagation(); handleAddToCart(item); }}
                       className="flex items-center gap-1 bg-green-600 hover:bg-green-800 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
                       title="Thêm giỏ hàng"
                     >
