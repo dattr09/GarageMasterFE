@@ -6,6 +6,7 @@ import { getAllParts } from "../../services/PartsApi";
 import { getRepairDetailsByOrderId, updateRepairDetails } from "../../services/RepairDetailApi";
 import { getAllEmployees } from "../../services/EmployeeApi";
 import { Save, XCircle, Wrench } from "lucide-react";
+import Swal from "sweetalert2";
 
 const fadeInStyle = `
 @keyframes fadeIn {
@@ -121,6 +122,14 @@ export default function RepairOrderEdit({ orderId, onSaved, onClose }) {
       const payload = { ...form, totalCost };
       await updateRepairOrder(orderId, payload);
       await updateRepairDetails(orderId, selectedPartsArray);
+
+      Swal.fire({
+        icon: "success",
+        title: "Đã cập nhật!",
+        text: "Thông tin đơn sửa chữa đã được lưu.",
+        confirmButtonColor: "#2563eb",
+      });
+
       onSaved && onSaved();
     } catch (err) {
       setError(err.message || "Có lỗi xảy ra!");
@@ -276,7 +285,7 @@ export default function RepairOrderEdit({ orderId, onSaved, onClose }) {
                             });
                           }}
                         />
-                        <span className="w-40">{part.name} ({part.price?.toLocaleString()}đ)</span>
+                        <span className="w-40">{part.name} ({part.price?.toLocaleString()}VNĐ)</span>
                         {selectedParts[part.id] && (
                           <input
                             type="number"
@@ -296,7 +305,7 @@ export default function RepairOrderEdit({ orderId, onSaved, onClose }) {
                 <div className="text-center">
                   <label className="font-semibold text-lg text-gray-700 block mb-1">Tổng tiền</label>
                   <div className="text-2xl font-bold text-green-600 bg-gray-100 px-4 py-3 rounded-xl border border-gray-200 shadow inline-block">
-                    {totalCost.toLocaleString()} đ
+                    {totalCost.toLocaleString()} VNĐ
                   </div>
                 </div>
               </div>

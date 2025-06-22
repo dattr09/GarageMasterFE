@@ -114,7 +114,7 @@ export default function RepairOrderDetails({ orderId, orderIndex, onClose, refre
             <div>
               <b className="text-blue-700">Tổng tiền:</b>{" "}
               <span className="font-bold text-blue-700">
-                {order.totalCost?.toLocaleString()} đ
+                {order.totalCost?.toLocaleString()} VNĐ
               </span>
             </div>
           </div>
@@ -144,10 +144,10 @@ export default function RepairOrderDetails({ orderId, orderIndex, onClose, refre
                           <td className="py-2 px-4">{part.name || d.partId}</td>
                           <td className="py-2 px-4 text-center">{d.quantity}</td>
                           <td className="py-2 px-4 text-right">
-                            {part.price?.toLocaleString() || 0} đ
+                            {part.price?.toLocaleString() || 0} VNĐ
                           </td>
                           <td className="py-2 px-4 text-right">
-                            {((part.price || 0) * d.quantity).toLocaleString()} đ
+                            {((part.price || 0) * d.quantity).toLocaleString()} VNĐ
                           </td>
                         </tr>
                       );

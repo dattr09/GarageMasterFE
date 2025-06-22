@@ -145,7 +145,7 @@ export default function RepairOrderList() {
                     })}
                   </td>
                   <td className="px-4 py-3 text-center text-blue-700 font-bold">
-                    {order.totalCost?.toLocaleString()} đ
+                    {order.totalCost?.toLocaleString()} VNĐ
                   </td>
                   <td className="px-4 py-3 flex flex-nowrap justify-center gap-2">
                     <button

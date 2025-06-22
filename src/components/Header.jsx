@@ -85,7 +85,7 @@ export default function Header() {
   return (
     <>
       <style>{fadeInUpStyle}</style>
-      <nav className="fixed top-0 left-0 w-full bg-white shadow-md z-50 px-6 md:px-10 py-3">
+      <nav className="fixed top-0 left-0 w-full bg-gradient-to-r from-blue-300 via-blue-200 to-blue-100 shadow-md z-50 px-6 md:px-10 py-3">
         <div className="flex flex-wrap items-center justify-between gap-4">
           {/* Logo + Search */}
           <div className="flex items-center gap-4">

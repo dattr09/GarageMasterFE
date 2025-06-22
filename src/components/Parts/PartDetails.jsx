@@ -89,9 +89,11 @@ function DetailRow({ label, value }) {
 // Định dạng tiền tệ VND
 function formatCurrency(val) {
   return typeof val === "number"
-    ? val.toLocaleString("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    })
+    ? val
+      .toLocaleString("vi-VN", {
+        style: "currency",
+        currency: "VND",
+      })
+      .replace("₫", "VNĐ")
     : val;
 }
