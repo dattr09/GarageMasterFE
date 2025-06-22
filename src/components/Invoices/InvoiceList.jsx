@@ -46,17 +46,6 @@ export default function InvoiceList() {
       <h2 className="text-3xl font-extrabold text-blue-800 mb-6 text-center drop-shadow">
         <FileText className="inline mr-2" /> Danh sách hóa đơn
       </h2>
-      <div className="flex justify-end mb-4">
-        <button
-          className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-semibold px-6 py-2 rounded-xl shadow-md hover:shadow-lg transition flex items-center gap-2"
-          onClick={() => {
-            setInvoiceData({ customerId: "", repairOrderId: "", paymentMethod: "Cash" });
-            setShowPrintInvoice(true);
-          }}
-        >
-          <Printer size={18} /> Tạo/In hóa đơn
-        </button>
-      </div>
       <div className="overflow-x-auto rounded-xl border border-gray-200">
         <table className="min-w-full bg-white text-sm text-gray-700">
           <thead>

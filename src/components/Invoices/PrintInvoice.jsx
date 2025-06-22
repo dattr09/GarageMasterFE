@@ -146,29 +146,6 @@ export default function PrintInvoice(props) {
             ))}
           </select>
         </div>
-
-        <div>
-          <label className="font-semibold flex items-center gap-2 mb-1">
-            <ClipboardList size={18} /> Chọn phiếu sửa chữa
-          </label>
-          <select
-            className="w-full border rounded-xl px-4 py-2 shadow-sm focus:ring-2 focus:ring-blue-300"
-            value={selectedOrder}
-            onChange={e => {
-              setSelectedOrder(e.target.value);
-              setInvoice(null);
-            }}
-            disabled={!selectedCustomer}
-          >
-            <option value="">-- Chọn phiếu sửa --</option>
-            {repairOrders.map(o => (
-              <option key={o.id} value={o.id}>
-                {o.id} - {o.description}
-              </option>
-            ))}
-          </select>
-        </div>
-
         <div>
           <label className="font-semibold flex items-center gap-2 mb-1">
             <CreditCard size={18} /> Hình thức thanh toán
