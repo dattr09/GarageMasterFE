@@ -61,8 +61,8 @@ export default function CustomerAdd({ onClose, onSaved }) {
       return;
     }
 
-    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-    const userId = userInfo?.id || userInfo?._id;
+    const user = JSON.parse(localStorage.getItem("user"));
+    const userId = user?.Id || user?.id;
     if (!userId) {
       setError("Không tìm thấy userId. Vui lòng đăng nhập lại!");
       return;
@@ -70,7 +70,7 @@ export default function CustomerAdd({ onClose, onSaved }) {
 
     try {
       await createCustomer({
-        userId,
+        userId, // Đảm bảo userId có giá trị
         name: form.name,
         email: form.email,
         phone: form.phone,
