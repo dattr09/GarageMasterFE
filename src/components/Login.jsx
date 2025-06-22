@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { login } from "../services/api";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { GoogleLogin } from "@react-oauth/google";
 
 const API_BASE_URL = "http://localhost:5119/api/auth";
 
@@ -28,10 +28,10 @@ export default function Login() {
     setLoading(true);
     setMessage("");
     try {
-      const response = await fetch('http://localhost:5119/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+      const response = await fetch("http://localhost:5119/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
       });
       const data = await response.json();
 
@@ -273,22 +273,27 @@ export default function Login() {
 
       {/* Đăng nhập với Google hoặc Apple */}
       <div className="flex flex-col gap-3">
-        <button
-          type="button"
-          className="w-full flex items-center justify-center gap-3 py-2 rounded-lg bg-white border border-gray-300 shadow hover:bg-gray-50 transition"
-          onClick={() =>
-            setOauthMessage("Tính năng đăng nhập Google sẽ sớm có!")
-          }
-        >
-          <img
-            src="https://www.svgrepo.com/show/475656/google-color.svg"
-            alt="Google"
-            className="w-6 h-6"
-          />
-          <span className="font-semibold text-gray-700 text-sm">
-            Đăng nhập với Google
-          </span>
-        </button>
+        <GoogleLogin
+          onSuccess={async (credentialResponse) => {
+            // Gửi credentialResponse.credential lên backend để xác thực và lấy JWT
+            const res = await fetch("http://localhost:5119/api/auth/google-login", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ token: credentialResponse.credential }),
+            });
+            const data = await res.json();
+            if (res.ok) {
+              localStorage.setItem("token", data.token);
+              localStorage.setItem("user", JSON.stringify(data.user));
+              window.location.href = "/";
+            } else {
+              alert(data.message || "Đăng nhập Google thất bại!");
+            }
+          }}
+          onError={() => {
+            alert("Đăng nhập Google thất bại!");
+          }}
+        />
         <button
           type="button"
           className="w-full flex items-center justify-center gap-3 py-2 rounded-lg bg-black border border-gray-800 shadow hover:bg-gray-900 transition"
