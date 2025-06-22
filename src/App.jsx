@@ -5,6 +5,7 @@ import AuthContainer from "./components/AuthContainer";
 import ForgotPassword from "./components/ForgotPassword";
 import ResetPassword from "./components/ResetPassword";
 import ConfirmEmail from "./components/ConfirmEmail";
+import OrderHistory from "./components/Orders/OrderHistory";
 
 // Hàm kiểm tra trạng thái đăng nhập
 function PrivateRoute({ children }) {
@@ -22,7 +23,7 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/confirm-email" element={<ConfirmEmail />} />
-
+        <Route path="/order-history" element={<OrderHistory />} />
         {/* Route bảo vệ - tất cả path con nằm trong MainLayout */}
         <Route path="/*" element={<MainLayout />} />
       </Routes>

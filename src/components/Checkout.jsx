@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createOrder } from "../services/OrderApi";
 import { ShoppingBag, Mail, Phone, MapPin, StickyNote, User } from "lucide-react";
+import { updatePartQuantity } from "../services/PartsApi";
 
 export default function Checkout() {
   const navigate = useNavigate();
@@ -50,6 +51,16 @@ export default function Checkout() {
     };
     try {
       const res = await createOrder(order);
+      
+      // Update part quantities after successful order creation
+      for (const item of cart) {
+        if (item.quantity > item.maxQuantity || item.maxQuantity <= 0) {
+          alert(`"${item.name}" đã hết hàng hoặc vượt quá tồn kho!`);
+          return;
+        }
+        await updatePartQuantity(item.id, -item.quantity);
+      }
+
       localStorage.removeItem("cart");
       setCart([]);
       window.dispatchEvent(new Event("cartChanged"));
