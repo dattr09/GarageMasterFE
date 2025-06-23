@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ShoppingCart, CreditCard, BadgeCheck, Handshake, Wrench, Truck, Target } from "lucide-react";
-import PartDetails from "../Parts/PartDetails"; // Thêm dòng này
+import PartDetails from "../Parts/PartDetails";
 import Swal from "sweetalert2";
 
 export default function FeaturedProducts({ parts = [], brands = [] }) {
   const PRODUCTS_PER_PAGE = 5;
   const featuredProducts = parts.slice(0, 10);
   const [page, setPage] = useState(0);
-  const [selectedPart, setSelectedPart] = useState(null); // Thêm state này
+  const [selectedPart, setSelectedPart] = useState(null);
   const totalPages = Math.max(featuredProducts.length - PRODUCTS_PER_PAGE + 1, 1);
   const navigate = useNavigate();
 
+  // Tự động chuyển trang sản phẩm nổi bật sau mỗi 4 giây
   useEffect(() => {
     const timer = setInterval(() => {
       setPage((prev) => (prev + 1) % totalPages);
@@ -19,6 +20,7 @@ export default function FeaturedProducts({ parts = [], brands = [] }) {
     return () => clearInterval(timer);
   }, [totalPages]);
 
+  // Xử lý thêm sản phẩm vào giỏ hàng
   const handleAddToCart = (item) => {
     const cart = JSON.parse(localStorage.getItem("cart") || "[]");
     const idx = cart.findIndex((i) => i.id === item.id);
@@ -26,7 +28,6 @@ export default function FeaturedProducts({ parts = [], brands = [] }) {
     else cart.push({ ...item, quantity: 1 });
     localStorage.setItem("cart", JSON.stringify(cart));
     window.dispatchEvent(new Event("cartChanged"));
-    // Thông báo đẹp, tự tắt sau 1.2s
     Swal.fire({
       icon: "success",
       title: "Đã thêm vào giỏ hàng!",
@@ -36,6 +37,7 @@ export default function FeaturedProducts({ parts = [], brands = [] }) {
     });
   };
 
+  // Xử lý mua ngay sản phẩm
   const handleBuy = (item) => {
     const cart = JSON.parse(localStorage.getItem("cart") || "[]");
     const idx = cart.findIndex((i) => i.id === item.id);

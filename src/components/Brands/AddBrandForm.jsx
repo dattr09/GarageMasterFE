@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ImagePlus, Save, XCircle, Landmark } from "lucide-react";
+import { Save, XCircle, Landmark } from "lucide-react";
 import { createBrand } from "../../services/BrandApi";
 import Swal from "sweetalert2";
 
@@ -19,6 +19,7 @@ export default function AddBrandForm({ onClose, onSaved }) {
   const [error, setError] = useState("");
   const [uploading, setUploading] = useState(false);
 
+  // Xử lý upload ảnh lên Cloudinary
   const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -35,6 +36,7 @@ export default function AddBrandForm({ onClose, onSaved }) {
     setUploading(false);
   };
 
+  // Xử lý submit form thêm hãng xe
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!name.trim()) {

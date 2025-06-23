@@ -49,10 +49,12 @@ export default function CustomerEdit({ customer, onClose, onSaved }) {
   });
   const [error, setError] = useState("");
 
+  // Xử lý thay đổi giá trị input form
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  // Xử lý submit form sửa khách hàng
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -63,8 +65,8 @@ export default function CustomerEdit({ customer, onClose, onSaved }) {
     }
 
     try {
-      const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-      const userId = userInfo?.id || userInfo?._id;
+      const user = JSON.parse(localStorage.getItem("user"));
+      const userId = user?.id || user?._id;
 
       await updateCustomer(customer.id, {
         userId,

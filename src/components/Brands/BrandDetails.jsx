@@ -1,12 +1,17 @@
 import React from "react";
 
 export default function BrandDetails({ brand, parts, onClose }) {
+  // Hàm xử lý đóng popup chi tiết hãng xe
+  const handleClose = () => {
+    onClose();
+  };
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
       <div className="bg-white rounded-3xl shadow-2xl p-6 sm:p-10 w-full max-w-4xl border border-blue-100 relative">
         {/* Nút đóng */}
         <button
-          onClick={onClose}
+          onClick={handleClose}
           className="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-2xl font-bold transition"
           title="Đóng"
           type="button"
@@ -41,7 +46,10 @@ export default function BrandDetails({ brand, parts, onClose }) {
             Danh sách linh kiện
           </h4>
 
-          <div className="overflow-x-auto">
+          <div
+            className="overflow-x-auto"
+            style={{ maxHeight: 180, overflowY: "auto" }}
+          >
             {parts.length === 0 ? (
               <div className="text-center text-gray-500 italic">
                 Không có linh kiện nào.
@@ -82,7 +90,7 @@ export default function BrandDetails({ brand, parts, onClose }) {
         {/* Nút đóng */}
         <div className="flex justify-center mt-8">
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="bg-blue-600 hover:bg-blue-800 text-white font-bold px-8 py-3 rounded-2xl shadow-lg transition text-base sm:text-lg tracking-wide"
           >
             Đóng

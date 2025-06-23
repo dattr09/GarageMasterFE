@@ -12,11 +12,13 @@ const fadeInStyle = `
 `;
 
 export default function MotoDetails({ moto, brands, customers, onClose }) {
+  // Lấy tên hãng xe từ brandId
   const getBrandName = (brandId) => {
     const brand = brands.find((b) => b.id === brandId);
     return brand ? brand.name : "N/A";
   };
 
+  // Lấy tên chủ xe từ customerId
   const getCustomerName = (customerId) => {
     const customer = customers.find((c) => c.id === customerId);
     return customer ? customer.name : "N/A";

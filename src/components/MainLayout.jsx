@@ -9,14 +9,15 @@ import Header from "./Header";
 import Footer from "./Footer";
 import RepairOrderList from "./RepairOrders/RepairOrderList";
 import EmployeeList from "./Employees/EmployeeList";
-import Cart from "./Cart"; // Import the Cart component
-import Checkout from "./Checkout"; // Import the Checkout component
-import OrderSuccess from "./OrderSuccess"; // Import the OrderSuccess component
+import Cart from "./Cart";
+import Checkout from "./Checkout";
+import OrderSuccess from "./OrderSuccess";
 import InvoiceList from "./Invoices/InvoiceList";
-import RevenueStats from "./Invoices/RevenueStats"; // Thêm dòng này
+import RevenueStats from "./Invoices/RevenueStats";
 
 const HEADER_HEIGHT = 64;
 
+// Layout chính cho toàn bộ trang, chứa Header, Footer và định tuyến các trang con
 const MainLayout = () => {
   return (
     <div className="main-layout bg-gradient-to-tr from-blue-200 via-white to-blue-100 flex flex-col min-h-screen">
@@ -35,12 +36,11 @@ const MainLayout = () => {
           <Route path="motos" element={<MotoList />} />
           <Route path="repair-orders" element={<RepairOrderList />} />
           <Route path="employees" element={<EmployeeList />} />
-          <Route path="/cart" element={<Cart />} /> {/* Add the Cart route */}
-          <Route path="/checkout" element={<Checkout />} /> {/* Add the Checkout route */}
-          <Route path="/order-success" element={<OrderSuccess />} /> {/* Add the OrderSuccess route */}
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/order-success" element={<OrderSuccess />} />
           <Route path="/invoices" element={<InvoiceList />} />
-          <Route path="/revenue-stats" element={<RevenueStats />} /> {/* Thêm dòng này */}
-          {/* Add more routes as needed */}
+          <Route path="/revenue-stats" element={<RevenueStats />} />
         </Routes>
         <Outlet />
       </main>

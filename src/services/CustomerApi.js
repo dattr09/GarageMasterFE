@@ -4,7 +4,7 @@ const API_URL = `${API_BASE_URL}/customers`;
 // Lấy tất cả khách hàng
 export async function getAllCustomers() {
   const token = localStorage.getItem("token");
-  const res = await fetch("http://localhost:5119/api/customers", {
+  const res = await fetch(API_URL, {
     headers: {
       "Authorization": `Bearer ${token}`,
       "Content-Type": "application/json"
@@ -24,7 +24,7 @@ export async function getCustomerById(id) {
 // Thêm khách hàng mới
 export async function createCustomer(data) {
   const token = localStorage.getItem("token");
-  const res = await fetch("http://localhost:5119/api/customers", {
+  const res = await fetch(API_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -33,7 +33,7 @@ export async function createCustomer(data) {
     body: JSON.stringify({
       userId: data.userId,
       name: data.name,
-      email: data.email,      // thêm dòng này
+      email: data.email,
       phone: data.phone,
       address: data.address
     })
@@ -45,7 +45,7 @@ export async function createCustomer(data) {
 // Sửa khách hàng
 export async function updateCustomer(id, customer) {
   const token = localStorage.getItem("token");
-  const res = await fetch(`http://localhost:5119/api/customers/${id}`, {
+  const res = await fetch(`${API_URL}/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -72,7 +72,7 @@ export async function updateCustomer(id, customer) {
 // Xóa khách hàng
 export async function deleteCustomer(id) {
   const token = localStorage.getItem("token");
-  const res = await fetch(`http://localhost:5119/api/customers/${id}`, {
+  const res = await fetch(`${API_URL}/${id}`, {
     method: "DELETE",
     headers: {
       "Authorization": `Bearer ${token}`,

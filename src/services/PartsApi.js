@@ -1,8 +1,9 @@
-const API_URL = "http://localhost:5119/api/parts"; // Đổi port nếu backend khác
+const API_URL = "http://localhost:5119/api/parts";
 
+// Lấy tất cả phụ tùng
 export async function getAllParts() {
   const token = localStorage.getItem("token");
-  const res = await fetch("http://localhost:5119/api/parts", {
+  const res = await fetch(API_URL, {
     headers: {
       "Authorization": `Bearer ${token}`,
       "Content-Type": "application/json"
@@ -12,21 +13,25 @@ export async function getAllParts() {
   return res.json();
 }
 
+// Lấy phụ tùng theo id
 export async function getPartById(id) {
   const res = await fetch(`${API_URL}/${id}`);
   return res.json();
 }
 
+// Tìm kiếm phụ tùng theo tên
 export async function searchPartsByName(name) {
   const res = await fetch(`${API_URL}/searchByName?name=${encodeURIComponent(name)}`);
   return res.json();
 }
 
+// Lấy phụ tùng theo hãng
 export async function getPartsByBrand(brandId) {
   const res = await fetch(`${API_URL}/byBrand/${brandId}`);
   return res.json();
 }
 
+// Thêm phụ tùng mới
 export async function createPart(part) {
   const token = localStorage.getItem("token");
   const res = await fetch(API_URL, {
@@ -41,9 +46,10 @@ export async function createPart(part) {
   return res.json();
 }
 
+// Cập nhật phụ tùng
 export async function updatePart(id, part) {
   const token = localStorage.getItem("token");
-  const res = await fetch(`http://localhost:5119/api/parts/${id}`, {
+  const res = await fetch(`${API_URL}/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -59,9 +65,10 @@ export async function updatePart(id, part) {
   return data;
 }
 
+// Xóa phụ tùng
 export async function deletePart(id) {
   const token = localStorage.getItem("token");
-  const res = await fetch(`http://localhost:5119/api/parts/${id}`, {
+  const res = await fetch(`${API_URL}/${id}`, {
     method: "DELETE",
     headers: {
       "Authorization": `Bearer ${token}`,
@@ -76,17 +83,17 @@ export async function deletePart(id) {
   return data;
 }
 
+// Cập nhật số lượng phụ tùng
 export async function updatePartQuantity(partId, quantityChange) {
   const token = localStorage.getItem("token");
-  return fetch(`http://localhost:5119/api/parts/${partId}/quantity`, {
+  const res = await fetch(`${API_URL}/${partId}/quantity`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
       "Authorization": `Bearer ${token}`
     },
     body: JSON.stringify({ quantityChange }),
-  }).then(res => {
-    if (!res.ok) throw new Error("Cập nhật số lượng thất bại");
-    return res.json();
   });
+  if (!res.ok) throw new Error("Cập nhật số lượng thất bại");
+  return res.json();
 }

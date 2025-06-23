@@ -17,6 +17,7 @@ const captions = [
 export default function NavbarCarousel() {
   const [current, setCurrent] = useState(0);
 
+  // Tự động chuyển ảnh carousel sau mỗi 5 giây
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrent((prev) => (prev + 1) % images.length);
@@ -24,8 +25,13 @@ export default function NavbarCarousel() {
     return () => clearInterval(timer);
   }, []);
 
-  const prevImage = () => setCurrent((prev) => (prev - 1 + images.length) % images.length);
-  const nextImage = () => setCurrent((prev) => (prev + 1) % images.length);
+  // Chuyển về ảnh trước
+  const prevImage = () =>
+    setCurrent((prev) => (prev - 1 + images.length) % images.length);
+
+  // Chuyển về ảnh sau
+  const nextImage = () =>
+    setCurrent((prev) => (prev + 1) % images.length);
 
   return (
     <div className="w-full h-[92vh] relative overflow-hidden rounded-xl bg-white">

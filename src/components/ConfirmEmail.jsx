@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { confirmEmail, login } from "../services/api";
+import { confirmEmail } from "../services/api";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 
@@ -17,14 +17,13 @@ export default function ConfirmEmail() {
   const location = useLocation();
 
   useEffect(() => {
-    // Ưu tiên lấy email từ query string
+    // Lấy email từ query string hoặc localStorage
     const params = new URLSearchParams(location.search);
     const queryEmail = params.get("email");
     if (queryEmail) {
       setEmail(queryEmail);
-      localStorage.setItem("pendingEmail", queryEmail); // Lưu lại để dự phòng
+      localStorage.setItem("pendingEmail", queryEmail);
     } else {
-      // Nếu không có, lấy từ localStorage
       const savedEmail = localStorage.getItem("pendingEmail");
       if (savedEmail) {
         setEmail(savedEmail);
@@ -34,8 +33,8 @@ export default function ConfirmEmail() {
     }
   }, [location.search]);
 
-  // Đếm ngược thời gian
   useEffect(() => {
+    // Đếm ngược thời gian hết hạn mã xác thực
     if (secondsLeft <= 0) return;
     const timer = setInterval(() => {
       setSecondsLeft((prev) => prev - 1);
@@ -43,7 +42,7 @@ export default function ConfirmEmail() {
     return () => clearInterval(timer);
   }, [secondsLeft]);
 
-  // Xử lý nhập từng ký tự
+  // Xử lý nhập từng ký tự mã xác thực
   const handleChange = (e, idx) => {
     const val = e.target.value.replace(/[^0-9a-zA-Z]/g, "");
     if (!val) return;
@@ -51,19 +50,17 @@ export default function ConfirmEmail() {
     arr[idx] = val.slice(-1);
     setCodeArr(arr);
 
-    // Animation nhỏ khi nhập
     inputRefs.current[idx]?.classList.add("scale-110");
     setTimeout(() => {
       inputRefs.current[idx]?.classList.remove("scale-110");
     }, 120);
 
-    // Focus sang ô tiếp theo nếu có
     if (val && idx < CODE_LENGTH - 1) {
       inputRefs.current[idx + 1]?.focus();
     }
   };
 
-  // Xử lý backspace
+  // Xử lý phím backspace khi nhập mã
   const handleKeyDown = (e, idx) => {
     if (e.key === "Backspace" && !codeArr[idx] && idx > 0) {
       let arr = [...codeArr];
@@ -73,16 +70,16 @@ export default function ConfirmEmail() {
     }
   };
 
-  // Xử lý paste
+  // Xử lý dán mã xác thực
   const handlePaste = (e) => {
     const paste = e.clipboardData.getData("text").replace(/[^0-9a-zA-Z]/g, "");
     if (paste.length === CODE_LENGTH) {
       setCodeArr(paste.split(""));
-      // Focus vào ô cuối cùng
       inputRefs.current[CODE_LENGTH - 1]?.focus();
     }
   };
 
+  // Xác nhận mã xác thực
   const handleConfirm = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -103,7 +100,7 @@ export default function ConfirmEmail() {
       setMessage(res.message || "Xác thực thành công!");
       if (res.token) {
         localStorage.setItem("token", res.token);
-        localStorage.removeItem("pendingEmail"); // Xóa email đã xác nhận
+        localStorage.removeItem("pendingEmail");
         setTimeout(() => navigate("/login"), 1500);
       }
     } catch (error) {
@@ -113,6 +110,7 @@ export default function ConfirmEmail() {
   };
 
   useEffect(() => {
+    // Ẩn thông báo sau 3s
     if (message) {
       const timer = setTimeout(() => setMessage(""), 3000);
       return () => clearTimeout(timer);

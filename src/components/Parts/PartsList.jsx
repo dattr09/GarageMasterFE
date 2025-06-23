@@ -25,6 +25,7 @@ export default function PartsList() {
   const [showForm, setShowForm] = useState(false);
   const [sortPrice, setSortPrice] = useState("");
   const [brandFilter, setBrandFilter] = useState("");
+  const [userRole, setUserRole] = useState("");
 
   // Lấy brand từ query string khi mount
   useEffect(() => {
@@ -44,7 +45,7 @@ export default function PartsList() {
     if (name) setSearch(name);
   }, [location.search]);
 
-  // Animation style
+  // Animation style cho hiệu ứng xuất hiện
   const fadeInStyle = `
     @keyframes fadeIn {
       0% { opacity: 0; transform: scale(0.98);}
@@ -56,8 +57,12 @@ export default function PartsList() {
   `;
 
   useEffect(() => {
+    // Lấy danh sách phụ tùng và hãng xe khi load component
     getAllParts().then(setParts);
     getAllBrands().then(setBrands);
+    // Lấy role từ localStorage
+    const user = JSON.parse(localStorage.getItem("user"));
+    setUserRole(user?.role || "");
   }, []);
 
   const handleDelete = async (id) => {
@@ -116,7 +121,7 @@ export default function PartsList() {
     }
   };
 
-  // Lọc, tìm kiếm, sắp xếp
+  // Lọc, tìm kiếm, sắp xếp danh sách phụ tùng
   let filteredParts = [...parts];
 
   // Search theo tên (tự động)
@@ -155,12 +160,14 @@ export default function PartsList() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-          <button
-            onClick={() => setShowForm({ type: "add" })}
-            className="flex items-center gap-2 bg-green-600 hover:bg-green-800 text-white font-bold px-4 py-2 rounded-xl transition shadow"
-          >
-            <PlusCircle size={20} /> Thêm mới
-          </button>
+          {userRole === "Admin" && (
+            <button
+              onClick={() => setShowForm({ type: "add" })}
+              className="flex items-center gap-2 bg-green-600 hover:bg-green-800 text-white font-bold px-4 py-2 rounded-xl transition shadow"
+            >
+              <PlusCircle size={20} /> Thêm mới
+            </button>
+          )}
           <select
             className="border rounded-xl px-3 py-2"
             value={sortPrice}
@@ -237,20 +244,24 @@ export default function PartsList() {
                 </div>
 
                 <div className="flex gap-2 mt-auto flex-wrap justify-center">
-                  <button
-                    onClick={() => setShowForm({ type: "edit", part })}
-                    className="flex items-center gap-1 bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
-                    title="Sửa"
-                  >
-                    <Pencil size={16} /> Sửa
-                  </button>
-                  <button
-                    onClick={() => handleDelete(part.id)}
-                    className="flex items-center gap-1 bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
-                    title="Xóa"
-                  >
-                    <Trash2 size={16} /> Xóa
-                  </button>
+                  {userRole === "Admin" && (
+                    <>
+                      <button
+                        onClick={() => setShowForm({ type: "edit", part })}
+                        className="flex items-center gap-1 bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
+                        title="Sửa"
+                      >
+                        <Pencil size={16} /> Sửa
+                      </button>
+                      <button
+                        onClick={() => handleDelete(part.id)}
+                        className="flex items-center gap-1 bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
+                        title="Xóa"
+                      >
+                        <Trash2 size={16} /> Xóa
+                      </button>
+                    </>
+                  )}
                   <button
                     onClick={() => handleAddToCart(part)}
                     className="flex items-center gap-1 bg-green-600 hover:bg-green-800 text-white px-3 py-1 rounded-lg shadow font-semibold transition"

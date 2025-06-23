@@ -13,10 +13,11 @@ import {
 
 export default function OrderHistory() {
   const [orders, setOrders] = useState([]);
-  const [selectedOrder, setSelectedOrder] = useState(null); // Thêm state này
+  const [selectedOrder, setSelectedOrder] = useState(null);
   const user = JSON.parse(localStorage.getItem("user"));
   const navigate = useNavigate();
 
+  // Lấy danh sách đơn hàng của user khi load component
   useEffect(() => {
     if (user?.id) {
       getOrdersByUser(user.id).then(setOrders);
@@ -113,6 +114,7 @@ export default function OrderHistory() {
 
 // Modal chi tiết đơn hàng
 function OrderDetailModal({ order, onClose }) {
+  // Hiển thị popup chi tiết đơn hàng
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
       <div className="bg-white rounded-3xl shadow-2xl p-6 sm:p-10 w-full max-w-4xl border border-blue-100 relative">

@@ -1,12 +1,12 @@
 const API_BASE_URL = "http://localhost:5119/api/auth";
 
 /**
- * Hàm chung để thực hiện các yêu cầu API
- * @param {string} endpoint - Đường dẫn endpoint (ví dụ: '/register')
- * @param {string} method - Phương thức HTTP (ví dụ: 'POST', 'GET')
- * @param {Object} data - Dữ liệu gửi đi (nếu có)
- * @param {boolean} includeCredentials - Có gửi cookie không (mặc định là false)
- * @returns {Promise<Object>} - Kết quả từ server
+ * Gửi yêu cầu API chung
+ * @param {string} endpoint
+ * @param {string} method
+ * @param {Object} data
+ * @param {boolean} includeCredentials
+ * @returns {Promise<Object>}
  */
 async function apiRequest(
   endpoint,
@@ -45,23 +45,24 @@ async function apiRequest(
 
     return result;
   } catch (error) {
+    // Xử lý lỗi mạng hoặc lỗi trả về từ server
     throw error.message
       ? error
       : { message: "Network error or server is unreachable" };
   }
 }
 
-// Hàm đăng ký
+// Đăng ký tài khoản
 export async function register(data) {
   return apiRequest("/register", "POST", data);
 }
 
-// Hàm xác nhận email
+// Xác nhận email
 export async function confirmEmail(data) {
   return apiRequest("/confirm-email", "POST", data);
 }
 
-// Hàm đăng nhập
+// Đăng nhập
 export async function login(data) {
   return apiRequest("/login", "POST", data, true); // Bao gồm cookie
 }

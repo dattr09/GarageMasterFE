@@ -7,6 +7,7 @@ export default function Cart() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Kiểm tra đăng nhập và lấy dữ liệu giỏ hàng từ localStorage
     const userId = localStorage.getItem("userId");
     if (!userId) {
       alert("Bạn cần đăng nhập để xem giỏ hàng!");
@@ -17,6 +18,7 @@ export default function Cart() {
     setCart(data);
   }, [navigate]);
 
+  // Xóa sản phẩm khỏi giỏ hàng
   const removeItem = (id) => {
     const newCart = cart.filter((item) => item.id !== id);
     setCart(newCart);
@@ -24,6 +26,7 @@ export default function Cart() {
     window.dispatchEvent(new Event("cartChanged"));
   };
 
+  // Cập nhật số lượng sản phẩm trong giỏ hàng
   const updateQuantity = (id, quantity) => {
     const newCart = cart.map((item) =>
       item.id === id ? { ...item, quantity: Math.max(1, quantity) } : item
@@ -33,6 +36,7 @@ export default function Cart() {
     window.dispatchEvent(new Event("cartChanged"));
   };
 
+  // Tính tổng tiền giỏ hàng
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   return (
@@ -79,7 +83,7 @@ export default function Cart() {
                       <input
                         type="number"
                         min={1}
-                        max={item.maxQuantity || item.quantity} // Thêm max
+                        max={item.maxQuantity || item.quantity}
                         value={item.quantity}
                         onChange={(e) => {
                           const val = Math.min(Number(e.target.value), item.maxQuantity || item.quantity);
@@ -125,6 +129,7 @@ export default function Cart() {
             </button>
             <button
               onClick={() => {
+                // Kiểm tra đăng nhập trước khi thanh toán
                 const token = localStorage.getItem("token");
                 if (!token) {
                   alert("Bạn cần đăng nhập để tiếp tục mua hàng!");

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getAllReviews, createOrUpdateReview } from "../../services/ReviewApi";
 
-// Hàm che email: tu******10@gmail.com
+// Che email, ví dụ: tu******10@gmail.com
 function maskEmail(email) {
   if (!email) return "";
   const [name, domain] = email.split("@");
@@ -15,14 +15,10 @@ function maskEmail(email) {
   );
 }
 
-// Giả lập lấy user từ localStorage hoặc context
+// Lấy user hiện tại từ localStorage
 function getCurrentUser() {
-  // Ví dụ: { email: "tuhoang10@gmail.com", id: "123" }
-  // Thay bằng logic thực tế của bạn
   return JSON.parse(localStorage.getItem("user")) || null;
 }
-
-const API_URL = "http://localhost:5119/api/reviews"; // đúng port backend
 
 export default function CustomerReviews() {
   const [reviews, setReviews] = useState([]);
@@ -32,14 +28,17 @@ export default function CustomerReviews() {
   const user = getCurrentUser();
 
   useEffect(() => {
+    // Lấy tất cả đánh giá khi load component
     getAllReviews().then(setReviews).catch(() => setReviews([]));
   }, []);
 
+  // Xử lý thay đổi input form đánh giá
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Xử lý gửi đánh giá mới hoặc cập nhật đánh giá
   const handleSubmit = async (e) => {
     e.preventDefault();
     await createOrUpdateReview({
@@ -54,7 +53,7 @@ export default function CustomerReviews() {
     });
   };
 
-  // Chỉ lấy đánh giá có userId & email thật, không trùng userId
+  // Lọc đánh giá hợp lệ (có userId, email, không trùng userId)
   const realReviews = reviews.filter(
     (r, idx, arr) =>
       r.userId &&
@@ -62,7 +61,7 @@ export default function CustomerReviews() {
       arr.findIndex(rr => rr.userId === r.userId) === idx
   );
 
-  // Lấy 3 review liên tiếp cho carousel
+  // Lấy n review liên tiếp cho carousel
   function getCarouselReviews(count = 4) {
     const n = realReviews.length;
     if (n <= count) return realReviews;
@@ -73,6 +72,7 @@ export default function CustomerReviews() {
     return result;
   }
 
+  // Chuyển carousel về trước
   const prev = () => {
     setCurrent((prev) => {
       const n = realReviews.length;
@@ -80,6 +80,7 @@ export default function CustomerReviews() {
     });
   };
 
+  // Chuyển carousel về sau
   const next = () => {
     setCurrent((prev) => {
       const n = realReviews.length;

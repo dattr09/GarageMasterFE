@@ -11,6 +11,7 @@ const fadeInStyle = `
 }
 `;
 
+// Lấy tên vai trò hiển thị từ mã vai trò hoặc chuỗi
 function getRoleName(role) {
   switch (role) {
     case 1:
@@ -31,13 +32,18 @@ function getRoleName(role) {
 }
 
 export default function EmployeeDetails({ employee, onClose }) {
+  // Xử lý đóng popup chi tiết nhân viên
+  const handleClose = () => {
+    onClose();
+  };
+
   return (
     <>
       <style>{fadeInStyle}</style>
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
         <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-10 w-full max-w-2xl border border-blue-100 relative animate-fade-in overflow-y-auto max-h-[90vh]">
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition"
             title="Đóng"
             type="button"
@@ -62,7 +68,7 @@ export default function EmployeeDetails({ employee, onClose }) {
 
           <div className="flex justify-center mt-10">
             <button
-              onClick={onClose}
+              onClick={handleClose}
               className="bg-blue-600 hover:bg-blue-800 text-white font-bold px-10 py-3 rounded-2xl shadow-xl transition text-lg tracking-wide flex items-center gap-2"
             >
               <XCircle className="w-5 h-5" /> Đóng
@@ -74,6 +80,7 @@ export default function EmployeeDetails({ employee, onClose }) {
   );
 }
 
+// Hiển thị một dòng thông tin chi tiết nhân viên
 function DetailRow({ label, value }) {
   return (
     <div className="flex justify-between items-center border-b pb-2 last:border-b-0">

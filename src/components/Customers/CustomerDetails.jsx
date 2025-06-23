@@ -12,13 +12,18 @@ const fadeInStyle = `
 `;
 
 export default function CustomerDetails({ customer, onClose }) {
+  // Xử lý đóng popup chi tiết khách hàng
+  const handleClose = () => {
+    onClose();
+  };
+
   return (
     <>
       <style>{fadeInStyle}</style>
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
         <div className="bg-white rounded-3xl shadow-2xl p-10 w-full max-w-lg border border-blue-100 relative animate-fade-in">
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-2xl font-bold transition"
             title="Đóng"
             type="button"
@@ -42,7 +47,7 @@ export default function CustomerDetails({ customer, onClose }) {
 
           <div className="flex justify-center mt-8">
             <button
-              onClick={onClose}
+              onClick={handleClose}
               className="bg-blue-600 hover:bg-blue-800 text-white font-bold px-12 py-3 rounded-2xl shadow-xl transition text-lg tracking-wide flex items-center gap-2"
             >
               <XCircle className="w-5 h-5" />
@@ -55,6 +60,7 @@ export default function CustomerDetails({ customer, onClose }) {
   );
 }
 
+// Hiển thị một dòng thông tin chi tiết khách hàng
 function DetailRow({ label, value, icon }) {
   return (
     <div className="flex items-center border-b pb-2 last:border-b-0">

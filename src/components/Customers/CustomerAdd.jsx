@@ -9,14 +9,14 @@ import {
   XCircle,
 } from "lucide-react";
 
-// Hàm gọi API tạo khách hàng
+// Gọi API tạo khách hàng mới
 const createCustomer = async (customerData) => {
-  const token = localStorage.getItem("token"); // Lấy token từ localStorage
+  const token = localStorage.getItem("token");
   const res = await fetch("http://localhost:5119/api/customers", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}), // Thêm token nếu có
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
     body: JSON.stringify(customerData),
   });
@@ -48,10 +48,12 @@ export default function CustomerAdd({ onClose, onSaved }) {
   });
   const [error, setError] = useState("");
 
+  // Xử lý thay đổi giá trị input form
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  // Xử lý submit form thêm khách hàng
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -70,7 +72,7 @@ export default function CustomerAdd({ onClose, onSaved }) {
 
     try {
       await createCustomer({
-        userId, // Đảm bảo userId có giá trị
+        userId,
         name: form.name,
         email: form.email,
         phone: form.phone,

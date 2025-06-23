@@ -16,6 +16,7 @@ export default function Checkout() {
   const [cart, setCart] = useState([]);
 
   useEffect(() => {
+    // Lấy thông tin user và giỏ hàng từ localStorage khi load trang
     const userStr = localStorage.getItem("user");
     let name = "", email = "", phone = "";
     if (userStr) {
@@ -32,10 +33,12 @@ export default function Checkout() {
     setCart(data);
   }, []);
 
+  // Xử lý thay đổi input form
   const handleChange = (e) => {
     setInfo({ ...info, [e.target.name]: e.target.value });
   };
 
+  // Xử lý submit đặt hàng
   const handleSubmit = async (e) => {
     e.preventDefault();
     const userId = localStorage.getItem("userId");
@@ -51,8 +54,8 @@ export default function Checkout() {
     };
     try {
       const res = await createOrder(order);
-      
-      // Update part quantities after successful order creation
+
+      // Cập nhật tồn kho phụ tùng sau khi đặt hàng thành công
       for (const item of cart) {
         if (item.quantity > item.maxQuantity || item.maxQuantity <= 0) {
           alert(`"${item.name}" đã hết hàng hoặc vượt quá tồn kho!`);

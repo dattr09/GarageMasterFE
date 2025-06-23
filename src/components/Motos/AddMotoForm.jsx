@@ -8,10 +8,10 @@ import {
   StickyNote,
   Bike,
   BadgePlus,
-  User
 } from "lucide-react";
 import Swal from "sweetalert2";
 
+// Hiệu ứng fade-in cho popup
 const fadeInStyle = `
 @keyframes fadeIn {
   0% { opacity: 0; transform: scale(0.95); }
@@ -33,10 +33,12 @@ export default function AddMotoForm({ brands, customers, onClose, onSaved }) {
   });
   const [error, setError] = useState("");
 
+  // Xử lý thay đổi input form
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  // Xử lý submit form thêm xe mới
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");

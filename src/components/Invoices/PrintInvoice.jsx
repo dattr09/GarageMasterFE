@@ -31,6 +31,7 @@ export default function PrintInvoice(props) {
   useEffect(() => setSelectedOrder(repairOrderId || ""), [repairOrderId]);
   useEffect(() => setSelectedPayment(paymentMethod || "Cash"), [paymentMethod]);
 
+  // Lấy danh sách khách hàng khi load component
   useEffect(() => {
     const token = localStorage.getItem("token");
     fetch("http://localhost:5119/api/customers", {
@@ -41,6 +42,7 @@ export default function PrintInvoice(props) {
       .catch(console.error);
   }, []);
 
+  // Lấy danh sách phiếu sửa chữa đã hoàn thành của khách hàng được chọn
   useEffect(() => {
     if (selectedCustomer) {
       const token = localStorage.getItem("token");
@@ -55,6 +57,7 @@ export default function PrintInvoice(props) {
     }
   }, [selectedCustomer]);
 
+  // Lấy danh sách nhân viên khi load component
   useEffect(() => {
     const token = localStorage.getItem("token");
     fetch("http://localhost:5119/api/employees", {
@@ -65,6 +68,7 @@ export default function PrintInvoice(props) {
       .catch(console.error);
   }, []);
 
+  // Xử lý tạo hóa đơn mới
   const handleCreateInvoice = async () => {
     if (!selectedCustomer || !selectedOrder) {
       alert("Bạn phải chọn khách hàng và phiếu sửa chữa!");
@@ -99,6 +103,7 @@ export default function PrintInvoice(props) {
     }
   };
 
+  // Xử lý in hóa đơn
   const handlePrint = () => {
     if (!invoice) return;
     const printContents = printRef.current.innerHTML;
@@ -108,6 +113,7 @@ export default function PrintInvoice(props) {
     printWindow.print();
   };
 
+  // Lấy tên nhân viên từ id
   const getEmployeeName = (id) => {
     const emp = employees.find(e => String(e.id) === String(id));
     return emp?.name || emp?.fullName || `${emp?.firstName || ""} ${emp?.lastName || ""}`.trim() || "Không tìm thấy";
