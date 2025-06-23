@@ -31,7 +31,7 @@ export default function Footer() {
                 +84 976 160 200
               </a>
             </li>
-            <li className="flex justify-center items-center gap-2 text-center">
+            <li className="flex justify-center items-center text-center">
               <MapPin className="w-5 h-5 text-blue-700" />
               167 Rừng Sác, Bình Khánh, Cần Giờ, Hồ Chí Minh
             </li>

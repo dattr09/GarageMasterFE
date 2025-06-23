@@ -1,11 +1,31 @@
 import React, { useEffect, useState } from "react";
-import { getRepairOrderById, updateRepairOrder } from "../../services/RepairOrderApi";
+import {
+  getRepairOrderById,
+  updateRepairOrder,
+} from "../../services/RepairOrderApi";
 import { getAllMotos } from "../../services/MotoApi";
 import { getAllCustomers } from "../../services/CustomerApi";
 import { getAllParts } from "../../services/PartsApi";
-import { getRepairDetailsByOrderId, updateRepairDetails } from "../../services/RepairDetailApi";
+import {
+  getRepairDetailsByOrderId,
+  updateRepairDetails,
+} from "../../services/RepairDetailApi";
 import { getAllEmployees } from "../../services/EmployeeApi";
-import { Save, XCircle, Wrench } from "lucide-react";
+import { getAllBrands } from "../../services/BrandApi";
+import {
+  Save,
+  XCircle,
+  Wrench,
+  User,
+  BadgeCheck,
+  PackageSearch,
+  CalendarClock,
+  ClipboardList,
+  Repeat,
+  Hammer,
+  Coins,
+  Settings,
+} from "lucide-react";
 import Swal from "sweetalert2";
 
 const fadeInStyle = `
@@ -32,32 +52,21 @@ export default function RepairOrderEdit({ orderId, onSaved, onClose }) {
   const [customers, setCustomers] = useState([]);
   const [parts, setParts] = useState([]);
   const [employees, setEmployees] = useState([]);
+  const [brands, setBrands] = useState([]);
   const [selectedParts, setSelectedParts] = useState({});
   const [error, setError] = useState("");
+  const [partSearch, setPartSearch] = useState("");
 
   useEffect(() => {
-    // Lấy dữ liệu đơn sửa chữa, xe, khách hàng, phụ tùng, nhân viên, chi tiết đơn khi mount
     fetchOrder();
+    fetchRepairDetails();
     getAllMotos().then(setMotos);
     getAllCustomers().then(setCustomers);
     getAllParts().then(setParts);
     getAllEmployees().then(setEmployees);
-    fetchRepairDetails();
+    getAllBrands().then(setBrands);
   }, [orderId]);
 
-  useEffect(() => {
-    // Tự động cập nhật model và year khi chọn biển số xe
-    if (form.licensePlate) {
-      const moto = motos.find((m) => m.licensePlate === form.licensePlate);
-      setForm((prev) => ({
-        ...prev,
-        model: moto?.model || "",
-        year: moto?.year || "",
-      }));
-    }
-  }, [form.licensePlate, motos]);
-
-  // Lấy thông tin đơn sửa chữa
   const fetchOrder = async () => {
     try {
       const data = await getRepairOrderById(orderId);
@@ -75,7 +84,6 @@ export default function RepairOrderEdit({ orderId, onSaved, onClose }) {
     }
   };
 
-  // Lấy chi tiết phụ tùng đã chọn cho đơn sửa chữa
   const fetchRepairDetails = async () => {
     const details = await getRepairDetailsByOrderId(orderId);
     const selected = {};
@@ -83,7 +91,6 @@ export default function RepairOrderEdit({ orderId, onSaved, onClose }) {
     setSelectedParts(selected);
   };
 
-  // Xử lý thay đổi input form
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name === "customerId") {
@@ -107,26 +114,23 @@ export default function RepairOrderEdit({ orderId, onSaved, onClose }) {
     }
   };
 
-  // Lọc xe theo khách hàng đã chọn
   const filteredMotos = form.customerId
     ? motos.filter((m) => m.customerId === form.customerId)
     : [];
 
-  // Danh sách phụ tùng đã chọn và số lượng
   const selectedPartsArray = Object.entries(selectedParts)
     .filter(([_, qty]) => qty > 0)
     .map(([partId, quantity]) => ({ partId, quantity }));
 
-  // Tính tổng tiền phụ tùng đã chọn
   const totalCost = selectedPartsArray.reduce((sum, { partId, quantity }) => {
     const part = parts.find((p) => p.id === partId);
     return sum + (part?.price || 0) * quantity;
   }, 0);
 
-  // Xử lý submit form cập nhật đơn sửa chữa
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+
     try {
       const payload = { ...form, totalCost };
       await updateRepairOrder(orderId, payload);
@@ -144,11 +148,29 @@ export default function RepairOrderEdit({ orderId, onSaved, onClose }) {
     }
   };
 
+  const getBrandName = (brandId) => {
+    const brand = brands?.find((b) => b.id === brandId);
+    return brand ? brand.name : "";
+  };
+
+  const filteredParts = parts.filter((part) =>
+    part.name.toLowerCase().includes(partSearch.toLowerCase())
+  );
+
   return (
     <>
       <style>{fadeInStyle}</style>
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-3xl shadow-2xl p-10 w-full max-w-5xl border border-blue-100 relative animate-fade-in overflow-y-auto max-h-[90vh]">
+        <div
+          className="bg-white rounded-3xl shadow-2xl p-10 w-full"
+          style={{
+            maxWidth: "90vw",
+            minWidth: 900,
+            border: "1px solid #dbeafe",
+            position: "relative",
+            maxHeight: "95vh",
+          }}
+        >
           <button
             onClick={onClose}
             className="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition"
@@ -165,132 +187,196 @@ export default function RepairOrderEdit({ orderId, onSaved, onClose }) {
             </h3>
           </div>
 
-          {error && <div className="mb-4 text-red-600 text-center font-semibold">{error}</div>}
+          {error && (
+            <div className="mb-4 text-red-600 text-center font-semibold">
+              {error}
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-10" style={{ minWidth: 800 }}>
+              {/* Cột 1: Khách hàng, xe */}
               <div className="space-y-6">
                 <div>
                   <label className="font-semibold text-gray-700 block mb-1">Khách hàng</label>
-                  <select
-                    name="customerId"
-                    value={form.customerId}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-2 rounded-xl border-2 border-gray-200"
-                  >
-                    <option value="">-- Chọn khách hàng --</option>
-                    {customers.map((c) => (
-                      <option key={c.id} value={c.id}>{c.name}</option>
-                    ))}
-                  </select>
-                </div>
-                {form.customerId && (
-                  <div>
-                    <label className="font-semibold text-gray-700 block mb-1">Biển số xe</label>
+                  <div className="relative">
                     <select
-                      name="licensePlate"
-                      value={form.licensePlate}
+                      name="customerId"
+                      value={form.customerId}
                       onChange={handleChange}
                       required
-                      className="w-full px-4 py-2 rounded-xl border-2 border-gray-200"
+                      className="w-full pl-10 pr-4 py-2 rounded-xl border-2 border-gray-200"
                     >
-                      <option value="">-- Chọn xe --</option>
-                      {filteredMotos.map((m) => (
-                        <option key={m.licensePlate} value={m.licensePlate}>{m.licensePlate}</option>
+                      <option value="">-- Chọn khách hàng --</option>
+                      {customers.map((c) => (
+                        <option key={c.id} value={c.id}>{c.name}</option>
                       ))}
                     </select>
+                    <User className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" />
                   </div>
-                )}
-                {form.licensePlate && (
-                  <div>
-                    <label className="font-semibold text-gray-700 block mb-1">Tên xe</label>
-                    <input
-                      disabled
-                      value={form.model}
-                      className="w-full px-4 py-2 rounded-xl border-2 border-gray-200 bg-gray-100"
-                    />
-                  </div>
-                )}
-                {form.licensePlate && (
-                  <div>
-                    <label className="font-semibold text-gray-700 block mb-1">Năm sản xuất</label>
-                    <input
-                      type="number"
-                      name="year"
-                      value={form.year}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-2 rounded-xl border-2 border-gray-200"
-                    />
-                  </div>
+                </div>
+
+                {form.customerId && (
+                  <>
+                    <div>
+                      <label className="font-semibold text-gray-700 block mb-1">Biển số xe</label>
+                      <div className="relative">
+                        <select
+                          name="licensePlate"
+                          value={form.licensePlate}
+                          onChange={handleChange}
+                          required
+                          className="w-full pl-10 pr-4 py-2 rounded-xl border-2 border-gray-200"
+                        >
+                          <option value="">-- Chọn xe --</option>
+                          {filteredMotos.map((m) => (
+                            <option key={m.licensePlate} value={m.licensePlate}>{m.licensePlate}</option>
+                          ))}
+                        </select>
+                        <BadgeCheck className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="font-semibold text-gray-700 block mb-1">Tên xe</label>
+                      <div className="relative">
+                        <input
+                          value={form.model}
+                          disabled
+                          className="w-full pl-10 pr-4 py-2 rounded-xl border-2 border-gray-200 bg-gray-100"
+                        />
+                        <PackageSearch className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="font-semibold text-gray-700 block mb-1">Năm sản xuất</label>
+                      <div className="relative">
+                        <input
+                          type="number"
+                          name="year"
+                          value={form.year}
+                          onChange={handleChange}
+                          required
+                          className="w-full pl-10 pr-4 py-2 rounded-xl border-2 border-gray-200"
+                        />
+                        <CalendarClock className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" />
+                      </div>
+                    </div>
+                  </>
                 )}
               </div>
 
+              {/* Cột 2: Trạng thái, mô tả, nhân viên */}
               <div className="space-y-6">
                 <div>
                   <label className="font-semibold text-gray-700 block mb-1">Tình trạng</label>
-                  <textarea
-                    name="description"
-                    value={form.description}
-                    onChange={handleChange}
-                    className="w-full px-4 py-2 rounded-xl border-2 border-gray-200"
-                  />
+                  <div className="relative">
+                    <textarea
+                      name="description"
+                      value={form.description}
+                      onChange={handleChange}
+                      className="w-full pl-10 pr-4 py-2 rounded-xl border-2 border-gray-200"
+                    />
+                    <ClipboardList className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" />
+                  </div>
                 </div>
+
                 <div>
                   <label className="font-semibold text-gray-700 block mb-1">Trạng thái</label>
-                  <select
-                    name="status"
-                    value={form.status}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-2 rounded-xl border-2 border-gray-200"
-                  >
-                    <option value="Pending">Chờ xử lý</option>
-                    <option value="InProgress">Đang sửa</option>
-                    <option value="Completed">Hoàn thành</option>
-                    <option value="Cancelled">Đã hủy</option>
-                  </select>
+                  <div className="relative">
+                    <select
+                      name="status"
+                      value={form.status}
+                      onChange={handleChange}
+                      required
+                      className="w-full pl-10 pr-4 py-2 rounded-xl border-2 border-gray-200"
+                    >
+                      <option value="Pending">Chờ xử lý</option>
+                      <option value="InProgress">Đang sửa</option>
+                      <option value="Completed">Hoàn thành</option>
+                      <option value="Cancelled">Đã hủy</option>
+                    </select>
+                    <Repeat className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" />
+                  </div>
                 </div>
+
                 <div>
                   <label className="font-semibold text-gray-700 block mb-1">Nhân viên sửa chữa</label>
-                  <select
-                    name="employeeId"
-                    value={form.employeeId}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-2 rounded-xl border-2 border-gray-200"
-                  >
-                    <option value="">-- Chọn nhân viên --</option>
-                    {employees.map((e) => (
-                      <option key={e.id} value={e.id}>{e.name}</option>
-                    ))}
-                  </select>
+                  <div className="relative">
+                    <select
+                      name="employeeId"
+                      value={form.employeeId}
+                      onChange={handleChange}
+                      required
+                      className="w-full pl-10 pr-4 py-2 rounded-xl border-2 border-gray-200"
+                    >
+                      <option value="">-- Chọn nhân viên --</option>
+                      {employees.map((e) => (
+                        <option key={e.id} value={e.id}>{e.name}</option>
+                      ))}
+                    </select>
+                    <Hammer className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" />
+                  </div>
                 </div>
               </div>
 
+              {/* Cột 3: Phụ tùng và tổng tiền */}
               <div className="space-y-6">
                 <div>
-                  <label className="font-semibold text-gray-700 block mb-1">Phụ tùng thay thế</label>
-                  <div className="bg-gray-100 p-3 rounded-xl max-h-64 overflow-y-auto">
-                    {parts.map((part) => (
-                      <div key={part.id} className="flex items-center gap-3 mb-2">
+                  <div className="flex items-center gap-2 mb-1">
+                    <label className="font-semibold text-gray-700 flex items-center m-0">
+                      Phụ tùng thay thế
+                      <Settings className="w-5 h-5 text-gray-400 ml-1" />
+                    </label>
+                    <input
+                      type="text"
+                      value={partSearch}
+                      onChange={e => setPartSearch(e.target.value)}
+                      placeholder="Tìm phụ tùng..."
+                      className="border border-gray-300 rounded px-2 py-1 text-sm flex-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                      style={{ minWidth: 180, maxWidth: 250, marginLeft: 16 }}
+                    />
+                  </div>
+                  <div
+                    className="bg-gray-100 p-3 rounded-xl max-h-64 overflow-y-auto"
+                    style={{ minWidth: 400, maxWidth: 900 }}
+                  >
+                    {filteredParts.map((part) => (
+                      <div
+                        key={part.id}
+                        className="flex items-center gap-3 mb-2"
+                      >
                         <input
                           type="checkbox"
                           checked={!!selectedParts[part.id]}
                           onChange={(e) => {
                             setSelectedParts((prev) => {
                               const copy = { ...prev };
-                              if (e.target.checked) {
-                                copy[part.id] = 1;
-                              } else {
-                                delete copy[part.id];
-                              }
+                              if (e.target.checked) copy[part.id] = 1;
+                              else delete copy[part.id];
                               return copy;
                             });
                           }}
                         />
-                        <span className="w-40">{part.name} ({part.price?.toLocaleString()}VNĐ)</span>
+                        <span
+                          className="flex-1 flex items-center"
+                          style={{
+                            minWidth: 0,
+                            wordBreak: "break-word",
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis"
+                          }}
+                        >
+                          <span className="font-semibold text-base text-blue-900">{part.name}</span>
+                          {getBrandName(part.brandId) && (
+                            <span className="text-gray-500 text-xs ml-1">({getBrandName(part.brandId)})</span>
+                          )}
+                          <span className="font-semibold text-base text-blue-900 ml-2">
+                            {part.price?.toLocaleString()} VNĐ
+                          </span>
+                        </span>
                         {selectedParts[part.id] && (
                           <input
                             type="number"
@@ -301,6 +387,7 @@ export default function RepairOrderEdit({ orderId, onSaved, onClose }) {
                               setSelectedParts((prev) => ({ ...prev, [part.id]: qty }));
                             }}
                             className="border rounded px-2 py-1 w-20"
+                            placeholder="Số lượng"
                           />
                         )}
                       </div>
@@ -309,8 +396,14 @@ export default function RepairOrderEdit({ orderId, onSaved, onClose }) {
                 </div>
                 <div className="text-center">
                   <label className="font-semibold text-lg text-gray-700 block mb-1">Tổng tiền</label>
-                  <div className="text-2xl font-bold text-green-600 bg-gray-100 px-4 py-3 rounded-xl border border-gray-200 shadow inline-block">
-                    {totalCost.toLocaleString()} VNĐ
+                  <div className="relative inline-block">
+                    <Coins className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                    <input
+                      disabled
+                      value={totalCost.toLocaleString() + " VNĐ"}
+                      className="text-2xl font-bold text-green-600 bg-gray-100 pl-10 pr-4 py-3 rounded-xl border border-gray-200 shadow w-full"
+                      style={{ maxWidth: "320px" }}
+                    />
                   </div>
                 </div>
               </div>
