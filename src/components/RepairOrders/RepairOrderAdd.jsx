@@ -5,6 +5,7 @@ import { getAllCustomers } from "../../services/CustomerApi";
 import { getAllParts } from "../../services/PartsApi";
 import { createRepairDetail } from "../../services/RepairDetailApi";
 import { getAllEmployees } from "../../services/EmployeeApi";
+import { getAllBrands } from "../../services/BrandApi";
 import {
   Save,
   XCircle,
@@ -45,8 +46,10 @@ export default function RepairOrderAdd({ onSaved, onClose }) {
   const [customers, setCustomers] = useState([]);
   const [parts, setParts] = useState([]);
   const [employees, setEmployees] = useState([]);
+  const [brands, setBrands] = useState([]);
   const [selectedParts, setSelectedParts] = useState({});
   const [error, setError] = useState("");
+  const [partSearch, setPartSearch] = useState("");
 
   // Lấy dữ liệu xe, khách hàng, phụ tùng, nhân viên khi load component
   useEffect(() => {
@@ -54,6 +57,7 @@ export default function RepairOrderAdd({ onSaved, onClose }) {
     getAllCustomers().then(setCustomers);
     getAllParts().then(setParts);
     getAllEmployees().then(setEmployees);
+    getAllBrands().then(setBrands);
   }, []);
 
   // Tự động cập nhật model và year khi chọn biển số xe
@@ -108,6 +112,11 @@ export default function RepairOrderAdd({ onSaved, onClose }) {
     ? motos.filter((m) => m.customerId === form.customerId)
     : [];
 
+  // Lọc phụ tùng theo tên tìm kiếm
+  const filteredParts = parts.filter((part) =>
+    part.name.toLowerCase().includes(partSearch.toLowerCase())
+  );
+
   // Xử lý submit form thêm đơn sửa chữa
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -149,11 +158,26 @@ export default function RepairOrderAdd({ onSaved, onClose }) {
     }
   };
 
+  const getBrandName = (brandId) => {
+    const brand = brands.find((b) => b.id === brandId);
+    return brand ? brand.name : "";
+  };
+
   return (
     <>
       <style>{fadeInStyle}</style>
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-3xl shadow-2xl p-10 w-full max-w-5xl border border-blue-100 relative animate-fade-in overflow-y-auto max-h-[90vh]">
+        <div
+          className="bg-white rounded-3xl shadow-2xl p-10 w-full"
+          style={{
+            maxWidth: "90vw",
+            minWidth: 900,
+            border: "1px solid #dbeafe",
+            position: "relative",
+            overflow: "visible",
+            maxHeight: "95vh"
+          }}
+        >
           <button
             onClick={onClose}
             className="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition"
@@ -173,7 +197,10 @@ export default function RepairOrderAdd({ onSaved, onClose }) {
           {error && <div className="mb-4 text-red-600 text-center font-semibold">{error}</div>}
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+            <div
+              className="grid grid-cols-1 md:grid-cols-3 gap-10"
+              style={{ minWidth: 800 }}
+            >
               {/* Cột 1: Thông tin khách hàng và xe */}
               <div className="space-y-6">
                 <div>
@@ -298,13 +325,29 @@ export default function RepairOrderAdd({ onSaved, onClose }) {
               {/* Cột 3: Phụ tùng thay thế và tổng tiền */}
               <div className="space-y-6">
                 <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="font-semibold text-gray-700">Phụ tùng thay thế</label>
-                    <Settings className="w-5 h-5 text-gray-400" />
+                  <div className="flex items-center gap-2 mb-1">
+                    <label className="font-semibold text-gray-700 flex items-center">
+                      Phụ tùng thay thế
+                      <Settings className="w-5 h-5 text-gray-400 ml-1" />
+                    </label>
+                    <input
+                      type="text"
+                      value={partSearch}
+                      onChange={e => setPartSearch(e.target.value)}
+                      placeholder="Tìm phụ tùng..."
+                      className="border border-gray-300 rounded px-2 py-1 text-sm flex-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                      style={{ minWidth: 180, maxWidth: 250, marginLeft: 16 }}
+                    />
                   </div>
-                  <div className="bg-gray-100 p-3 rounded-xl max-h-64 overflow-y-auto">
-                    {parts.map((part) => (
-                      <div key={part.id} className="flex items-center gap-3 mb-2">
+                  <div
+                    className="bg-gray-100 p-3 rounded-xl max-h-64 overflow-y-auto"
+                    style={{ minWidth: 400, maxWidth: 700 }}
+                  >
+                    {filteredParts.map((part) => (
+                      <div
+                        key={part.id}
+                        className="flex items-center gap-3 mb-2"
+                      >
                         <input
                           type="checkbox"
                           checked={!!selectedParts[part.id]}
@@ -317,8 +360,23 @@ export default function RepairOrderAdd({ onSaved, onClose }) {
                             });
                           }}
                         />
-                        <span className="w-40">
-                          {part.name} ({part.price?.toLocaleString()}VNĐ)
+                        <span
+                          className="flex-1 flex items-center"
+                          style={{
+                            minWidth: 0,
+                            wordBreak: "break-word",
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis"
+                          }}
+                        >
+                          <span className="font-semibold text-base text-blue-900">{part.name}</span>
+                          {getBrandName(part.brandId) && (
+                            <span className="text-gray-500 text-xs ml-1">({getBrandName(part.brandId)})</span>
+                          )}
+                          <span className="font-semibold text-base text-blue-900 ml-2">
+                            {part.price?.toLocaleString()} VNĐ
+                          </span>
                         </span>
                         {selectedParts[part.id] && (
                           <input
