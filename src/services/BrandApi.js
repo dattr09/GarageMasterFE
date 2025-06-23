@@ -1,8 +1,9 @@
 const API_URL = "http://localhost:5119/api/brand";
 
+// Lấy tất cả hãng xe
 export async function getAllBrands() {
   const token = localStorage.getItem("token");
-  const res = await fetch("http://localhost:5119/api/brand", {
+  const res = await fetch(API_URL, {
     headers: {
       "Authorization": `Bearer ${token}`,
       "Content-Type": "application/json"
@@ -12,6 +13,7 @@ export async function getAllBrands() {
   return res.json();
 }
 
+// Tạo mới hãng xe
 export async function createBrand(data) {
   const token = localStorage.getItem("token");
   const res = await fetch(API_URL, {
@@ -26,9 +28,10 @@ export async function createBrand(data) {
   return res.json();
 }
 
+// Cập nhật hãng xe
 export async function updateBrand(id, brand) {
   const token = localStorage.getItem("token");
-  const res = await fetch(`http://localhost:5119/api/brand/${id}`, {
+  const res = await fetch(`${API_URL}/${id}`, {
     method: "PUT",
     headers: {
       "Authorization": `Bearer ${token}`,
@@ -44,9 +47,10 @@ export async function updateBrand(id, brand) {
   return data;
 }
 
+// Xóa hãng xe
 export async function deleteBrand(id) {
   const token = localStorage.getItem("token");
-  const res = await fetch(`http://localhost:5119/api/brand/${id}`, {
+  const res = await fetch(`${API_URL}/${id}`, {
     method: "DELETE",
     headers: {
       "Authorization": `Bearer ${token}`,

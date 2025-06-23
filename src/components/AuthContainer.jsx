@@ -41,7 +41,7 @@ export default function AuthContainer() {
             }}
             transition={{ duration: 0.7, ease: "easeInOut" }}
           >
-            {/* Logo chạy vào theo hướng */}
+            {/* Logo động */}
             <motion.img
               src={
                 isRegister
@@ -72,7 +72,7 @@ export default function AuthContainer() {
             </div>
           </motion.div>
 
-          {/* Form động desktop */}
+          {/* Form desktop động */}
           <div className="absolute top-0 h-full w-1/2 right-0 md:block hidden z-20">
             <AnimatePresence mode="wait">
               {location.pathname === "/login" && (
@@ -103,7 +103,7 @@ export default function AuthContainer() {
             </AnimatePresence>
           </div>
 
-          {/* Form động mobile */}
+          {/* Form mobile động */}
           <div className="md:hidden w-full p-4">
             <AnimatePresence mode="wait">
               {location.pathname === "/login" && (

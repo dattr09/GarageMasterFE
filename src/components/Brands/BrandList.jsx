@@ -14,28 +14,36 @@ export default function BrandList() {
   const [editing, setEditing] = useState(null);
   const [showDetail, setShowDetail] = useState(false);
   const [detailBrand, setDetailBrand] = useState(null);
+  const [userRole, setUserRole] = useState("");
 
+  // Lấy danh sách hãng xe và linh kiện, đồng thời lấy role người dùng
   useEffect(() => {
     getAllBrands().then(setBrands).catch(() => { });
     getAllParts().then(setParts);
+    const user = JSON.parse(localStorage.getItem("user"));
+    setUserRole(user?.role || "");
   }, []);
 
+  // Mở form thêm/sửa hãng xe
   const openForm = (brand = null) => {
     setEditing(brand);
     setShowForm(true);
   };
 
+  // Đóng form thêm/sửa hãng xe
   const closeForm = () => {
     setShowForm(false);
     setEditing(null);
   };
 
+  // Sau khi lưu thành công, reload danh sách và đóng form
   const handleSaved = async () => {
     const list = await getAllBrands();
     setBrands(list);
     closeForm();
   };
 
+  // Xử lý xóa hãng xe
   const handleDelete = async (id) => {
     const result = await Swal.fire({
       title: "Bạn chắc chắn muốn xóa hãng xe này?",
@@ -55,11 +63,13 @@ export default function BrandList() {
     }
   };
 
+  // Hiển thị popup chi tiết hãng xe
   const handleShowDetail = (brand) => {
     setDetailBrand(brand);
     setShowDetail(true);
   };
 
+  // Đóng popup chi tiết hãng xe
   const closeDetail = () => {
     setShowDetail(false);
     setDetailBrand(null);
@@ -74,12 +84,14 @@ export default function BrandList() {
 
         <div className="flex flex-col sm:flex-row gap-3 items-center justify-between mb-6">
           <span className="text-gray-600 text-sm italic">Tổng có {brands.length} hãng xe</span>
-          <button
-            onClick={() => openForm()}
-            className="flex items-center gap-2 bg-green-600 hover:bg-green-800 text-white font-bold px-4 py-2 rounded-xl transition shadow"
-          >
-            <PlusCircle size={20} /> Thêm mới
-          </button>
+          {userRole === "Admin" && (
+            <button
+              onClick={() => openForm()}
+              className="flex items-center gap-2 bg-green-600 hover:bg-green-800 text-white font-bold px-4 py-2 rounded-xl transition shadow"
+            >
+              <PlusCircle size={20} /> Thêm mới
+            </button>
+          )}
         </div>
 
         <div className="overflow-x-auto rounded-xl border border-gray-200 shadow">
@@ -125,20 +137,24 @@ export default function BrandList() {
                       >
                         <Info size={16} /> Chi tiết
                       </button>
-                      <button
-                        onClick={() => openForm(brand)}
-                        className="flex items-center gap-1 bg-yellow-400 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
-                        title="Sửa"
-                      >
-                        <Pencil size={16} /> Sửa
-                      </button>
-                      <button
-                        onClick={() => handleDelete(brand.id)}
-                        className="flex items-center gap-1 bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
-                        title="Xóa"
-                      >
-                        <Trash2 size={16} /> Xóa
-                      </button>
+                      {userRole === "Admin" && (
+                        <>
+                          <button
+                            onClick={() => openForm(brand)}
+                            className="flex items-center gap-1 bg-yellow-400 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
+                            title="Sửa"
+                          >
+                            <Pencil size={16} /> Sửa
+                          </button>
+                          <button
+                            onClick={() => handleDelete(brand.id)}
+                            className="flex items-center gap-1 bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
+                            title="Xóa"
+                          >
+                            <Trash2 size={16} /> Xóa
+                          </button>
+                        </>
+                      )}
                     </td>
                   </tr>
                 ))
@@ -147,7 +163,6 @@ export default function BrandList() {
           </table>
         </div>
 
-        {/* Form Thêm/Sửa */}
         {showForm &&
           (editing ? (
             <EditBrandForm brand={editing} onClose={closeForm} onSaved={handleSaved} />
@@ -155,7 +170,6 @@ export default function BrandList() {
             <AddBrandForm onClose={closeForm} onSaved={handleSaved} />
           ))}
 
-        {/* Chi tiết hãng */}
         {showDetail && detailBrand && (
           <BrandDetails
             brand={detailBrand}

@@ -23,9 +23,13 @@ export default function MotoList() {
   const [showDetail, setShowDetail] = useState(false);
   const [detailMoto, setDetailMoto] = useState(null);
   const [search, setSearch] = useState("");
+  const [userRole, setUserRole] = useState("");
 
   useEffect(() => {
     fetchData();
+    // Lấy role từ localStorage
+    const user = JSON.parse(localStorage.getItem("user"));
+    setUserRole(user?.role || "");
   }, []);
 
   const fetchData = async () => {
@@ -39,7 +43,11 @@ export default function MotoList() {
       setBrands(brandsData);
       setCustomers(customersData);
     } catch (error) {
-      Swal.fire("Lỗi!", "Không thể tải dữ liệu", "error");
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (user?.role === "Admin") {
+        Swal.fire("Lỗi!", "Không thể tải dữ liệu", "error");
+      }
+      // Nếu không phải admin thì không hiện thông báo gì cả
     }
   };
 
@@ -84,6 +92,9 @@ export default function MotoList() {
     );
   });
 
+  // Kiểm tra quyền admin hoặc employee
+  const canEdit = userRole === "Admin" || userRole === "Employee";
+
   return (
     <div className="max-w-5xl mx-auto bg-white rounded-xl shadow-xl p-6 mt-6 animate-fade-in">
       <h2 className="text-3xl font-extrabold text-center text-blue-800 mb-6 drop-shadow-md">
@@ -98,15 +109,17 @@ export default function MotoList() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <button
-          onClick={() => {
-            setEditing(null);
-            setShowForm(true);
-          }}
-          className="flex items-center gap-2 bg-green-600 hover:bg-green-800 text-white font-bold px-4 py-2 rounded-xl transition shadow"
-        >
-          <PlusCircle size={20} /> Thêm mới
-        </button>
+        {canEdit && (
+          <button
+            onClick={() => {
+              setEditing(null);
+              setShowForm(true);
+            }}
+            className="flex items-center gap-2 bg-green-600 hover:bg-green-800 text-white font-bold px-4 py-2 rounded-xl transition shadow"
+          >
+            <PlusCircle size={20} /> Thêm mới
+          </button>
+        )}
       </div>
 
       <div className="overflow-x-auto rounded-xl border border-gray-200 shadow">
@@ -146,23 +159,27 @@ export default function MotoList() {
                     >
                       <Info size={16} /> Chi tiết
                     </button>
-                    <button
-                      onClick={() => {
-                        setEditing(moto);
-                        setShowForm(true);
-                      }}
-                      className="flex items-center gap-1 bg-yellow-400 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
-                      title="Sửa"
-                    >
-                      <Pencil size={16} /> Sửa
-                    </button>
-                    <button
-                      onClick={() => handleDelete(moto.licensePlate)}
-                      className="flex items-center gap-1 bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
-                      title="Xóa"
-                    >
-                      <Trash2 size={16} /> Xóa
-                    </button>
+                    {canEdit && (
+                      <>
+                        <button
+                          onClick={() => {
+                            setEditing(moto);
+                            setShowForm(true);
+                          }}
+                          className="flex items-center gap-1 bg-yellow-400 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
+                          title="Sửa"
+                        >
+                          <Pencil size={16} /> Sửa
+                        </button>
+                        <button
+                          onClick={() => handleDelete(moto.licensePlate)}
+                          className="flex items-center gap-1 bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
+                          title="Xóa"
+                        >
+                          <Trash2 size={16} /> Xóa
+                        </button>
+                      </>
+                    )}
                   </td>
                 </tr>
               ))

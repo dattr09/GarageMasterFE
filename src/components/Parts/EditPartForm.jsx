@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import {
   Edit,
-  Image as ImageIcon,
   Tags,
   Hash,
   DollarSign,
@@ -44,9 +43,11 @@ export default function EditPartForm({ part, onClose, onSaved }) {
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
+    // Lấy danh sách hãng xe khi load component
     getAllBrands().then(setBrands);
   }, []);
 
+  // Xử lý thay đổi input form
   const handleChange = (e) => {
     const { name, value, type } = e.target;
     setForm({
@@ -55,6 +56,7 @@ export default function EditPartForm({ part, onClose, onSaved }) {
     });
   };
 
+  // Xử lý upload ảnh lên Cloudinary
   const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -75,6 +77,7 @@ export default function EditPartForm({ part, onClose, onSaved }) {
     setUploading(false);
   };
 
+  // Xử lý submit form cập nhật phụ tùng
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -210,7 +213,7 @@ export default function EditPartForm({ part, onClose, onSaved }) {
   );
 }
 
-// Input dùng chung
+// Input dùng chung cho form
 function FormInput({ label, icon, ...props }) {
   return (
     <div className="relative">

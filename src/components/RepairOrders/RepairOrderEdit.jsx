@@ -36,6 +36,7 @@ export default function RepairOrderEdit({ orderId, onSaved, onClose }) {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    // Lấy dữ liệu đơn sửa chữa, xe, khách hàng, phụ tùng, nhân viên, chi tiết đơn khi mount
     fetchOrder();
     getAllMotos().then(setMotos);
     getAllCustomers().then(setCustomers);
@@ -45,6 +46,7 @@ export default function RepairOrderEdit({ orderId, onSaved, onClose }) {
   }, [orderId]);
 
   useEffect(() => {
+    // Tự động cập nhật model và year khi chọn biển số xe
     if (form.licensePlate) {
       const moto = motos.find((m) => m.licensePlate === form.licensePlate);
       setForm((prev) => ({
@@ -55,6 +57,7 @@ export default function RepairOrderEdit({ orderId, onSaved, onClose }) {
     }
   }, [form.licensePlate, motos]);
 
+  // Lấy thông tin đơn sửa chữa
   const fetchOrder = async () => {
     try {
       const data = await getRepairOrderById(orderId);
@@ -72,6 +75,7 @@ export default function RepairOrderEdit({ orderId, onSaved, onClose }) {
     }
   };
 
+  // Lấy chi tiết phụ tùng đã chọn cho đơn sửa chữa
   const fetchRepairDetails = async () => {
     const details = await getRepairDetailsByOrderId(orderId);
     const selected = {};
@@ -79,6 +83,7 @@ export default function RepairOrderEdit({ orderId, onSaved, onClose }) {
     setSelectedParts(selected);
   };
 
+  // Xử lý thay đổi input form
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name === "customerId") {
@@ -102,26 +107,29 @@ export default function RepairOrderEdit({ orderId, onSaved, onClose }) {
     }
   };
 
+  // Lọc xe theo khách hàng đã chọn
   const filteredMotos = form.customerId
     ? motos.filter((m) => m.customerId === form.customerId)
     : [];
 
+  // Danh sách phụ tùng đã chọn và số lượng
   const selectedPartsArray = Object.entries(selectedParts)
     .filter(([_, qty]) => qty > 0)
     .map(([partId, quantity]) => ({ partId, quantity }));
 
+  // Tính tổng tiền phụ tùng đã chọn
   const totalCost = selectedPartsArray.reduce((sum, { partId, quantity }) => {
     const part = parts.find((p) => p.id === partId);
     return sum + (part?.price || 0) * quantity;
   }, 0);
 
+  // Xử lý submit form cập nhật đơn sửa chữa
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     try {
       const payload = { ...form, totalCost };
       await updateRepairOrder(orderId, payload);
-      await updateRepairDetails(orderId, selectedPartsArray);
 
       Swal.fire({
         icon: "success",
@@ -161,7 +169,6 @@ export default function RepairOrderEdit({ orderId, onSaved, onClose }) {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-              {/* Cột 1 */}
               <div className="space-y-6">
                 <div>
                   <label className="font-semibold text-gray-700 block mb-1">Khách hàng</label>
@@ -220,7 +227,6 @@ export default function RepairOrderEdit({ orderId, onSaved, onClose }) {
                 )}
               </div>
 
-              {/* Cột 2 */}
               <div className="space-y-6">
                 <div>
                   <label className="font-semibold text-gray-700 block mb-1">Tình trạng</label>
@@ -263,7 +269,6 @@ export default function RepairOrderEdit({ orderId, onSaved, onClose }) {
                 </div>
               </div>
 
-              {/* Cột 3 */}
               <div className="space-y-6">
                 <div>
                   <label className="font-semibold text-gray-700 block mb-1">Phụ tùng thay thế</label>

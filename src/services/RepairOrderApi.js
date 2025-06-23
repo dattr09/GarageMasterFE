@@ -19,6 +19,7 @@ export async function getRepairOrderById(id) {
 }
 
 export async function createRepairOrder(data) {
+  // Tạo mới đơn sửa chữa
   const token = localStorage.getItem("token");
   const res = await fetch(API_URL, {
     method: "POST",
@@ -28,7 +29,6 @@ export async function createRepairOrder(data) {
     },
     body: JSON.stringify(data)
   });
-  console.log(res)
   if (!res.ok) throw new Error("Thêm đơn sửa chữa thất bại");
   return res.json();
 }
@@ -43,11 +43,21 @@ export async function updateRepairOrder(id, data) {
     },
     body: JSON.stringify(data)
   });
-  if (!res.ok) throw new Error("Cập nhật đơn sửa chữa thất bại");
-  return res;
+  if (!res.ok) {
+    let message = "Cập nhật đơn sửa chữa thất bại";
+    try {
+      const text = await res.text();
+      if (text) {
+        const err = JSON.parse(text);
+        if (err?.message) message = err.message;
+      }
+    } catch { }
+    throw new Error(message);
+  }
 }
 
 export async function deleteRepairOrder(id) {
+  // Xóa đơn sửa chữa
   const token = localStorage.getItem("token");
   const res = await fetch(`${API_URL}/${id}`, {
     method: "DELETE",

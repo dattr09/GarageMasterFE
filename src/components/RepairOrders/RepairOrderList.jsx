@@ -19,12 +19,17 @@ export default function RepairOrderList() {
   const [selectedOrderId, setSelectedOrderId] = useState(null);
   const [selectedOrderIndex, setSelectedOrderIndex] = useState(null);
   const [search, setSearch] = useState("");
+  const [userRole, setUserRole] = useState("");
 
   useEffect(() => {
     fetchOrders();
     fetchCustomers();
+    // Lấy role từ localStorage
+    const user = JSON.parse(localStorage.getItem("user"));
+    setUserRole(user?.role || "");
   }, [refreshKey]);
 
+  // Lấy danh sách đơn sửa chữa
   const fetchOrders = async () => {
     try {
       const data = await getAllRepairOrders();
@@ -34,6 +39,7 @@ export default function RepairOrderList() {
     }
   };
 
+  // Lấy danh sách khách hàng
   const fetchCustomers = async () => {
     try {
       const data = await getAllCustomers();
@@ -41,6 +47,7 @@ export default function RepairOrderList() {
     } catch (err) { }
   };
 
+  // Lấy tên khách hàng từ id
   const getCustomerName = (customerId) => {
     const customer = customers.find((c) => c.id === customerId);
     return customer ? customer.name : customerId;
@@ -55,6 +62,7 @@ export default function RepairOrderList() {
     );
   });
 
+  // Xử lý xóa đơn sửa chữa
   const handleDelete = async (id) => {
     const result = await Swal.fire({
       title: "Bạn chắc chắn muốn xóa?",
@@ -80,6 +88,9 @@ export default function RepairOrderList() {
     Cancelled: "Đã hủy",
   };
 
+  // Kiểm tra quyền admin hoặc employee
+  const canEdit = userRole === "Admin" || userRole === "Employee";
+
   return (
     <div className="max-w-full mx-auto bg-white rounded-xl shadow-xl p-6 mt-6 animate-fade-in">
       <h2 className="text-3xl font-extrabold text-center text-blue-800 mb-6 drop-shadow-md">
@@ -94,15 +105,16 @@ export default function RepairOrderList() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <button
-          onClick={() => setShowForm({ type: "add" })}
-          className="flex items-center gap-2 bg-green-600 hover:bg-green-800 text-white font-bold px-4 py-2 rounded-xl transition shadow"
-        >
-          <PlusCircle size={20} /> Thêm mới
-        </button>
+        {canEdit && (
+          <button
+            onClick={() => setShowForm({ type: "add" })}
+            className="flex items-center gap-2 bg-green-600 hover:bg-green-800 text-white font-bold px-4 py-2 rounded-xl transition shadow"
+          >
+            <PlusCircle size={20} /> Thêm mới
+          </button>
+        )}
       </div>
 
-      {/* Bỏ overflow-x-auto, chỉ giữ border và shadow */}
       <div className="rounded-xl border border-gray-200 shadow overflow-x-auto w-full">
         <table className="w-full min-w-[900px] divide-y divide-gray-200 text-sm text-gray-700">
           <thead className="bg-blue-100 text-blue-900">
@@ -159,31 +171,43 @@ export default function RepairOrderList() {
                     >
                       <Info size={16} /> Chi tiết
                     </button>
-                    <button
-                      onClick={() => setShowForm({ type: "edit", id: order.id })}
-                      className="flex items-center gap-1 bg-yellow-400 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg shadow font-semibold transition whitespace-nowrap"
-                      title="Sửa"
-                    >
-                      <Pencil size={16} /> Sửa
-                    </button>
-                    <button
-                      onClick={() => handleDelete(order.id)}
-                      className="flex items-center gap-1 bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded-lg shadow font-semibold transition whitespace-nowrap"
-                      title="Xóa"
-                    >
-                      <Trash2 size={16} /> Xóa
-                    </button>
-                    {order.status === "Completed" || order.status === "Hoàn thành" ? (
-                      <button
-                        className="bg-green-600 hover:bg-green-800 text-white px-3 py-1 rounded-lg shadow font-semibold transition whitespace-nowrap"
-                        onClick={() =>
-                          (window.location.href = `/invoices?customerId=${order.customerId}&repairOrderId=${order.id}`)
-                        }
-                      >
-                        Tạo hóa đơn
-                      </button>
-                    ) : (
-                      <span className="text-gray-400 italic whitespace-nowrap">Chưa hoàn thành</span>
+                    {canEdit && (
+                      <>
+                        <button
+                          onClick={() => setShowForm({ type: "edit", id: order.id })}
+                          className="flex items-center gap-1 bg-yellow-400 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg shadow font-semibold transition whitespace-nowrap"
+                          title="Sửa"
+                        >
+                          <Pencil size={16} /> Sửa
+                        </button>
+                        <button
+                          onClick={() => handleDelete(order.id)}
+                          className="flex items-center gap-1 bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded-lg shadow font-semibold transition whitespace-nowrap"
+                          title="Xóa"
+                        >
+                          <Trash2 size={16} /> Xóa
+                        </button>
+                        {(order.status === "Completed" || order.status === "Hoàn thành") && (
+                          <button
+                            className="bg-green-600 hover:bg-green-800 text-white px-3 py-1 rounded-lg shadow font-semibold transition whitespace-nowrap"
+                            onClick={() =>
+                              (window.location.href = `/invoices?customerId=${order.customerId}&repairOrderId=${order.id}`)
+                            }
+                          >
+                            Tạo hóa đơn
+                          </button>
+                        )}
+                        {(order.status !== "Completed" && order.status !== "Hoàn thành") && (
+                          <span className="text-gray-400 italic whitespace-nowrap">Chưa hoàn thành</span>
+                        )}
+                      </>
+                    )}
+                    {!canEdit && (
+                      <span className="text-gray-400 italic whitespace-nowrap">
+                        {order.status === "Completed" || order.status === "Hoàn thành"
+                          ? "Chỉ Admin/Employee được tạo hóa đơn"
+                          : "Chưa hoàn thành"}
+                      </span>
                     )}
                   </td>
                 </tr>

@@ -12,6 +12,7 @@ const fadeInStyle = `
 `;
 
 export default function PartDetails({ part, brands = [], onClose }) {
+  // Lấy tên hãng xe từ brandId
   const getBrandName = (brandId) => {
     const brand = brands.find((b) => b.id === brandId);
     return brand ? brand.name : brandId;
@@ -76,7 +77,7 @@ export default function PartDetails({ part, brands = [], onClose }) {
   );
 }
 
-// Component hiển thị từng dòng chi tiết
+// Hiển thị một dòng chi tiết thông tin phụ tùng
 function DetailRow({ label, value }) {
   return (
     <div className="flex justify-between items-center border-b pb-2 last:border-b-0">

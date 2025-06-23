@@ -1,6 +1,6 @@
 const API_BASE = "http://localhost:5119/api/invoices";
 
-// Hàm lấy token từ localStorage
+// Lấy token từ localStorage để tạo header xác thực
 function getAuthHeaders() {
   const token = localStorage.getItem("token");
   return token ? { "Authorization": `Bearer ${token}` } : {};
@@ -34,7 +34,7 @@ export async function getInvoiceById(id) {
   return res.json();
 }
 
-// Lấy hóa đơn của bạn
+// Lấy hóa đơn của người dùng hiện tại
 export async function getMyInvoices() {
   const res = await fetch(`${API_BASE}/my`, { headers: getAuthHeaders() });
   if (!res.ok) throw new Error("Lỗi lấy hóa đơn của bạn");

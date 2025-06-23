@@ -5,7 +5,6 @@ import { getAllCustomers } from "../../services/CustomerApi";
 import { getAllParts } from "../../services/PartsApi";
 import { createRepairDetail } from "../../services/RepairDetailApi";
 import { getAllEmployees } from "../../services/EmployeeApi";
-
 import {
   Save,
   XCircle,
@@ -49,6 +48,7 @@ export default function RepairOrderAdd({ onSaved, onClose }) {
   const [selectedParts, setSelectedParts] = useState({});
   const [error, setError] = useState("");
 
+  // Lấy dữ liệu xe, khách hàng, phụ tùng, nhân viên khi load component
   useEffect(() => {
     getAllMotos().then(setMotos);
     getAllCustomers().then(setCustomers);
@@ -56,6 +56,7 @@ export default function RepairOrderAdd({ onSaved, onClose }) {
     getAllEmployees().then(setEmployees);
   }, []);
 
+  // Tự động cập nhật model và year khi chọn biển số xe
   useEffect(() => {
     if (form.licensePlate) {
       const moto = motos.find((m) => m.licensePlate === form.licensePlate);
@@ -67,6 +68,7 @@ export default function RepairOrderAdd({ onSaved, onClose }) {
     }
   }, [form.licensePlate, motos]);
 
+  // Xử lý thay đổi input form
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name === "customerId") {
@@ -90,19 +92,23 @@ export default function RepairOrderAdd({ onSaved, onClose }) {
     }
   };
 
+  // Danh sách phụ tùng đã chọn và số lượng
   const selectedPartsArray = Object.entries(selectedParts)
     .filter(([_, qty]) => qty > 0)
     .map(([partId, quantity]) => ({ partId, quantity }));
 
+  // Tính tổng tiền phụ tùng đã chọn
   const totalCost = selectedPartsArray.reduce((sum, { partId, quantity }) => {
     const part = parts.find((p) => p.id === partId);
     return sum + (part?.price || 0) * quantity;
   }, 0);
 
+  // Lọc xe theo khách hàng đã chọn
   const filteredMotos = form.customerId
     ? motos.filter((m) => m.customerId === form.customerId)
     : [];
 
+  // Xử lý submit form thêm đơn sửa chữa
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -168,7 +174,7 @@ export default function RepairOrderAdd({ onSaved, onClose }) {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-              {/* Column 1 */}
+              {/* Cột 1: Thông tin khách hàng và xe */}
               <div className="space-y-6">
                 <div>
                   <label className="font-semibold text-gray-700 block mb-1">Khách hàng</label>
@@ -237,7 +243,7 @@ export default function RepairOrderAdd({ onSaved, onClose }) {
                 )}
               </div>
 
-              {/* Column 2 */}
+              {/* Cột 2: Tình trạng, trạng thái, nhân viên */}
               <div className="space-y-6">
                 <div>
                   <label className="font-semibold text-gray-700 block mb-1">Tình trạng</label>
@@ -289,7 +295,7 @@ export default function RepairOrderAdd({ onSaved, onClose }) {
                 </div>
               </div>
 
-              {/* Column 3 */}
+              {/* Cột 3: Phụ tùng thay thế và tổng tiền */}
               <div className="space-y-6">
                 <div>
                   <div className="flex items-center justify-between mb-1">

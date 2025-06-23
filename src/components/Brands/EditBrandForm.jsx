@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { updateBrand } from "../../services/BrandApi";
-import { Landmark, Save, XCircle, ImagePlus } from "lucide-react";
+import { Landmark, Save, XCircle } from "lucide-react";
 import Swal from "sweetalert2";
 
 const fadeInStyle = `
@@ -19,6 +19,7 @@ export default function EditBrandForm({ brand, onClose, onSaved }) {
   const [error, setError] = useState("");
   const [uploading, setUploading] = useState(false);
 
+  // Xử lý upload ảnh lên Cloudinary
   const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -35,6 +36,7 @@ export default function EditBrandForm({ brand, onClose, onSaved }) {
     setUploading(false);
   };
 
+  // Xử lý submit form sửa hãng xe
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!name.trim()) {

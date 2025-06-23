@@ -6,6 +6,7 @@ import {
 import { getAllInvoices } from "../../services/InvoiceApi";
 import { getAllOrders } from "../../services/OrderApi";
 
+// Gom nhóm mảng theo key
 function groupBy(arr, keyFn) {
   return arr.reduce((acc, item) => {
     const key = keyFn(item);
@@ -14,6 +15,7 @@ function groupBy(arr, keyFn) {
     return acc;
   }, {});
 }
+// Tính tổng giá trị theo hàm truyền vào
 function sum(arr, fn) {
   return arr.reduce((acc, item) => acc + fn(item), 0);
 }
@@ -28,6 +30,7 @@ export default function RevenueStats() {
   const [quarterFilter, setQuarterFilter] = useState("All");
 
   useEffect(() => {
+    // Lấy danh sách hóa đơn và đơn hàng khi load component
     getAllInvoices().then(setInvoices).catch(console.error);
     getAllOrders().then(setOrders).catch(console.error);
   }, []);
@@ -35,12 +38,14 @@ export default function RevenueStats() {
   const paidInvoices = invoices.filter((inv) => inv.status !== "Canceled");
   const paidOrders = orders;
 
+  // Chuẩn hóa dữ liệu đơn hàng
   const mappedOrders = paidOrders.map((order) => ({
     checkOut: order.createdAt || order.checkOut,
     totalCost: order.total || order.totalCost,
     type: "order",
   }));
 
+  // Chuẩn hóa dữ liệu hóa đơn
   const mappedInvoices = paidInvoices.map((inv) => ({
     checkOut: inv.checkOut,
     totalCost: inv.totalCost,
@@ -64,11 +69,13 @@ export default function RevenueStats() {
     };
   });
 
+  // Gom nhóm dữ liệu theo tháng
   const byMonth = groupBy(allData, (item) => {
     const d = new Date(item.checkOut);
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
   });
 
+  // Tính tổng hóa đơn và đơn hàng theo tháng
   const stats = monthLabels.map((m) => {
     const items = byMonth[m.key] || [];
     const invoiceTotal = sum(items.filter((i) => i.type === "invoice"), (i) => Number(i.totalCost));
@@ -83,6 +90,7 @@ export default function RevenueStats() {
     Q4: [10, 11, 12],
   };
 
+  // Lọc dữ liệu theo quý nếu có chọn
   const filteredStats =
     quarterFilter === "All"
       ? stats
@@ -148,11 +156,11 @@ export default function RevenueStats() {
 
         {viewMode === "bar" && (
           <div className="overflow-x-auto rounded-xl ring-1 ring-blue-200 shadow-inner bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-            <div className="min-w-[950px] h-[500px]"> {/* Tăng min-width nếu cần */}
+            <div className="min-w-[950px] h-[500px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
                   data={filteredStats}
-                  margin={{ top: 20, right: 30, left: 60, bottom: 50 }} // Tăng left margin
+                  margin={{ top: 20, right: 30, left: 60, bottom: 50 }}
                   barCategoryGap="20%"
                 >
                   <defs>

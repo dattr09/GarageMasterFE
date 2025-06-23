@@ -4,7 +4,7 @@ import PrintInvoice from "./PrintInvoice";
 import { getAllInvoices, getMyInvoices } from "../../services/InvoiceApi";
 import { getAllEmployees } from "../../services/EmployeeApi";
 import { getRepairOrderById } from "../../services/RepairOrderApi";
-import { FileText, Printer, XCircle } from "lucide-react";
+import { FileText, XCircle } from "lucide-react";
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);
@@ -21,6 +21,7 @@ export default function InvoiceList() {
   const [invoiceData, setInvoiceData] = useState({});
 
   useEffect(() => {
+    // Lấy danh sách hóa đơn và nhân viên khi load component
     const user = JSON.parse(localStorage.getItem("user"));
     if (user?.role === "Admin" || user?.role === "Employee") {
       getAllInvoices().then(setInvoices).catch(console.error);
@@ -31,12 +32,14 @@ export default function InvoiceList() {
   }, []);
 
   useEffect(() => {
+    // Nếu có customerId và repairOrderId trên URL thì mở popup tạo hóa đơn
     if (customerId && repairOrderId) {
       setInvoiceData({ customerId, repairOrderId, paymentMethod: "Cash" });
       setShowPrintInvoice(true);
     }
   }, [customerId, repairOrderId]);
 
+  // Lấy tên nhân viên từ id
   const getEmployeeName = (id) => {
     if (id === undefined || id === null || id === "" || !employees.length) return "Chưa có";
     const employee = employees.find(emp => String(emp.id) === String(id));
@@ -112,6 +115,7 @@ export default function InvoiceList() {
             repairOrderId={invoiceData.repairOrderId}
             paymentMethod={invoiceData.paymentMethod}
             onCreated={() => {
+              // Sau khi tạo hóa đơn, reload danh sách hóa đơn
               setShowPrintInvoice(false);
               getAllInvoices().then(setInvoices).catch(console.error);
             }}
@@ -119,7 +123,6 @@ export default function InvoiceList() {
         </div>
       )}
 
-      {/* Hiện popup chi tiết hóa đơn đè lên */}
       {selected && (
         <InvoiceDetail
           invoice={selected}
@@ -131,10 +134,12 @@ export default function InvoiceList() {
   );
 }
 
+// Popup chi tiết hóa đơn
 function InvoiceDetail({ invoice, onClose, getEmployeeName }) {
   const [repairOrder, setRepairOrder] = React.useState(null);
 
   React.useEffect(() => {
+    // Lấy thông tin phiếu sửa chữa khi mở popup chi tiết hóa đơn
     if (invoice.repairOrderId) {
       getRepairOrderById(invoice.repairOrderId).then(setRepairOrder);
     }

@@ -1,4 +1,5 @@
 export async function getAllEmployees() {
+  // Lấy danh sách nhân viên
   const token = localStorage.getItem("token");
   const res = await fetch("http://localhost:5119/api/v1/employees", {
     headers: { "Authorization": `Bearer ${token}` }
@@ -8,6 +9,7 @@ export async function getAllEmployees() {
 }
 
 export async function registerEmployee(data) {
+  // Đăng ký nhân viên mới
   const token = localStorage.getItem("token");
   const res = await fetch("http://localhost:5119/api/v1/employees/register", {
     method: "POST",
@@ -22,6 +24,7 @@ export async function registerEmployee(data) {
 }
 
 export async function deleteEmployee(id) {
+  // Xóa nhân viên theo id
   const token = localStorage.getItem("token");
   const res = await fetch(`http://localhost:5119/api/v1/employees/${id}`, {
     method: "DELETE",
@@ -33,6 +36,7 @@ export async function deleteEmployee(id) {
 }
 
 export async function updateEmployee(id, data) {
+  // Cập nhật thông tin nhân viên
   const token = localStorage.getItem("token");
   const res = await fetch(`http://localhost:5119/api/v1/employees/${id}`, {
     method: "PUT",
@@ -43,6 +47,6 @@ export async function updateEmployee(id, data) {
     body: JSON.stringify(data),
   });
   if (!res.ok) throw new Error("Cập nhật nhân viên thất bại");
-  if (res.status === 204) return null; // No Content
+  if (res.status === 204) return null;
   return await res.json();
 }

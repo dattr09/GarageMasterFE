@@ -25,6 +25,7 @@ export default function RepairOrderDetails({ orderId, orderIndex, onClose, refre
   const [error, setError] = useState("");
 
   useEffect(() => {
+    // Lấy dữ liệu đơn sửa chữa, khách hàng, phụ tùng, nhân viên, chi tiết đơn khi mount hoặc refresh
     fetchOrder();
     getAllCustomers().then(setCustomers);
     getRepairDetailsByOrderId(orderId).then(setDetails);
@@ -32,6 +33,7 @@ export default function RepairOrderDetails({ orderId, orderIndex, onClose, refre
     getAllEmployees().then(setEmployees);
   }, [orderId, refreshKey]);
 
+  // Lấy thông tin đơn sửa chữa
   const fetchOrder = async () => {
     try {
       const data = await getRepairOrderById(orderId);
@@ -41,8 +43,11 @@ export default function RepairOrderDetails({ orderId, orderIndex, onClose, refre
     }
   };
 
+  // Lấy tên khách hàng từ id
   const getCustomerName = (id) => customers.find(c => c.id === id)?.name || id;
+  // Lấy tên nhân viên từ id
   const getEmployeeName = (id) => employees.find(e => e.id === id)?.name || "Chưa có";
+  // Lấy thông tin phụ tùng từ id
   const getPartInfo = (id) => parts.find(p => p.id === id) || {};
 
   const statusMap = {

@@ -36,10 +36,12 @@ export default function EmployeeAdd({ onClose, onSaved }) {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
+  // Xử lý thay đổi giá trị input form
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  // Xử lý submit form thêm nhân viên mới
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");

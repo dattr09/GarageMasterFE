@@ -15,6 +15,7 @@ const fadeInUpStyle = `
 export default function OrderSuccess() {
   const location = useLocation();
   const navigate = useNavigate();
+  // Lấy mã đơn hàng từ state hoặc tạo mã ngẫu nhiên nếu không có
   const orderId =
     location.state?.orderId || "000" + Math.floor(1000 + Math.random() * 9000);
 
@@ -23,15 +24,12 @@ export default function OrderSuccess() {
       <style>{fadeInUpStyle}</style>
       <div className="min-h-screen rounded-3xl flex items-center justify-center bg-gradient-to-tr from-blue-100 via-white to-blue-50 px-4 py-16">
         <div className="bg-white max-w-2xl w-full rounded-3xl shadow-2xl overflow-hidden animate-fade-in-up">
-          {/* Header */}
           <div className="bg-gradient-to-r from-green-400 to-green-500 p-8 text-white text-center">
             <CheckCircle className="w-16 h-16 mx-auto mb-3 animate-bounce drop-shadow-lg" />
             <h2 className="text-3xl md:text-4xl font-bold drop-shadow">
               Đặt hàng thành công!
             </h2>
           </div>
-
-          {/* Body */}
           <div className="p-8 text-center space-y-4">
             <p className="text-gray-700 text-lg leading-relaxed">
               Cảm ơn bạn đã mua hàng tại{" "}
@@ -46,10 +44,9 @@ export default function OrderSuccess() {
               Đơn hàng của bạn đang được xử lý và sẽ giao trong thời gian sớm nhất.
             </p>
           </div>
-
-          {/* Footer */}
           <div className="px-8 pb-8 text-center">
             <button
+              // Xử lý quay về trang chủ
               onClick={() => navigate("/")}
               className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-800 text-white font-bold py-3 px-6 rounded-2xl shadow-md transition-transform transform hover:scale-105"
             >

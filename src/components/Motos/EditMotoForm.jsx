@@ -6,7 +6,6 @@ import {
   XCircle,
   Bike,
   Landmark,
-  User,
   Calendar,
   StickyNote
 } from "lucide-react";
@@ -31,10 +30,12 @@ export default function EditMotoForm({ moto, brands, customers, onClose, onSaved
     notes: moto.notes || ""
   });
 
+  // Xử lý thay đổi input form
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  // Xử lý submit form cập nhật xe máy
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {

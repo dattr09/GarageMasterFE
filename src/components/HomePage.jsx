@@ -12,6 +12,7 @@ export default function HomePage() {
   const [brands, setBrands] = useState([]);
 
   useEffect(() => {
+    // Lấy danh sách phụ tùng và hãng xe khi load trang chủ
     getAllParts().then(setParts);
     getAllBrands().then(setBrands);
   }, []);

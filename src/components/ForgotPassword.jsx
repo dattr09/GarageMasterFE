@@ -8,6 +8,7 @@ export default function ForgotPassword() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  // Xử lý gửi yêu cầu quên mật khẩu
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
@@ -35,6 +36,7 @@ export default function ForgotPassword() {
   };
 
   useEffect(() => {
+    // Ẩn thông báo sau 3s
     if (message) {
       const timer = setTimeout(() => setMessage(""), 3000);
       return () => clearTimeout(timer);

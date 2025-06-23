@@ -22,10 +22,12 @@ export default function EmployeeEdit({ employee, onClose, onSaved }) {
   });
   const [error, setError] = useState("");
 
+  // Xử lý thay đổi giá trị input form
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  // Xử lý submit form sửa thông tin nhân viên
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");

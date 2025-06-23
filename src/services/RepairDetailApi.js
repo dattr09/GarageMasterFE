@@ -43,7 +43,7 @@ export async function updateRepairDetail(id, data) {
     body: JSON.stringify(data)
   });
   if (!res.ok) throw new Error("Cập nhật chi tiết sửa chữa thất bại");
-  return res;
+  return res.json();
 }
 
 export async function deleteRepairDetail(id) {
@@ -53,20 +53,28 @@ export async function deleteRepairDetail(id) {
     headers: { "Authorization": `Bearer ${token}` }
   });
   if (!res.ok) throw new Error("Xóa chi tiết sửa chữa thất bại");
-  return res;
+  return res.json();
 }
 
 export async function getRepairDetailsByOrderId(orderId) {
-  const res = await fetch(`http://localhost:5119/api/repairdetail/order/${orderId}`);
+  const token = localStorage.getItem("token");
+  const res = await fetch(`${API_URL}/order/${orderId}`, {
+    headers: { "Authorization": `Bearer ${token}` }
+  });
   if (!res.ok) throw new Error("Không lấy được chi tiết sửa chữa");
   return res.json();
 }
 
 export async function updateRepairDetails(orderId, details) {
-  // Gửi PUT hoặc POST lên backend, ví dụ:
-  return fetch(`/api/repair-details/${orderId}`, {
+  const token = localStorage.getItem("token");
+  const res = await fetch(`${API_URL}/order/${orderId}`, {
     method: "PUT",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    },
     body: JSON.stringify(details),
   });
+  if (!res.ok) throw new Error("Cập nhật chi tiết sửa chữa thất bại");
+  return res;
 }

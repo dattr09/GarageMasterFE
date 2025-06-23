@@ -22,12 +22,13 @@ export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
+  // Kiểm tra điều kiện mật khẩu hợp lệ
   const checkPassword = (pwd) => {
-    // Điều kiện: ít nhất 8 ký tự, có chữ hoa, chữ thường, số, ký tự đặc biệt
     const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
     return regex.test(pwd);
   };
 
+  // Kiểm tra chi tiết các tiêu chí mật khẩu
   const checkPasswordDetail = (pwd) => ({
     length: pwd.length >= 8,
     upper: /[A-Z]/.test(pwd),
@@ -36,6 +37,7 @@ export default function Register() {
     special: /[\W_]/.test(pwd),
   });
 
+  // Xử lý thay đổi mật khẩu và cập nhật trạng thái kiểm tra
   const handlePasswordChange = (e) => {
     const value = e.target.value;
     setPassword(value);
@@ -43,6 +45,7 @@ export default function Register() {
     setPasswordChecks(checkPasswordDetail(value));
   };
 
+  // Xử lý đăng ký tài khoản
   const handleRegister = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -55,8 +58,6 @@ export default function Register() {
         DateOfBirth: dob,
       });
       setMessage("Đăng ký thành công! Vui lòng kiểm tra email để xác thực.");
-
-      // Sau khi đăng ký thành công:
       localStorage.setItem("pendingEmail", email);
       localStorage.setItem("pendingPassword", password);
       navigate("/confirm-email");
@@ -72,6 +73,7 @@ export default function Register() {
   };
 
   useEffect(() => {
+    // Ẩn thông báo sau 3s
     if (message) {
       const timer = setTimeout(() => setMessage(""), 3000);
       return () => clearTimeout(timer);

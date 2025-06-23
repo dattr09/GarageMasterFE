@@ -8,10 +8,15 @@ const DEFAULT_ITEMS = ITEMS_PER_ROW * ROWS_DEFAULT;
 
 export default function Accessories({ parts = [] }) {
   const navigate = useNavigate();
+
+  // Lấy danh sách phụ tùng duy nhất theo tên
   const categories = Array.from(
     new Map(parts.map(item => [item.name, { name: item.name, img: item.image }])).values()
   );
+
   const [showAll, setShowAll] = useState(false);
+
+  // Xác định số lượng phụ tùng hiển thị
   const visibleAccessories = showAll ? categories : categories.slice(0, DEFAULT_ITEMS);
 
   return (

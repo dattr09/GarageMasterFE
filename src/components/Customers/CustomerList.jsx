@@ -13,16 +13,21 @@ export default function CustomerList() {
   const [showDetail, setShowDetail] = useState(false);
   const [detailCustomer, setDetailCustomer] = useState(null);
   const [search, setSearch] = useState("");
+  const [userRole, setUserRole] = useState("");
 
   useEffect(() => {
     fetchCustomers();
+    const user = JSON.parse(localStorage.getItem("user"));
+    setUserRole(user?.role || "");
   }, []);
 
+  // Lấy danh sách khách hàng từ API
   const fetchCustomers = async () => {
     const list = await getAllCustomers();
     setCustomers(list.reverse());
   };
 
+  // Xử lý xóa khách hàng
   const handleDelete = async (id) => {
     const result = await Swal.fire({
       title: "Bạn chắc chắn muốn xóa khách hàng này?",
@@ -40,13 +45,16 @@ export default function CustomerList() {
     }
   };
 
-  // Sửa lại filteredCustomers để lọc theo search realtime
+  // Lọc khách hàng theo tên (tìm theo họ hoặc tên cuối)
   const filteredCustomers = customers.filter((c) => {
     if (!search.trim()) return true;
     const nameParts = c.name.trim().toLowerCase().split(" ");
     const lastName = nameParts[nameParts.length - 1];
     return lastName.includes(search.trim().toLowerCase());
   });
+
+  // Kiểm tra quyền có phải admin hoặc employee không
+  const canEdit = userRole === "Admin" || userRole === "Employee";
 
   return (
     <div className="max-w-7xl mx-auto p-6 mt-8 bg-white rounded-3xl shadow-xl border border-gray-200 animate-fade-in">
@@ -80,15 +88,17 @@ export default function CustomerList() {
               ))}
           </datalist>
         </div>
-        <button
-          onClick={() => {
-            setEditing(null);
-            setShowForm(true);
-          }}
-          className="flex items-center gap-2 bg-green-600 hover:bg-green-800 text-white font-bold px-4 py-2 rounded-xl transition shadow"
-        >
-          <PlusCircle size={20} /> Thêm mới
-        </button>
+        {canEdit && (
+          <button
+            onClick={() => {
+              setEditing(null);
+              setShowForm(true);
+            }}
+            className="flex items-center gap-2 bg-green-600 hover:bg-green-800 text-white font-bold px-4 py-2 rounded-xl transition shadow"
+          >
+            <PlusCircle size={20} /> Thêm mới
+          </button>
+        )}
       </div>
 
       {/* Table */}
@@ -132,23 +142,27 @@ export default function CustomerList() {
                       >
                         <Info size={16} /> Chi tiết
                       </button>
-                      <button
-                        onClick={() => {
-                          setEditing(c);
-                          setShowForm(true);
-                        }}
-                        className="flex items-center gap-1 bg-yellow-400 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
-                        title="Sửa"
-                      >
-                        <Pencil size={16} /> Sửa
-                      </button>
-                      <button
-                        onClick={() => handleDelete(c.id)}
-                        className="flex items-center gap-1 bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
-                        title="Xóa"
-                      >
-                        <Trash2 size={16} /> Xóa
-                      </button>
+                      {canEdit && (
+                        <>
+                          <button
+                            onClick={() => {
+                              setEditing(c);
+                              setShowForm(true);
+                            }}
+                            className="flex items-center gap-1 bg-yellow-400 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
+                            title="Sửa"
+                          >
+                            <Pencil size={16} /> Sửa
+                          </button>
+                          <button
+                            onClick={() => handleDelete(c.id)}
+                            className="flex items-center gap-1 bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
+                            title="Xóa"
+                          >
+                            <Trash2 size={16} /> Xóa
+                          </button>
+                        </>
+                      )}
                     </div>
                   </td>
                 </tr>

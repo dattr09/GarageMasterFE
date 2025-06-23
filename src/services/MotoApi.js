@@ -3,7 +3,7 @@ const API_URL = "http://localhost:5119/api/motos";
 // Lấy tất cả xe
 export async function getAllMotos() {
   const token = localStorage.getItem("token");
-  const res = await fetch("http://localhost:5119/api/motos", {
+  const res = await fetch(API_URL, {
     headers: {
       "Authorization": `Bearer ${token}`,
       "Content-Type": "application/json"
@@ -38,7 +38,7 @@ export async function createMoto(data) {
 // Sửa xe
 export async function updateMoto(licensePlate, moto) {
   const token = localStorage.getItem("token");
-  const res = await fetch(`http://localhost:5119/api/motos/${licensePlate}`, {
+  const res = await fetch(`${API_URL}/${licensePlate}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -57,7 +57,7 @@ export async function updateMoto(licensePlate, moto) {
 // Xóa xe
 export async function deleteMoto(licensePlate) {
   const token = localStorage.getItem("token");
-  const res = await fetch(`http://localhost:5119/api/motos/${licensePlate}`, {
+  const res = await fetch(`${API_URL}/${licensePlate}`, {
     method: "DELETE",
     headers: {
       "Authorization": `Bearer ${token}`,

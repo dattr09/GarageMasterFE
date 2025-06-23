@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { login } from "../services/api";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 
@@ -17,20 +16,30 @@ export default function Login() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Ẩn thông báo đăng nhập sau 3s
     if (message) {
       const timer = setTimeout(() => setMessage(""), 3000);
       return () => clearTimeout(timer);
     }
   }, [message]);
 
+  useEffect(() => {
+    // Ẩn thông báo phát triển tính năng sau 1.2s
+    if (oauthMessage) {
+      const timer = setTimeout(() => setOauthMessage(""), 1200);
+      return () => clearTimeout(timer);
+    }
+  }, [oauthMessage]);
+
+  // Xử lý đăng nhập
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
     setMessage("");
     try {
-      const response = await fetch('http://localhost:5119/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch(`${API_BASE_URL}/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password })
       });
       const data = await response.json();
@@ -41,14 +50,11 @@ export default function Login() {
         return;
       }
 
-      localStorage.setItem("token", data.token); // <-- Thêm dòng này
+      localStorage.setItem("token", data.token);
       setMessage(data.message || "Đăng nhập thành công.");
       setToken(data.token);
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user)); // <-- Thêm dòng này
-      localStorage.setItem("userId", data.user.Id || data.user.id); // Thêm dòng này
-
-      // Chuyển hướng hoặc reload
+      localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("userId", data.user.Id || data.user.id);
       navigate("/");
     } catch (error) {
       setMessage("Có lỗi xảy ra, vui lòng thử lại.");
@@ -319,7 +325,6 @@ export default function Login() {
           transition={{ duration: 0.3 }}
           className="fixed left-1/2 top-20 z-50 -translate-x-1/2 flex items-center gap-3 rounded-xl px-6 py-4 shadow-2xl text-base font-semibold bg-blue-50 text-blue-700 border border-blue-200"
           role="alert"
-          onClick={() => setOauthMessage("")}
           style={{ cursor: "pointer" }}
         >
           <svg

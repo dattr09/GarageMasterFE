@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import {
   PackagePlus,
-  Image as ImageIcon,
   Tags,
   Hash,
   DollarSign,
@@ -13,8 +12,6 @@ import {
   Boxes,
   Layers,
 } from "lucide-react";
-
-// API
 import { createPart } from "../../services/PartsApi";
 import { getAllBrands } from "../../services/BrandApi";
 
@@ -45,10 +42,12 @@ export default function AddPartForm({ onClose, onSaved }) {
   const [error, setError] = useState("");
   const [uploading, setUploading] = useState(false);
 
+  // Lấy danh sách hãng xe khi load component
   useEffect(() => {
     getAllBrands().then(setBrands);
   }, []);
 
+  // Xử lý thay đổi input form
   const handleChange = (e) => {
     const { name, value, type } = e.target;
     setForm({
@@ -57,6 +56,7 @@ export default function AddPartForm({ onClose, onSaved }) {
     });
   };
 
+  // Xử lý upload ảnh lên Cloudinary
   const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -77,6 +77,7 @@ export default function AddPartForm({ onClose, onSaved }) {
     setUploading(false);
   };
 
+  // Xử lý submit form thêm phụ tùng mới
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -216,7 +217,7 @@ export default function AddPartForm({ onClose, onSaved }) {
   );
 }
 
-// Input dùng chung
+// Input dùng chung cho form
 function FormInput({ label, icon, ...props }) {
   return (
     <div className="relative">

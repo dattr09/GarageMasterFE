@@ -12,16 +12,21 @@ export default function EmployeeList() {
   const [detailEmployee, setDetailEmployee] = useState(null);
   const [editEmployee, setEditEmployee] = useState(null);
   const [search, setSearch] = useState("");
+  const [userRole, setUserRole] = useState("");
 
   useEffect(() => {
     fetchEmployees();
+    const user = JSON.parse(localStorage.getItem("user"));
+    setUserRole(user?.role || "");
   }, []);
 
+  // Lấy danh sách nhân viên từ API và cập nhật state
   const fetchEmployees = async () => {
     const data = await getAllEmployees();
     setEmployees(data);
   };
 
+  // Xử lý xóa nhân viên
   const handleDelete = async (id) => {
     const result = await Swal.fire({
       title: "Bạn chắc chắn muốn xoá nhân viên này?",
@@ -44,6 +49,7 @@ export default function EmployeeList() {
     }
   };
 
+  // Lấy tên vai trò hiển thị từ mã vai trò hoặc chuỗi
   function getRoleName(role) {
     switch (role) {
       case 1:
@@ -63,6 +69,7 @@ export default function EmployeeList() {
     }
   }
 
+  // Lọc nhân viên theo tên
   const filteredEmployees = employees.filter(e =>
     e.name.toLowerCase().includes(search.toLowerCase())
   );
@@ -81,12 +88,14 @@ export default function EmployeeList() {
           value={search}
           onChange={e => setSearch(e.target.value)}
         />
-        <button
-          onClick={() => setShowAdd(true)}
-          className="flex items-center gap-2 bg-green-600 hover:bg-green-800 text-white font-bold px-4 py-2 rounded-xl transition shadow"
-        >
-          <PlusCircle size={20} /> Thêm mới
-        </button>
+        {userRole === "Admin" && (
+          <button
+            onClick={() => setShowAdd(true)}
+            className="flex items-center gap-2 bg-green-600 hover:bg-green-800 text-white font-bold px-4 py-2 rounded-xl transition shadow"
+          >
+            <PlusCircle size={20} /> Thêm mới
+          </button>
+        )}
       </div>
 
       <div className="overflow-x-auto rounded-xl border border-gray-200 shadow">
@@ -125,20 +134,24 @@ export default function EmployeeList() {
                     >
                       <Info size={16} /> Chi tiết
                     </button>
-                    <button
-                      onClick={() => setEditEmployee(e)}
-                      className="flex items-center gap-1 bg-yellow-400 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
-                      title="Sửa"
-                    >
-                      <Pencil size={16} /> Sửa
-                    </button>
-                    <button
-                      onClick={() => handleDelete(e.id)}
-                      className="flex items-center gap-1 bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
-                      title="Xóa"
-                    >
-                      <Trash2 size={16} /> Xóa
-                    </button>
+                    {userRole === "Admin" && (
+                      <>
+                        <button
+                          onClick={() => setEditEmployee(e)}
+                          className="flex items-center gap-1 bg-yellow-400 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
+                          title="Sửa"
+                        >
+                          <Pencil size={16} /> Sửa
+                        </button>
+                        <button
+                          onClick={() => handleDelete(e.id)}
+                          className="flex items-center gap-1 bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
+                          title="Xóa"
+                        >
+                          <Trash2 size={16} /> Xóa
+                        </button>
+                      </>
+                    )}
                   </td>
                 </tr>
               ))
@@ -147,7 +160,6 @@ export default function EmployeeList() {
         </table>
       </div>
 
-      {/* Popup thêm */}
       {showAdd && (
         <EmployeeAdd
           onClose={() => setShowAdd(false)}
@@ -158,7 +170,6 @@ export default function EmployeeList() {
         />
       )}
 
-      {/* Popup chi tiết */}
       {detailEmployee && (
         <EmployeeDetails
           employee={detailEmployee}
@@ -166,7 +177,6 @@ export default function EmployeeList() {
         />
       )}
 
-      {/* Popup sửa */}
       {editEmployee && (
         <EmployeeEdit
           employee={editEmployee}

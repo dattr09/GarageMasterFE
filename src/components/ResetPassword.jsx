@@ -22,6 +22,7 @@ export default function ResetPassword() {
     }
   }, [message]);
 
+  // Xử lý đổi mật khẩu
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
@@ -42,9 +43,6 @@ export default function ResetPassword() {
       return;
     }
     setLoading(true);
-
-    // Thêm dòng này để kiểm tra giá trị gửi lên
-    console.log({ email, current, password });
 
     try {
       const res = await fetch("http://localhost:5119/api/auth/reset-password", {
@@ -224,7 +222,6 @@ export default function ResetPassword() {
             Quay lại đăng nhập
           </button>
         </div>
-        {/* Xóa hoặc comment lại motion.p cũ để tránh trùng lặp */}
       </motion.div>
     </div>
   );

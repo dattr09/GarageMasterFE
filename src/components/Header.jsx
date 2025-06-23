@@ -27,6 +27,7 @@ export default function Header() {
   const dropdownRef = useRef(null);
 
   useEffect(() => {
+    // Đóng dropdown khi click ra ngoài
     function handleClickOutside(e) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setOpen(false);
@@ -37,6 +38,7 @@ export default function Header() {
   }, []);
 
   useEffect(() => {
+    // Cập nhật số lượng sản phẩm trong giỏ hàng khi có thay đổi
     function updateCartCount() {
       const cart = JSON.parse(localStorage.getItem("cart") || "[]");
       const count = cart.reduce((sum, item) => sum + (item.quantity || 0), 0);
@@ -51,6 +53,7 @@ export default function Header() {
     };
   }, []);
 
+  // Xử lý đăng xuất
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
@@ -66,13 +69,14 @@ export default function Header() {
   const partsList = ["Nhớt động cơ", "Bugi", "Lốp xe", "Ắc quy", "Phanh đĩa", "Đèn pha", "Lọc gió"];
   const brandsList = ["Honda", "Yamaha", "Suzuki", "SYM", "Piaggio", "Kawasaki", "Ducati"];
 
-  // Gợi ý từ cả parts và brands
   useEffect(() => {
+    // Gợi ý tìm kiếm từ phụ tùng và hãng xe
     const allList = [...partsList, ...brandsList];
     const data = allList.filter(item => item.toLowerCase().includes(search.toLowerCase()));
     setSuggestions(search ? data.slice(0, 7) : []);
   }, [search]);
 
+  // Xử lý tìm kiếm
   const handleSearch = (e) => {
     e.preventDefault();
     if (!search.trim()) return;
