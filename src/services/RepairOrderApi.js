@@ -1,46 +1,41 @@
-const API_URL = "http://localhost:5119/api/repairorder";
+const API_URL = "http://localhost:8080/api/repairorders";
 
+// Lấy tất cả đơn sửa chữa (public)
 export async function getAllRepairOrders() {
-  const token = localStorage.getItem("token");
-  const res = await fetch(API_URL, {
-    headers: { "Authorization": `Bearer ${token}` }
-  });
+  const res = await fetch(API_URL, { headers: { "Content-Type": "application/json" } });
   if (!res.ok) throw new Error("Không lấy được danh sách đơn sửa chữa");
   return res.json();
 }
 
+// Lấy đơn sửa chữa theo id (public)
 export async function getRepairOrderById(id) {
-  const token = localStorage.getItem("token");
-  const res = await fetch(`${API_URL}/${id}`, {
-    headers: { "Authorization": `Bearer ${token}` }
-  });
+  const res = await fetch(`${API_URL}/${id}`);
   if (!res.ok) throw new Error("Không lấy được đơn sửa chữa");
   return res.json();
 }
 
+// Tạo mới đơn sửa chữa (cần token)
 export async function createRepairOrder(data) {
-  // Tạo mới đơn sửa chữa
   const token = localStorage.getItem("token");
+  const headers = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
   const res = await fetch(API_URL, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`
-    },
+    headers,
     body: JSON.stringify(data)
   });
   if (!res.ok) throw new Error("Thêm đơn sửa chữa thất bại");
   return res.json();
 }
 
+// Cập nhật đơn sửa chữa (cần token)
 export async function updateRepairOrder(id, data) {
   const token = localStorage.getItem("token");
+  const headers = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
   const res = await fetch(`${API_URL}/${id}`, {
     method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`
-    },
+    headers,
     body: JSON.stringify(data)
   });
   if (!res.ok) {
@@ -56,12 +51,14 @@ export async function updateRepairOrder(id, data) {
   }
 }
 
+// Xóa đơn sửa chữa (cần token)
 export async function deleteRepairOrder(id) {
-  // Xóa đơn sửa chữa
   const token = localStorage.getItem("token");
+  const headers = {};
+  if (token) headers["Authorization"] = `Bearer ${token}`;
   const res = await fetch(`${API_URL}/${id}`, {
     method: "DELETE",
-    headers: { "Authorization": `Bearer ${token}` }
+    headers
   });
   if (!res.ok) throw new Error("Xóa đơn sửa chữa thất bại");
   return res;

@@ -13,7 +13,9 @@ const fadeInStyle = `
 }
 `;
 
-export default function AddBrandForm({ onClose, onSaved }) {
+export default function AddBrandForm({ userRole, onClose, onSaved }) {
+  if (userRole !== "Admin") return null;
+
   const [name, setName] = useState("");
   const [image, setImage] = useState("");
   const [error, setError] = useState("");
@@ -48,6 +50,7 @@ export default function AddBrandForm({ onClose, onSaved }) {
       return;
     }
     try {
+      console.log({ name, image });
       await createBrand({ name, image });
       Swal.fire({
         icon: "success",

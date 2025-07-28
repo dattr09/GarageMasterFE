@@ -1,60 +1,52 @@
-const API_URL = "http://localhost:5119/api/parts";
+const API_URL = "http://localhost:8080/api/parts";
 
-// Lấy tất cả phụ tùng
+// Lấy tất cả phụ tùng (public)
 export async function getAllParts() {
-  const token = localStorage.getItem("token");
-  const res = await fetch(API_URL, {
-    headers: {
-      "Authorization": `Bearer ${token}`,
-      "Content-Type": "application/json"
-    }
-  });
+  const res = await fetch(API_URL, { headers: { "Content-Type": "application/json" } });
   if (!res.ok) throw new Error("Không lấy được danh sách phụ tùng");
   return res.json();
 }
 
-// Lấy phụ tùng theo id
+// Lấy phụ tùng theo id (public)
 export async function getPartById(id) {
   const res = await fetch(`${API_URL}/${id}`);
   return res.json();
 }
 
-// Tìm kiếm phụ tùng theo tên
+// Tìm kiếm phụ tùng theo tên (public)
 export async function searchPartsByName(name) {
   const res = await fetch(`${API_URL}/searchByName?name=${encodeURIComponent(name)}`);
   return res.json();
 }
 
-// Lấy phụ tùng theo hãng
+// Lấy phụ tùng theo hãng (public)
 export async function getPartsByBrand(brandId) {
   const res = await fetch(`${API_URL}/byBrand/${brandId}`);
   return res.json();
 }
 
-// Thêm phụ tùng mới
+// Thêm phụ tùng mới (cần token)
 export async function createPart(part) {
   const token = localStorage.getItem("token");
+  const headers = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
   const res = await fetch(API_URL, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`
-    },
+    headers,
     body: JSON.stringify(part),
   });
   if (!res.ok) throw new Error("Thêm phụ tùng thất bại");
   return res.json();
 }
 
-// Cập nhật phụ tùng
+// Cập nhật phụ tùng (cần token)
 export async function updatePart(id, part) {
   const token = localStorage.getItem("token");
+  const headers = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
   const res = await fetch(`${API_URL}/${id}`, {
     method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`
-    },
+    headers,
     body: JSON.stringify(part)
   });
   let data = null;
@@ -65,15 +57,14 @@ export async function updatePart(id, part) {
   return data;
 }
 
-// Xóa phụ tùng
+// Xóa phụ tùng (cần token)
 export async function deletePart(id) {
   const token = localStorage.getItem("token");
+  const headers = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
   const res = await fetch(`${API_URL}/${id}`, {
     method: "DELETE",
-    headers: {
-      "Authorization": `Bearer ${token}`,
-      "Content-Type": "application/json"
-    }
+    headers
   });
   let data = null;
   if (res.status !== 204) {
@@ -83,15 +74,14 @@ export async function deletePart(id) {
   return data;
 }
 
-// Cập nhật số lượng phụ tùng
+// Cập nhật số lượng phụ tùng (cần token)
 export async function updatePartQuantity(partId, quantityChange) {
   const token = localStorage.getItem("token");
+  const headers = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
   const res = await fetch(`${API_URL}/${partId}/quantity`, {
     method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`
-    },
+    headers,
     body: JSON.stringify({ quantityChange }),
   });
   if (!res.ok) throw new Error("Cập nhật số lượng thất bại");

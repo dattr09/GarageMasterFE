@@ -98,11 +98,8 @@ export default function ConfirmEmail() {
     try {
       const res = await confirmEmail({ email, code });
       setMessage(res.message || "Xác thực thành công!");
-      if (res.token) {
-        localStorage.setItem("token", res.token);
-        localStorage.removeItem("pendingEmail");
-        setTimeout(() => navigate("/login"), 1500);
-      }
+      localStorage.removeItem("pendingEmail");
+      setTimeout(() => navigate("/login"), 1500);
     } catch (error) {
       setMessage(error.message || "Xác nhận thất bại.");
     }
