@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { login } from "../services/api";
 
-const API_BASE_URL = "http://localhost:5119/api/auth";
+const API_BASE_URL = "http://localhost:8080/api/auth";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -37,27 +38,13 @@ export default function Login() {
     setLoading(true);
     setMessage("");
     try {
-      const response = await fetch(`${API_BASE_URL}/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password })
-      });
-      const data = await response.json();
-
-      if (!response.ok) {
-        setMessage(data.message || "Đăng nhập thất bại.");
-        setLoading(false);
-        return;
-      }
-
+      const data = await login({ email, password });
       localStorage.setItem("token", data.token);
-      setMessage(data.message || "Đăng nhập thành công.");
-      setToken(data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
-      localStorage.setItem("userId", data.user.Id || data.user.id);
+      setMessage(data.message || "Đăng nhập thành công.");
       navigate("/");
     } catch (error) {
-      setMessage("Có lỗi xảy ra, vui lòng thử lại.");
+      setMessage(error.message || "Đăng nhập thất bại.");
     }
     setLoading(false);
   };

@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:5119/api/auth";
+const API_BASE_URL = "http://localhost:8080/api/auth";
 
 /**
  * Gửi yêu cầu API chung
@@ -6,13 +6,15 @@ const API_BASE_URL = "http://localhost:5119/api/auth";
  * @param {string} method
  * @param {Object} data
  * @param {boolean} includeCredentials
+ * @param {boolean} requireAuth
  * @returns {Promise<Object>}
  */
 async function apiRequest(
   endpoint,
   method,
   data = null,
-  includeCredentials = false
+  includeCredentials = false,
+  requireAuth = true
 ) {
   try {
     const options = {
@@ -22,10 +24,11 @@ async function apiRequest(
       },
     };
 
-    // Thêm token vào header nếu có
-    const token = localStorage.getItem("token");
-    if (token) {
-      options.headers["Authorization"] = `Bearer ${token}`;
+    if (requireAuth) {
+      const token = localStorage.getItem("token");
+      if (token) {
+        options.headers["Authorization"] = `Bearer ${token}`;
+      }
     }
 
     if (data) {
@@ -37,7 +40,14 @@ async function apiRequest(
     }
 
     const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
-    const result = await response.json();
+
+    let result;
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+      result = await response.json();
+    } else {
+      result = await response.text();
+    }
 
     if (!response.ok) {
       throw result || { message: "Unknown error occurred" };
@@ -45,7 +55,6 @@ async function apiRequest(
 
     return result;
   } catch (error) {
-    // Xử lý lỗi mạng hoặc lỗi trả về từ server
     throw error.message
       ? error
       : { message: "Network error or server is unreachable" };
@@ -54,15 +63,34 @@ async function apiRequest(
 
 // Đăng ký tài khoản
 export async function register(data) {
-  return apiRequest("/register", "POST", data);
+  const res = await fetch("http://localhost:8080/api/auth/register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const error = await res.json();
+    throw error;
+  }
+  return res.text();
 }
 
 // Xác nhận email
 export async function confirmEmail(data) {
-  return apiRequest("/confirm-email", "POST", data);
+  return apiRequest("/confirm-email", "POST", data, false, false);
 }
 
 // Đăng nhập
 export async function login(data) {
-  return apiRequest("/login", "POST", data, true); // Bao gồm cookie
+  return apiRequest("/login", "POST", data, false, false);
+}
+
+// Đặt lại mật khẩu
+export async function forgotPassword(data) {
+  return apiRequest("/forgot-password", "POST", data, false, false);
+}
+
+// Đặt lại mật khẩu qua email
+export async function resetPassword(data) {
+  return apiRequest("/reset-password", "POST", data, false, false);
 }

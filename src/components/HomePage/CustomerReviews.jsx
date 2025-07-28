@@ -17,7 +17,13 @@ function maskEmail(email) {
 
 // Lấy user hiện tại từ localStorage
 function getCurrentUser() {
-  return JSON.parse(localStorage.getItem("user")) || null;
+  const userStr = localStorage.getItem("user");
+  if (!userStr || userStr === "undefined") return null;
+  try {
+    return JSON.parse(userStr);
+  } catch {
+    return null;
+  }
 }
 
 export default function CustomerReviews() {

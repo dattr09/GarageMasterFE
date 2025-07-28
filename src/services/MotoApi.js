@@ -1,49 +1,40 @@
-const API_URL = "http://localhost:5119/api/motos";
+const API_URL = "http://localhost:8080/api/motos";
 
-// Lấy tất cả xe
+// Lấy tất cả xe (public)
 export async function getAllMotos() {
-  const token = localStorage.getItem("token");
-  const res = await fetch(API_URL, {
-    headers: {
-      "Authorization": `Bearer ${token}`,
-      "Content-Type": "application/json"
-    }
-  });
+  const res = await fetch(API_URL, { headers: { "Content-Type": "application/json" } });
   if (!res.ok) throw new Error("Không lấy được danh sách xe");
   return res.json();
 }
 
-// Lấy xe theo biển số
+// Lấy xe theo biển số (public)
 export async function getMotoById(licensePlate) {
   const res = await fetch(`${API_URL}/${licensePlate}`);
   if (!res.ok) throw new Error("Không lấy được thông tin xe");
   return res.json();
 }
 
-// Thêm xe mới
+// Thêm, sửa, xóa xe (cần token)
 export async function createMoto(data) {
   const token = localStorage.getItem("token");
+  const headers = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
   const res = await fetch(API_URL, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`
-    },
+    headers,
     body: JSON.stringify(data),
   });
   if (!res.ok) throw new Error("Thêm xe thất bại");
   return res.json();
 }
 
-// Sửa xe
 export async function updateMoto(licensePlate, moto) {
   const token = localStorage.getItem("token");
+  const headers = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
   const res = await fetch(`${API_URL}/${licensePlate}`, {
     method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`
-    },
+    headers,
     body: JSON.stringify(moto)
   });
   let data = null;
@@ -54,15 +45,13 @@ export async function updateMoto(licensePlate, moto) {
   return data;
 }
 
-// Xóa xe
 export async function deleteMoto(licensePlate) {
   const token = localStorage.getItem("token");
+  const headers = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
   const res = await fetch(`${API_URL}/${licensePlate}`, {
     method: "DELETE",
-    headers: {
-      "Authorization": `Bearer ${token}`,
-      "Content-Type": "application/json"
-    }
+    headers
   });
   let data = null;
   if (res.status !== 204) {

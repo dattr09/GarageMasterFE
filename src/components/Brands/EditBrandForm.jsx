@@ -13,7 +13,7 @@ const fadeInStyle = `
 }
 `;
 
-export default function EditBrandForm({ brand, onClose, onSaved }) {
+export default function EditBrandForm({ brand, onClose, onSaved, userRole }) {
   const [name, setName] = useState(brand ? brand.name : "");
   const [image, setImage] = useState(brand ? brand.image || "" : "");
   const [error, setError] = useState("");
@@ -60,6 +60,8 @@ export default function EditBrandForm({ brand, onClose, onSaved }) {
       setError(err.message || "Có lỗi xảy ra!");
     }
   };
+
+  if (userRole !== "Admin") return null; // Không cho hiển thị nếu không phải admin
 
   return (
     <>

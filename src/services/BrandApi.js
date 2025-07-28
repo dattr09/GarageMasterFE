@@ -1,66 +1,49 @@
-const API_URL = "http://localhost:5119/api/brand";
+const API_URL = "http://localhost:8080/api/brands";
 
-// Lấy tất cả hãng xe
+// Lấy tất cả hãng xe (public)
 export async function getAllBrands() {
-  const token = localStorage.getItem("token");
-  const res = await fetch(API_URL, {
-    headers: {
-      "Authorization": `Bearer ${token}`,
-      "Content-Type": "application/json"
-    }
-  });
+  const res = await fetch(API_URL, { headers: { "Content-Type": "application/json" } });
   if (!res.ok) throw new Error("Không lấy được danh sách hãng xe");
   return res.json();
 }
 
-// Tạo mới hãng xe
+// Tạo mới hãng xe (cần token)
 export async function createBrand(data) {
   const token = localStorage.getItem("token");
+  const headers = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
   const res = await fetch(API_URL, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`
-    },
+    headers,
     body: JSON.stringify(data),
   });
   if (!res.ok) throw new Error("Tạo hãng xe thất bại");
   return res.json();
 }
 
-// Cập nhật hãng xe
+// Cập nhật hãng xe (cần token)
 export async function updateBrand(id, brand) {
   const token = localStorage.getItem("token");
+  const headers = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
   const res = await fetch(`${API_URL}/${id}`, {
     method: "PUT",
-    headers: {
-      "Authorization": `Bearer ${token}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(brand)
+    headers,
+    body: JSON.stringify(brand),
   });
-  let data = null;
-  if (res.status !== 204) {
-    data = await res.json();
-  }
-  if (!res.ok) throw new Error(data?.message || "Cập nhật hãng xe thất bại");
-  return data;
+  if (!res.ok) throw new Error("Cập nhật hãng xe thất bại");
+  return res.json();
 }
 
-// Xóa hãng xe
+// Xóa hãng xe (cần token)
 export async function deleteBrand(id) {
   const token = localStorage.getItem("token");
+  const headers = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
   const res = await fetch(`${API_URL}/${id}`, {
     method: "DELETE",
-    headers: {
-      "Authorization": `Bearer ${token}`,
-      "Content-Type": "application/json"
-    }
+    headers,
   });
-  let data = null;
-  if (res.status !== 204) {
-    data = await res.json();
-  }
-  if (!res.ok) throw new Error(data?.message || "Xóa hãng xe thất bại");
-  return data;
+  if (res.status === 204) return;
+  if (!res.ok) throw new Error("Xóa hãng xe thất bại");
 }

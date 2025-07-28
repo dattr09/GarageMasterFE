@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { resetPassword } from "../services/api";
 
 export default function ResetPassword() {
-  const [current, setCurrent] = useState(""); // Mật khẩu hiện tại (random gửi về email)
-  const [password, setPassword] = useState(""); // Mật khẩu mới
-  const [confirm, setConfirm] = useState(""); // Xác nhận mật khẩu mới
+  const [current, setCurrent] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -31,7 +32,7 @@ export default function ResetPassword() {
       return;
     }
     if (!current) {
-      setMessage("Vui lòng nhập mật khẩu hiện tại.");
+      setMessage("Vui lòng nhập mã xác thực hoặc mật khẩu hiện tại.");
       return;
     }
     if (!password) {
@@ -45,23 +46,14 @@ export default function ResetPassword() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:5119/api/auth/reset-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, currentPassword: current, newPassword: password }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setMessage("Đổi mật khẩu thành công!");
-        setTimeout(() => {
-          localStorage.removeItem("resetEmail");
-          navigate("/login");
-        }, 1200);
-      } else {
-        setMessage(data.message || "Đổi mật khẩu thất bại.");
-      }
+      await resetPassword({ email, currentPassword: current, newPassword: password });
+      setMessage("Đổi mật khẩu thành công!");
+      setTimeout(() => {
+        localStorage.removeItem("resetEmail");
+        navigate("/login");
+      }, 1200);
     } catch (err) {
-      setMessage("Không thể kết nối máy chủ!");
+      setMessage("Có lỗi xảy ra khi đổi mật khẩu. Vui lòng thử lại!");
     }
     setLoading(false);
   };

@@ -50,18 +50,19 @@ export default function Register() {
     e.preventDefault();
     setLoading(true);
     setMessage("");
+    const data = {
+      email: email,
+      password: password,
+      username: username,
+    };
     try {
-      await register({
-        Email: email,
-        Password: password,
-        username,
-        DateOfBirth: dob,
-      });
-      setMessage("Đăng ký thành công! Vui lòng kiểm tra email để xác thực.");
+      await register(data);
       localStorage.setItem("pendingEmail", email);
       localStorage.setItem("pendingPassword", password);
+      setLoading(false);
       navigate("/confirm-email");
     } catch (error) {
+      setLoading(false);
       if (error.details?.errors) {
         const messages = Object.values(error.details.errors).flat();
         setMessage(messages.join(" | "));
@@ -69,7 +70,6 @@ export default function Register() {
         setMessage(error.message || "Đăng ký thất bại.");
       }
     }
-    setLoading(false);
   };
 
   useEffect(() => {

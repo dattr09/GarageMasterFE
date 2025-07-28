@@ -21,7 +21,8 @@ export default function BrandList() {
     getAllBrands().then(setBrands).catch(() => { });
     getAllParts().then(setParts);
     const user = JSON.parse(localStorage.getItem("user"));
-    setUserRole(user?.role || "");
+    const userRole = user?.roles?.[0] || "";
+    setUserRole(userRole);
   }, []);
 
   // Mở form thêm/sửa hãng xe
@@ -165,9 +166,9 @@ export default function BrandList() {
 
         {showForm &&
           (editing ? (
-            <EditBrandForm brand={editing} onClose={closeForm} onSaved={handleSaved} />
+            <EditBrandForm userRole={userRole} brand={editing} onClose={closeForm} onSaved={handleSaved} />
           ) : (
-            <AddBrandForm onClose={closeForm} onSaved={handleSaved} />
+            <AddBrandForm userRole={userRole} onClose={closeForm} onSaved={handleSaved} />
           ))}
 
         {showDetail && detailBrand && (

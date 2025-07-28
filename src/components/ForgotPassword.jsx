@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { forgotPassword } from "../services/api";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -14,21 +15,12 @@ export default function ForgotPassword() {
     setMessage("");
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:5119/api/auth/forgot-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        localStorage.setItem("resetEmail", email);
-        setMessage("Vui lòng kiểm tra email - mật khẩu mới đã được gửi thành công!");
-        setTimeout(() => {
-          navigate("/reset-password");
-        }, 2000);
-      } else {
-        setMessage(data.message || "Có lỗi xảy ra!");
-      }
+      await forgotPassword({ email });
+      localStorage.setItem("resetEmail", email);
+      setMessage("Vui lòng kiểm tra email - mật khẩu mới đã được gửi thành công!");
+      setTimeout(() => {
+        navigate("/reset-password");
+      }, 2000);
     } catch (err) {
       setMessage("Không thể kết nối máy chủ!");
     }
