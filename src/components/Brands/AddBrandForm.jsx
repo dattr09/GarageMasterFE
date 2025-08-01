@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Save, XCircle, Landmark } from "lucide-react";
 import { createBrand } from "../../services/BrandApi";
 import Swal from "sweetalert2";
+import { jwtDecode } from "jwt-decode"; // ✅ đúng cú pháp
 
 const fadeInStyle = `
 @keyframes fadeIn {
@@ -41,25 +42,47 @@ export default function AddBrandForm({ userRole, onClose, onSaved }) {
   // Xử lý submit form thêm hãng xe
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!name.trim()) {
       setError("Tên hãng xe không được để trống");
       return;
     }
+
     if (!image) {
       setError("Vui lòng chọn ảnh hãng xe");
       return;
     }
+
     try {
-      console.log({ name, image });
+      // ✅ Lấy token từ localStorage
+      const token = localStorage.getItem("token");
+
+      if (token) {
+        const decoded = jwtDecode(token);
+        console.log("📦 Access Token:", token);
+        console.log("🔓 Decoded Token:", decoded);
+        console.log(
+          "🔐 Authorities/Roles:",
+          decoded.authorities || decoded.role || "Không tìm thấy trường role"
+        );
+      } else {
+        console.warn("⚠️ Không tìm thấy token trong localStorage");
+      }
+
+      // ✅ Gửi dữ liệu tạo brand
       await createBrand({ name, image });
+
+      // ✅ Thông báo thành công
       Swal.fire({
         icon: "success",
         title: "Thành công!",
         text: "Hãng xe đã được thêm.",
         confirmButtonColor: "#2563eb",
       });
+
       onSaved();
     } catch (err) {
+      console.error("❌ Lỗi khi tạo brand:", err);
       setError(err.message || "Có lỗi xảy ra!");
     }
   };
@@ -91,7 +114,10 @@ export default function AddBrandForm({ userRole, onClose, onSaved }) {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <form
+            onSubmit={handleSubmit}
+            className="grid grid-cols-1 md:grid-cols-2 gap-8"
+          >
             <div>
               <label className="block font-semibold mb-1 text-gray-700">
                 Tên hãng xe

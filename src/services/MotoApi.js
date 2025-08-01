@@ -2,7 +2,9 @@ const API_URL = "http://localhost:8080/api/motos";
 
 // Lấy tất cả xe (public)
 export async function getAllMotos() {
-  const res = await fetch(API_URL, { headers: { "Content-Type": "application/json" } });
+  const res = await fetch(API_URL, {
+    headers: { "Content-Type": "application/json" },
+  });
   if (!res.ok) throw new Error("Không lấy được danh sách xe");
   return res.json();
 }
@@ -24,7 +26,7 @@ export async function createMoto(data) {
     headers,
     body: JSON.stringify(data),
   });
-  if (!res.ok) throw new Error("Thêm xe thất bại");
+  if (!res.ok) throw new Error("Thêm xe thất bại  ");
   return res.json();
 }
 
@@ -35,7 +37,7 @@ export async function updateMoto(licensePlate, moto) {
   const res = await fetch(`${API_URL}/${licensePlate}`, {
     method: "PUT",
     headers,
-    body: JSON.stringify(moto)
+    body: JSON.stringify(moto),
   });
   let data = null;
   if (res.status !== 204) {
@@ -51,7 +53,7 @@ export async function deleteMoto(licensePlate) {
   if (token) headers["Authorization"] = `Bearer ${token}`;
   const res = await fetch(`${API_URL}/${licensePlate}`, {
     method: "DELETE",
-    headers
+    headers,
   });
   let data = null;
   if (res.status !== 204) {

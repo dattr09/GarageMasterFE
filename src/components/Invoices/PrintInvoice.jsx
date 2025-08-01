@@ -34,10 +34,10 @@ export default function PrintInvoice(props) {
   // Lấy danh sách khách hàng khi load component
   useEffect(() => {
     const token = localStorage.getItem("token");
-    fetch("http://localhost:5119/api/customers", {
+    fetch("http://localhost:8080/api/customers", {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     })
-      .then(res => (res.status === 204 ? null : res.json()))
+      .then((res) => (res.status === 204 ? null : res.json()))
       .then(setCustomers)
       .catch(console.error);
   }, []);
@@ -46,11 +46,16 @@ export default function PrintInvoice(props) {
   useEffect(() => {
     if (selectedCustomer) {
       const token = localStorage.getItem("token");
-      fetch(`http://localhost:5119/api/repairorders?customerId=${selectedCustomer}`, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      })
-        .then(res => (res.status >= 400 ? [] : res.json()))
-        .then(data => setRepairOrders((data || []).filter(o => o.status === "Completed")))
+      fetch(
+        `http://localhost:8080/api/repairorders?customerId=${selectedCustomer}`,
+        {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        }
+      )
+        .then((res) => (res.status >= 400 ? [] : res.json()))
+        .then((data) =>
+          setRepairOrders((data || []).filter((o) => o.status === "Completed"))
+        )
         .catch(console.error);
     } else {
       setRepairOrders([]);
@@ -60,10 +65,10 @@ export default function PrintInvoice(props) {
   // Lấy danh sách nhân viên khi load component
   useEffect(() => {
     const token = localStorage.getItem("token");
-    fetch("http://localhost:5119/api/employees", {
+    fetch("http://localhost:8080/api/employees", {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     })
-      .then(res => res.json())
+      .then((res) => res.json())
       .then(setEmployees)
       .catch(console.error);
   }, []);
@@ -81,7 +86,7 @@ export default function PrintInvoice(props) {
       paymentMethod: selectedPayment,
     };
     try {
-      const res = await fetch("http://localhost:5119/api/invoices", {
+      const res = await fetch("http://localhost:8080/api/invoices", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -108,15 +113,22 @@ export default function PrintInvoice(props) {
     if (!invoice) return;
     const printContents = printRef.current.innerHTML;
     const printWindow = window.open("", "", "width=800,height=600");
-    printWindow.document.write(`<html><head><title>In hóa đơn</title></head><body>${printContents}</body></html>`);
+    printWindow.document.write(
+      `<html><head><title>In hóa đơn</title></head><body>${printContents}</body></html>`
+    );
     printWindow.document.close();
     printWindow.print();
   };
 
   // Lấy tên nhân viên từ id
   const getEmployeeName = (id) => {
-    const emp = employees.find(e => String(e.id) === String(id));
-    return emp?.name || emp?.fullName || `${emp?.firstName || ""} ${emp?.lastName || ""}`.trim() || "Không tìm thấy";
+    const emp = employees.find((e) => String(e.id) === String(id));
+    return (
+      emp?.name ||
+      emp?.fullName ||
+      `${emp?.firstName || ""} ${emp?.lastName || ""}`.trim() ||
+      "Không tìm thấy"
+    );
   };
 
   return (
@@ -140,15 +152,17 @@ export default function PrintInvoice(props) {
           <select
             className="w-full border rounded-xl px-4 py-2 shadow-sm focus:ring-2 focus:ring-blue-300"
             value={selectedCustomer}
-            onChange={e => {
+            onChange={(e) => {
               setSelectedCustomer(e.target.value);
               setSelectedOrder("");
               setInvoice(null);
             }}
           >
             <option value="">-- Chọn khách hàng --</option>
-            {customers.map(c => (
-              <option key={c.id} value={c.id}>{c.name}</option>
+            {customers.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
             ))}
           </select>
         </div>
@@ -159,7 +173,7 @@ export default function PrintInvoice(props) {
           <select
             className="w-full border rounded-xl px-4 py-2 shadow-sm focus:ring-2 focus:ring-blue-300"
             value={selectedPayment}
-            onChange={e => setSelectedPayment(e.target.value)}
+            onChange={(e) => setSelectedPayment(e.target.value)}
           >
             <option value="Cash">Tiền mặt</option>
             <option value="BankTransfer">Chuyển khoản</option>
@@ -181,13 +195,28 @@ export default function PrintInvoice(props) {
             HÓA ĐƠN THANH TOÁN
           </h3>
           <div className="grid grid-cols-1 gap-2 text-sm sm:text-base whitespace-nowrap">
-            <div><b>Mã hóa đơn:</b> HD{String(invoice.id).padStart(3, "0")}</div>
-            <div><b>Khách hàng:</b> {invoice.customerName}</div>
-            <div><b>Nhân viên sửa chữa:</b> {getEmployeeName(invoice.employeeId)}</div>
-            <div><b>Ngày tạo:</b> {new Date(invoice.checkOut).toLocaleString("vi-VN")}</div>
-            <div><b>Phương thức thanh toán:</b> {invoice.paymentMethod === "Cash" ? "Tiền mặt" : "Chuyển khoản"}</div>
             <div>
-              <b>Tổng tiền:</b> <span className="font-bold text-blue-700">{Number(invoice.totalCost).toLocaleString()} đ</span>
+              <b>Mã hóa đơn:</b> HD{String(invoice.id).padStart(3, "0")}
+            </div>
+            <div>
+              <b>Khách hàng:</b> {invoice.customerName}
+            </div>
+            <div>
+              <b>Nhân viên sửa chữa:</b> {getEmployeeName(invoice.employeeId)}
+            </div>
+            <div>
+              <b>Ngày tạo:</b>{" "}
+              {new Date(invoice.checkOut).toLocaleString("vi-VN")}
+            </div>
+            <div>
+              <b>Phương thức thanh toán:</b>{" "}
+              {invoice.paymentMethod === "Cash" ? "Tiền mặt" : "Chuyển khoản"}
+            </div>
+            <div>
+              <b>Tổng tiền:</b>{" "}
+              <span className="font-bold text-blue-700">
+                {Number(invoice.totalCost).toLocaleString()} đ
+              </span>
             </div>
           </div>
           <button

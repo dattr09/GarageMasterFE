@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { updateBrand } from "../../services/BrandApi";
 import { Landmark, Save, XCircle } from "lucide-react";
 import Swal from "sweetalert2";
+import { jwtDecode } from "jwt-decode"; // ✅ đúng cú pháp
 
 const fadeInStyle = `
 @keyframes fadeIn {
@@ -39,6 +40,7 @@ export default function EditBrandForm({ brand, onClose, onSaved, userRole }) {
   // Xử lý submit form sửa hãng xe
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!name.trim()) {
       setError("Tên hãng xe không được để trống");
       return;
@@ -47,6 +49,24 @@ export default function EditBrandForm({ brand, onClose, onSaved, userRole }) {
       setError("Vui lòng chọn ảnh hãng xe");
       return;
     }
+
+    // 👇 Log token và role
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        console.log("🔐 Token:", token);
+        console.log(
+          "👤 Role:",
+          decoded.role || decoded.roles || decoded.authorities || "Không rõ"
+        );
+      } catch (err) {
+        console.error("Lỗi giải mã token:", err);
+      }
+    } else {
+      console.warn("⚠️ Không tìm thấy accessToken trong localStorage");
+    }
+
     try {
       await updateBrand(brand.id, { name, image });
       Swal.fire({
@@ -90,7 +110,10 @@ export default function EditBrandForm({ brand, onClose, onSaved, userRole }) {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <form
+            onSubmit={handleSubmit}
+            className="grid grid-cols-1 md:grid-cols-2 gap-8"
+          >
             <div>
               <label className="block font-semibold mb-1 text-gray-700">
                 Tên hãng xe

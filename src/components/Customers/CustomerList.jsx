@@ -54,7 +54,7 @@ export default function CustomerList() {
   });
 
   // Kiểm tra quyền có phải admin hoặc employee không
-  const canEdit = userRole === "Admin" || userRole === "Employee";
+  // const canEdit = userRole === "Admin" || userRole === "Employee";
 
   return (
     <div className="max-w-7xl mx-auto p-6 mt-8 bg-white rounded-3xl shadow-xl border border-gray-200 animate-fade-in">
@@ -88,17 +88,17 @@ export default function CustomerList() {
               ))}
           </datalist>
         </div>
-        {canEdit && (
-          <button
-            onClick={() => {
-              setEditing(null);
-              setShowForm(true);
-            }}
-            className="flex items-center gap-2 bg-green-600 hover:bg-green-800 text-white font-bold px-4 py-2 rounded-xl transition shadow"
-          >
-            <PlusCircle size={20} /> Thêm mới
-          </button>
-        )}
+        {/* {canEdit && ( */}
+        <button
+          onClick={() => {
+            setEditing(null);
+            setShowForm(true);
+          }}
+          className="flex items-center gap-2 bg-green-600 hover:bg-green-800 text-white font-bold px-4 py-2 rounded-xl transition shadow"
+        >
+          <PlusCircle size={20} /> Thêm mới
+        </button>
+        {/* )} */}
       </div>
 
       {/* Table */}
@@ -116,7 +116,10 @@ export default function CustomerList() {
           <tbody>
             {filteredCustomers.length === 0 ? (
               <tr>
-                <td colSpan={5} className="text-center py-6 text-gray-400 italic">
+                <td
+                  colSpan={5}
+                  className="text-center py-6 text-gray-400 italic"
+                >
                   Không có khách hàng nào.
                 </td>
               </tr>
@@ -124,12 +127,20 @@ export default function CustomerList() {
               filteredCustomers.map((c, idx) => (
                 <tr
                   key={c.id}
-                  className={`transition text-center ${idx % 2 === 0 ? "bg-white" : "bg-gray-50"} hover:bg-blue-50`}
+                  className={`transition text-center ${
+                    idx % 2 === 0 ? "bg-white" : "bg-gray-50"
+                  } hover:bg-blue-50`}
                 >
-                  <td className="py-3 px-4 font-medium truncate max-w-[150px]">{c.name}</td>
-                  <td className="py-3 px-4 truncate max-w-[180px]">{c.email}</td>
+                  <td className="py-3 px-4 font-medium truncate max-w-[150px]">
+                    {c.name}
+                  </td>
+                  <td className="py-3 px-4 truncate max-w-[180px]">
+                    {c.email}
+                  </td>
                   <td className="py-3 px-4">{c.phone}</td>
-                  <td className="py-3 px-4 truncate max-w-[200px]">{c.address}</td>
+                  <td className="py-3 px-4 truncate max-w-[200px]">
+                    {c.address}
+                  </td>
                   <td className="py-3 px-4">
                     <div className="flex justify-center flex-wrap gap-2">
                       <button
@@ -142,27 +153,27 @@ export default function CustomerList() {
                       >
                         <Info size={16} /> Chi tiết
                       </button>
-                      {canEdit && (
-                        <>
-                          <button
-                            onClick={() => {
-                              setEditing(c);
-                              setShowForm(true);
-                            }}
-                            className="flex items-center gap-1 bg-yellow-400 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
-                            title="Sửa"
-                          >
-                            <Pencil size={16} /> Sửa
-                          </button>
-                          <button
-                            onClick={() => handleDelete(c.id)}
-                            className="flex items-center gap-1 bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
-                            title="Xóa"
-                          >
-                            <Trash2 size={16} /> Xóa
-                          </button>
-                        </>
-                      )}
+                      {/* {canEdit && ( */}
+                      <>
+                        <button
+                          onClick={() => {
+                            setEditing(c);
+                            setShowForm(true);
+                          }}
+                          className="flex items-center gap-1 bg-yellow-400 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
+                          title="Sửa"
+                        >
+                          <Pencil size={16} /> Sửa
+                        </button>
+                        <button
+                          onClick={() => handleDelete(c.id)}
+                          className="flex items-center gap-1 bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
+                          title="Xóa"
+                        >
+                          <Trash2 size={16} /> Xóa
+                        </button>
+                      </>
+                      {/* )} */}
                     </div>
                   </td>
                 </tr>

@@ -1,19 +1,11 @@
 import React, { useEffect, useState } from "react";
-import {
-  getAllParts,
-  deletePart,
-} from "../../services/PartsApi";
+import { getAllParts, deletePart } from "../../services/PartsApi";
 import { getAllBrands } from "../../services/BrandApi";
 import AddPartForm from "./AddPartForm";
 import EditPartForm from "./EditPartForm";
 import PartDetails from "./PartDetails";
 import Swal from "sweetalert2";
-import {
-  Trash2,
-  Pencil,
-  ShoppingCart,
-  PlusCircle,
-} from "lucide-react";
+import { Trash2, Pencil, ShoppingCart, PlusCircle } from "lucide-react";
 import { useLocation } from "react-router-dom";
 
 export default function PartsList() {
@@ -33,7 +25,7 @@ export default function PartsList() {
     const brandName = params.get("brand");
     if (brandName && brands.length > 0) {
       // Tìm id hãng theo tên
-      const found = brands.find(b => b.name === brandName);
+      const found = brands.find((b) => b.name === brandName);
       if (found) setBrandFilter(String(found.id));
     }
   }, [location.search, brands]);
@@ -61,7 +53,7 @@ export default function PartsList() {
     getAllParts().then(setParts);
     getAllBrands().then(setBrands);
     // Lấy role từ localStorage
-    const user = JSON.parse(localStorage.getItem("user"));
+    const user = JSON.parse(localStorage.getItem("role"));
     setUserRole(user?.role || "");
   }, []);
 
@@ -160,14 +152,14 @@ export default function PartsList() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-          {userRole === "Admin" && (
-            <button
-              onClick={() => setShowForm({ type: "add" })}
-              className="flex items-center gap-2 bg-green-600 hover:bg-green-800 text-white font-bold px-4 py-2 rounded-xl transition shadow"
-            >
-              <PlusCircle size={20} /> Thêm mới
-            </button>
-          )}
+          {/* {userRole === "Admin" && ( */}
+          <button
+            onClick={() => setShowForm({ type: "add" })}
+            className="flex items-center gap-2 bg-green-600 hover:bg-green-800 text-white font-bold px-4 py-2 rounded-xl transition shadow"
+          >
+            <PlusCircle size={20} /> Thêm mới
+          </button>
+          {/* )} */}
           <select
             className="border rounded-xl px-3 py-2"
             value={sortPrice}
@@ -231,11 +223,16 @@ export default function PartsList() {
 
                 <div className="text-blue-800 font-bold text-xl mb-1">
                   {part.price
-                    .toLocaleString("vi-VN", { style: "currency", currency: "VND" })
+                    .toLocaleString("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    })
                     .replace("₫", "VNĐ")}
                 </div>
 
-                <div className="text-sm text-gray-500 mb-1">Đơn vị: {part.unit}</div>
+                <div className="text-sm text-gray-500 mb-1">
+                  Đơn vị: {part.unit}
+                </div>
                 <div className="text-sm text-gray-500 mb-2">
                   Hãng:{" "}
                   <span className="text-blue-600 font-semibold">
@@ -244,24 +241,24 @@ export default function PartsList() {
                 </div>
 
                 <div className="flex gap-2 mt-auto flex-wrap justify-center">
-                  {userRole === "Admin" && (
-                    <>
-                      <button
-                        onClick={() => setShowForm({ type: "edit", part })}
-                        className="flex items-center gap-1 bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
-                        title="Sửa"
-                      >
-                        <Pencil size={16} /> Sửa
-                      </button>
-                      <button
-                        onClick={() => handleDelete(part.id)}
-                        className="flex items-center gap-1 bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
-                        title="Xóa"
-                      >
-                        <Trash2 size={16} /> Xóa
-                      </button>
-                    </>
-                  )}
+                  {/* {userRole === "Admin" && ( */}
+                  <>
+                    <button
+                      onClick={() => setShowForm({ type: "edit", part })}
+                      className="flex items-center gap-1 bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
+                      title="Sửa"
+                    >
+                      <Pencil size={16} /> Sửa
+                    </button>
+                    <button
+                      onClick={() => handleDelete(part.id)}
+                      className="flex items-center gap-1 bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
+                      title="Xóa"
+                    >
+                      <Trash2 size={16} /> Xóa
+                    </button>
+                  </>
+                  {/* )} */}
                   <button
                     onClick={() => handleAddToCart(part)}
                     className="flex items-center gap-1 bg-green-600 hover:bg-green-800 text-white px-3 py-1 rounded-lg shadow font-semibold transition"

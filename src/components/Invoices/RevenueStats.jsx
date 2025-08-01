@@ -1,7 +1,16 @@
 import React, { useEffect, useState } from "react";
 import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  CartesianGrid, Legend, PieChart, Pie, Cell
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+  Legend,
+  PieChart,
+  Pie,
+  Cell,
 } from "recharts";
 import { getAllInvoices } from "../../services/InvoiceApi";
 import { getAllOrders } from "../../services/OrderApi";
@@ -55,7 +64,9 @@ export default function RevenueStats() {
   const allData = [...mappedInvoices, ...mappedOrders];
 
   // Lấy danh sách các năm có trong dữ liệu
-  const years = Array.from(new Set(allData.map((item) => new Date(item.checkOut).getFullYear()))).sort();
+  const years = Array.from(
+    new Set(allData.map((item) => new Date(item.checkOut).getFullYear()))
+  ).sort();
 
   // Chuẩn bị 12 tháng trong năm được chọn
   const monthLabels = Array.from({ length: 12 }, (_, i) => {
@@ -78,8 +89,14 @@ export default function RevenueStats() {
   // Tính tổng hóa đơn và đơn hàng theo tháng
   const stats = monthLabels.map((m) => {
     const items = byMonth[m.key] || [];
-    const invoiceTotal = sum(items.filter((i) => i.type === "invoice"), (i) => Number(i.totalCost));
-    const orderTotal = sum(items.filter((i) => i.type === "order"), (i) => Number(i.totalCost));
+    const invoiceTotal = sum(
+      items.filter((i) => i.type === "invoice"),
+      (i) => Number(i.totalCost)
+    );
+    const orderTotal = sum(
+      items.filter((i) => i.type === "order"),
+      (i) => Number(i.totalCost)
+    );
     return { ...m, invoice: invoiceTotal, order: orderTotal };
   });
 
@@ -97,8 +114,13 @@ export default function RevenueStats() {
       : stats.filter((m) => quarterMap[quarterFilter].includes(m.monthIndex));
 
   const now = new Date();
-  const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-  const currentMonthStats = stats.find((m) => m.key === currentMonthKey) || { invoice: 0, order: 0 };
+  const currentMonthKey = `${now.getFullYear()}-${String(
+    now.getMonth() + 1
+  ).padStart(2, "0")}`;
+  const currentMonthStats = stats.find((m) => m.key === currentMonthKey) || {
+    invoice: 0,
+    order: 0,
+  };
   const currentMonthTotal = currentMonthStats.invoice + currentMonthStats.order;
 
   return (
@@ -110,7 +132,9 @@ export default function RevenueStats() {
 
         <div className="text-center mb-6 text-xl text-blue-700 font-semibold">
           Doanh thu tháng {now.getMonth() + 1}/{now.getFullYear()}:{" "}
-          <span className="text-green-600">{currentMonthTotal.toLocaleString()} VNĐ</span>
+          <span className="text-green-600">
+            {currentMonthTotal.toLocaleString()} VNĐ
+          </span>
         </div>
 
         <div className="flex flex-col md:flex-row md:justify-between items-center gap-4 mb-6">
@@ -120,9 +144,17 @@ export default function RevenueStats() {
                 key={mode}
                 onClick={() => setViewMode(mode)}
                 className={`px-4 py-2 rounded-full text-sm font-medium 
-                  ${viewMode === mode ? "bg-blue-600 text-white" : "bg-blue-100 text-blue-700 hover:bg-blue-200"}`}
+                  ${
+                    viewMode === mode
+                      ? "bg-blue-600 text-white"
+                      : "bg-blue-100 text-blue-700 hover:bg-blue-200"
+                  }`}
               >
-                {mode === "bar" ? "Biểu đồ cột" : mode === "table" ? "Dạng bảng" : "Biểu đồ tròn"}
+                {mode === "bar"
+                  ? "Biểu đồ cột"
+                  : mode === "table"
+                  ? "Dạng bảng"
+                  : "Biểu đồ tròn"}
               </button>
             ))}
           </div>
@@ -164,22 +196,52 @@ export default function RevenueStats() {
                   barCategoryGap="20%"
                 >
                   <defs>
-                    <linearGradient id="colorInvoice" x1="0" y1="0" x2="0" y2="1">
+                    <linearGradient
+                      id="colorInvoice"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
                       <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.9} />
-                      <stop offset="100%" stopColor="#93c5fd" stopOpacity={0.2} />
+                      <stop
+                        offset="100%"
+                        stopColor="#93c5fd"
+                        stopOpacity={0.2}
+                      />
                     </linearGradient>
                     <linearGradient id="colorOrder" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="0%" stopColor="#10b981" stopOpacity={0.9} />
-                      <stop offset="100%" stopColor="#6ee7b7" stopOpacity={0.2} />
+                      <stop
+                        offset="100%"
+                        stopColor="#6ee7b7"
+                        stopOpacity={0.2}
+                      />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-                  <XAxis dataKey="label" angle={-15} textAnchor="end" height={80} interval={0} />
+                  <XAxis
+                    dataKey="label"
+                    angle={-15}
+                    textAnchor="end"
+                    height={80}
+                    interval={0}
+                  />
                   <YAxis tickFormatter={(v) => v.toLocaleString()} />
                   <Tooltip formatter={(v) => v.toLocaleString() + " VNĐ"} />
                   <Legend verticalAlign="top" iconType="circle" />
-                  <Bar dataKey="invoice" name="Hóa Đơn" fill="url(#colorInvoice)" radius={[6, 6, 0, 0]} />
-                  <Bar dataKey="order" name="Đơn Hàng" fill="url(#colorOrder)" radius={[6, 6, 0, 0]} />
+                  <Bar
+                    dataKey="invoice"
+                    name="Hóa Đơn"
+                    fill="url(#colorInvoice)"
+                    radius={[6, 6, 0, 0]}
+                  />
+                  <Bar
+                    dataKey="order"
+                    name="Đơn Hàng"
+                    fill="url(#colorOrder)"
+                    radius={[6, 6, 0, 0]}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -201,9 +263,15 @@ export default function RevenueStats() {
                 {filteredStats.map((m, idx) => (
                   <tr key={idx} className="border-t">
                     <td className="p-3">{m.label}</td>
-                    <td className="p-3 text-blue-600">{m.invoice.toLocaleString()} VNĐ</td>
-                    <td className="p-3 text-green-600">{m.order.toLocaleString()} VNĐ</td>
-                    <td className="p-3 font-semibold">{(m.invoice + m.order).toLocaleString()} VNĐ</td>
+                    <td className="p-3 text-blue-600">
+                      {m.invoice.toLocaleString()} VNĐ
+                    </td>
+                    <td className="p-3 text-green-600">
+                      {m.order.toLocaleString()} VNĐ
+                    </td>
+                    <td className="p-3 font-semibold">
+                      {(m.invoice + m.order).toLocaleString()} VNĐ
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -219,13 +287,21 @@ export default function RevenueStats() {
                 <Legend verticalAlign="bottom" />
                 <Pie
                   data={[
-                    { name: "Tổng Hóa Đơn", value: sum(filteredStats, (i) => i.invoice) },
-                    { name: "Tổng Đơn Hàng", value: sum(filteredStats, (i) => i.order) },
+                    {
+                      name: "Tổng Hóa Đơn",
+                      value: sum(filteredStats, (i) => i.invoice),
+                    },
+                    {
+                      name: "Tổng Đơn Hàng",
+                      value: sum(filteredStats, (i) => i.order),
+                    },
                   ]}
                   dataKey="value"
                   nameKey="name"
                   outerRadius={130}
-                  label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                  label={({ name, percent }) =>
+                    `${name} (${(percent * 100).toFixed(0)}%)`
+                  }
                 >
                   {COLORS.map((color, index) => (
                     <Cell key={index} fill={color} />

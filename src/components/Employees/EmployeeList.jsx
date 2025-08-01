@@ -70,7 +70,7 @@ export default function EmployeeList() {
   }
 
   // Lọc nhân viên theo tên
-  const filteredEmployees = employees.filter(e =>
+  const filteredEmployees = employees.filter((e) =>
     e.name.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -86,16 +86,16 @@ export default function EmployeeList() {
           className="flex-1 px-4 py-2 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
           placeholder="Tìm theo tên nhân viên..."
           value={search}
-          onChange={e => setSearch(e.target.value)}
+          onChange={(e) => setSearch(e.target.value)}
         />
-        {userRole === "Admin" && (
-          <button
-            onClick={() => setShowAdd(true)}
-            className="flex items-center gap-2 bg-green-600 hover:bg-green-800 text-white font-bold px-4 py-2 rounded-xl transition shadow"
-          >
-            <PlusCircle size={20} /> Thêm mới
-          </button>
-        )}
+        {/* {userRole === "Admin" && ( */}
+        <button
+          onClick={() => setShowAdd(true)}
+          className="flex items-center gap-2 bg-green-600 hover:bg-green-800 text-white font-bold px-4 py-2 rounded-xl transition shadow"
+        >
+          <PlusCircle size={20} /> Thêm mới
+        </button>
+        {/* )} */}
       </div>
 
       <div className="overflow-x-auto rounded-xl border border-gray-200 shadow">
@@ -112,7 +112,10 @@ export default function EmployeeList() {
           <tbody>
             {filteredEmployees.length === 0 ? (
               <tr>
-                <td colSpan={5} className="text-center py-6 text-gray-400 italic">
+                <td
+                  colSpan={5}
+                  className="text-center py-6 text-gray-400 italic"
+                >
                   Không có nhân viên nào.
                 </td>
               </tr>
@@ -120,12 +123,18 @@ export default function EmployeeList() {
               filteredEmployees.map((e, idx) => (
                 <tr
                   key={e.id}
-                  className={`transition ${idx % 2 === 0 ? "bg-white" : "bg-blue-50"} hover:bg-blue-100`}
+                  className={`transition ${
+                    idx % 2 === 0 ? "bg-white" : "bg-blue-50"
+                  } hover:bg-blue-100`}
                 >
-                  <td className="px-6 py-4 text-center font-medium">{e.name}</td>
+                  <td className="px-6 py-4 text-center font-medium">
+                    {e.name}
+                  </td>
                   <td className="px-6 py-4 text-center">{e.phone}</td>
                   <td className="px-6 py-4 text-center">{e.address}</td>
-                  <td className="px-6 py-4 text-center">{getRoleName(e.employeeRole)}</td>
+                  <td className="px-6 py-4 text-center">
+                    {getRoleName(e.employeeRole)}
+                  </td>
                   <td className="px-6 py-4 text-center flex flex-wrap justify-center gap-2">
                     <button
                       onClick={() => setDetailEmployee(e)}
@@ -134,24 +143,24 @@ export default function EmployeeList() {
                     >
                       <Info size={16} /> Chi tiết
                     </button>
-                    {userRole === "Admin" && (
-                      <>
-                        <button
-                          onClick={() => setEditEmployee(e)}
-                          className="flex items-center gap-1 bg-yellow-400 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
-                          title="Sửa"
-                        >
-                          <Pencil size={16} /> Sửa
-                        </button>
-                        <button
-                          onClick={() => handleDelete(e.id)}
-                          className="flex items-center gap-1 bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
-                          title="Xóa"
-                        >
-                          <Trash2 size={16} /> Xóa
-                        </button>
-                      </>
-                    )}
+                    {/* {userRole === "Admin" && ( */}
+                    <>
+                      <button
+                        onClick={() => setEditEmployee(e)}
+                        className="flex items-center gap-1 bg-yellow-400 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
+                        title="Sửa"
+                      >
+                        <Pencil size={16} /> Sửa
+                      </button>
+                      <button
+                        onClick={() => handleDelete(e.id)}
+                        className="flex items-center gap-1 bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded-lg shadow font-semibold transition"
+                        title="Xóa"
+                      >
+                        <Trash2 size={16} /> Xóa
+                      </button>
+                    </>
+                    {/* )} */}
                   </td>
                 </tr>
               ))

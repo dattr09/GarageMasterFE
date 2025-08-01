@@ -44,7 +44,7 @@ export default function RepairOrderList() {
     try {
       const data = await getAllCustomers();
       setCustomers(data);
-    } catch (err) { }
+    } catch (err) {}
   };
 
   // Lấy tên khách hàng từ id
@@ -89,7 +89,7 @@ export default function RepairOrderList() {
   };
 
   // Kiểm tra quyền admin hoặc employee
-  const canEdit = userRole === "Admin" || userRole === "Employee";
+  // const canEdit = userRole === "Admin" || userRole === "Employee";
 
   return (
     <div className="max-w-full mx-auto bg-white rounded-xl shadow-xl p-6 mt-6 animate-fade-in">
@@ -105,14 +105,14 @@ export default function RepairOrderList() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        {canEdit && (
-          <button
-            onClick={() => setShowForm({ type: "add" })}
-            className="flex items-center gap-2 bg-green-600 hover:bg-green-800 text-white font-bold px-4 py-2 rounded-xl transition shadow"
-          >
-            <PlusCircle size={20} /> Thêm mới
-          </button>
-        )}
+        {/* {canEdit && ( */}
+        <button
+          onClick={() => setShowForm({ type: "add" })}
+          className="flex items-center gap-2 bg-green-600 hover:bg-green-800 text-white font-bold px-4 py-2 rounded-xl transition shadow"
+        >
+          <PlusCircle size={20} /> Thêm mới
+        </button>
+        {/* )} */}
       </div>
 
       <div className="rounded-xl border border-gray-200 shadow overflow-x-auto w-full">
@@ -120,9 +120,15 @@ export default function RepairOrderList() {
           <thead className="bg-blue-100 text-blue-900">
             <tr>
               <th className="px-4 py-3 text-center font-semibold">Mã đơn</th>
-              <th className="px-4 py-3 text-center font-semibold">Biển số xe</th>
-              <th className="px-4 py-3 text-center font-semibold">Khách hàng</th>
-              <th className="px-4 py-3 text-center font-semibold">Trạng thái</th>
+              <th className="px-4 py-3 text-center font-semibold">
+                Biển số xe
+              </th>
+              <th className="px-4 py-3 text-center font-semibold">
+                Khách hàng
+              </th>
+              <th className="px-4 py-3 text-center font-semibold">
+                Trạng thái
+              </th>
               <th className="px-4 py-3 text-center font-semibold">Ngày tạo</th>
               <th className="px-4 py-3 text-center font-semibold">Tổng tiền</th>
               <th className="px-4 py-3 text-center font-semibold">Thao tác</th>
@@ -131,7 +137,10 @@ export default function RepairOrderList() {
           <tbody>
             {filteredOrders.length === 0 ? (
               <tr>
-                <td colSpan={7} className="text-center py-6 text-gray-400 italic">
+                <td
+                  colSpan={7}
+                  className="text-center py-6 text-gray-400 italic"
+                >
                   Không có đơn sửa chữa nào.
                 </td>
               </tr>
@@ -139,13 +148,19 @@ export default function RepairOrderList() {
               filteredOrders.map((order, idx) => (
                 <tr
                   key={order.id}
-                  className={`transition ${idx % 2 === 0 ? "bg-white" : "bg-blue-50"} hover:bg-blue-100`}
+                  className={`transition ${
+                    idx % 2 === 0 ? "bg-white" : "bg-blue-50"
+                  } hover:bg-blue-100`}
                 >
                   <td className="px-4 py-3 text-center font-bold text-blue-700 whitespace-nowrap">
                     {`KH${(idx + 1).toString().padStart(3, "0")}`}
                   </td>
-                  <td className="px-4 py-3 text-center whitespace-nowrap">{order.licensePlate}</td>
-                  <td className="px-4 py-3 text-center whitespace-nowrap">{getCustomerName(order.customerId)}</td>
+                  <td className="px-4 py-3 text-center whitespace-nowrap">
+                    {order.licensePlate}
+                  </td>
+                  <td className="px-4 py-3 text-center whitespace-nowrap">
+                    {getCustomerName(order.customerId)}
+                  </td>
                   <td className="px-4 py-3 text-center font-semibold text-blue-600 whitespace-nowrap">
                     {statusMap[order.status] || order.status}
                   </td>
@@ -171,44 +186,51 @@ export default function RepairOrderList() {
                     >
                       <Info size={16} /> Chi tiết
                     </button>
-                    {canEdit && (
-                      <>
+                    {/* {canEdit && ( */}
+                    <>
+                      <button
+                        onClick={() =>
+                          setShowForm({ type: "edit", id: order.id })
+                        }
+                        className="flex items-center gap-1 bg-yellow-400 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg shadow font-semibold transition whitespace-nowrap"
+                        title="Sửa"
+                      >
+                        <Pencil size={16} /> Sửa
+                      </button>
+                      <button
+                        onClick={() => handleDelete(order.id)}
+                        className="flex items-center gap-1 bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded-lg shadow font-semibold transition whitespace-nowrap"
+                        title="Xóa"
+                      >
+                        <Trash2 size={16} /> Xóa
+                      </button>
+                      {(order.status === "Completed" ||
+                        order.status === "Hoàn thành") && (
                         <button
-                          onClick={() => setShowForm({ type: "edit", id: order.id })}
-                          className="flex items-center gap-1 bg-yellow-400 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg shadow font-semibold transition whitespace-nowrap"
-                          title="Sửa"
+                          className="bg-green-600 hover:bg-green-800 text-white px-3 py-1 rounded-lg shadow font-semibold transition whitespace-nowrap"
+                          onClick={() =>
+                            (window.location.href = `/invoices?customerId=${order.customerId}&repairOrderId=${order.id}`)
+                          }
                         >
-                          <Pencil size={16} /> Sửa
+                          Tạo hóa đơn
                         </button>
-                        <button
-                          onClick={() => handleDelete(order.id)}
-                          className="flex items-center gap-1 bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded-lg shadow font-semibold transition whitespace-nowrap"
-                          title="Xóa"
-                        >
-                          <Trash2 size={16} /> Xóa
-                        </button>
-                        {(order.status === "Completed" || order.status === "Hoàn thành") && (
-                          <button
-                            className="bg-green-600 hover:bg-green-800 text-white px-3 py-1 rounded-lg shadow font-semibold transition whitespace-nowrap"
-                            onClick={() =>
-                              (window.location.href = `/invoices?customerId=${order.customerId}&repairOrderId=${order.id}`)
-                            }
-                          >
-                            Tạo hóa đơn
-                          </button>
+                      )}
+                      {order.status !== "Completed" &&
+                        order.status !== "Hoàn thành" && (
+                          <span className="text-gray-400 italic whitespace-nowrap">
+                            Chưa hoàn thành
+                          </span>
                         )}
-                        {(order.status !== "Completed" && order.status !== "Hoàn thành") && (
-                          <span className="text-gray-400 italic whitespace-nowrap">Chưa hoàn thành</span>
-                        )}
-                      </>
-                    )}
-                    {!canEdit && (
-                      <span className="text-gray-400 italic whitespace-nowrap">
-                        {order.status === "Completed" || order.status === "Hoàn thành"
-                          ? "Chỉ Admin/Employee được tạo hóa đơn"
-                          : "Chưa hoàn thành"}
-                      </span>
-                    )}
+                    </>
+                    {/* )} */}
+                    {/* {!canEdit && ( */}
+                    <span className="text-gray-400 italic whitespace-nowrap">
+                      {order.status === "Completed" ||
+                      order.status === "Hoàn thành"
+                        ? "Chỉ Admin/Employee được tạo hóa đơn"
+                        : "Chưa hoàn thành"}
+                    </span>
+                    {/* )} */}
                   </td>
                 </tr>
               ))

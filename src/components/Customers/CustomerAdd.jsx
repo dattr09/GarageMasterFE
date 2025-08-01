@@ -1,18 +1,11 @@
 import React, { useState } from "react";
 import Swal from "sweetalert2";
-import {
-  UserPlus,
-  Mail,
-  Phone,
-  MapPin,
-  Save,
-  XCircle,
-} from "lucide-react";
+import { UserPlus, Mail, Phone, MapPin, Save, XCircle } from "lucide-react";
 
 // Gọi API tạo khách hàng mới
 const createCustomer = async (customerData) => {
   const token = localStorage.getItem("token");
-  const res = await fetch("http://localhost:5119/api/customers", {
+  const res = await fetch("http://localhost:8080/api/customers", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -112,12 +105,19 @@ export default function CustomerAdd({ onClose, onSaved }) {
         </div>
 
         {error && (
-          <div className="mb-4 text-red-600 text-center font-semibold">{error}</div>
+          <div className="mb-4 text-red-600 text-center font-semibold">
+            {error}
+          </div>
         )}
 
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <form
+          onSubmit={handleSubmit}
+          className="grid grid-cols-1 md:grid-cols-2 gap-8"
+        >
           <div className="relative">
-            <label className="block font-semibold mb-1 text-gray-700">Tên khách hàng</label>
+            <label className="block font-semibold mb-1 text-gray-700">
+              Tên khách hàng
+            </label>
             <input
               name="name"
               value={form.name}
@@ -129,7 +129,9 @@ export default function CustomerAdd({ onClose, onSaved }) {
           </div>
 
           <div className="relative">
-            <label className="block font-semibold mb-1 text-gray-700">Email</label>
+            <label className="block font-semibold mb-1 text-gray-700">
+              Email
+            </label>
             <input
               name="email"
               type="email"
@@ -142,7 +144,9 @@ export default function CustomerAdd({ onClose, onSaved }) {
           </div>
 
           <div className="relative">
-            <label className="block font-semibold mb-1 text-gray-700">Số điện thoại</label>
+            <label className="block font-semibold mb-1 text-gray-700">
+              Số điện thoại
+            </label>
             <input
               name="phone"
               value={form.phone}
@@ -153,7 +157,9 @@ export default function CustomerAdd({ onClose, onSaved }) {
           </div>
 
           <div className="relative">
-            <label className="block font-semibold mb-1 text-gray-700">Địa chỉ</label>
+            <label className="block font-semibold mb-1 text-gray-700">
+              Địa chỉ
+            </label>
             <input
               name="address"
               value={form.address}

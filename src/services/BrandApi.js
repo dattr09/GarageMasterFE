@@ -2,7 +2,9 @@ const API_URL = "http://localhost:8080/api/brands";
 
 // Lấy tất cả hãng xe (public)
 export async function getAllBrands() {
-  const res = await fetch(API_URL, { headers: { "Content-Type": "application/json" } });
+  const res = await fetch(API_URL, {
+    headers: { "Content-Type": "application/json" },
+  });
   if (!res.ok) throw new Error("Không lấy được danh sách hãng xe");
   return res.json();
 }
@@ -25,6 +27,10 @@ export async function createBrand(data) {
 export async function updateBrand(id, brand) {
   const token = localStorage.getItem("token");
   const headers = { "Content-Type": "application/json" };
+  console.log("🧾 Token:", token);
+  console.log("🧾 Headers:", headers);
+  console.log("📡 URL:", `${API_URL}/${id}`);
+
   if (token) headers["Authorization"] = `Bearer ${token}`;
   const res = await fetch(`${API_URL}/${id}`, {
     method: "PUT",
