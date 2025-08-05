@@ -10,15 +10,13 @@ export async function getAllEmployees() {
   return res.json();
 }
 
-// Đăng ký nhân viên mới (cần token)
+// Đăng ký nhân viên mới (không cần token)
 export async function registerEmployee(data) {
-  const token = localStorage.getItem("token");
   const headers = { "Content-Type": "application/json" };
-  if (token) headers["Authorization"] = `Bearer ${token}`;
-  const res = await fetch(`${API_URL}/register`, {
+  const res = await fetch(API_URL, {
     method: "POST",
     headers,
-    body: JSON.stringify(data)
+    body: JSON.stringify(data),
   });
   if (!res.ok) throw new Error("Thêm nhân viên thất bại");
   return res.json();
@@ -31,7 +29,7 @@ export async function deleteEmployee(id) {
   if (token) headers["Authorization"] = `Bearer ${token}`;
   const res = await fetch(`${API_URL}/${id}`, {
     method: "DELETE",
-    headers
+    headers,
   });
   if (!res.ok) throw new Error("Xoá nhân viên thất bại");
 }

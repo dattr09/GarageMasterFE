@@ -31,6 +31,7 @@ export default function EmployeeAdd({ onClose, onSaved }) {
     address: "",
     email: "",
     password: "",
+    employeeRole: "", // Đã đúng tên trường
   });
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -45,7 +46,14 @@ export default function EmployeeAdd({ onClose, onSaved }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    if (!form.name || !form.email || !form.password) {
+    if (
+      !form.name.trim() ||
+      !form.phone.trim() ||
+      !form.address.trim() ||
+      !form.email.trim() ||
+      !form.password.trim() ||
+      !form.employeeRole.trim()
+    ) {
       setError("Vui lòng nhập đầy đủ thông tin!");
       return;
     }
@@ -55,10 +63,12 @@ export default function EmployeeAdd({ onClose, onSaved }) {
       await Swal.fire({
         icon: "success",
         title: "Tạo tài khoản thành công!",
-        text: "Vui lòng kiểm tra email để xác thực tài khoản.",
+        text: "Nhân viên đã được thêm.",
         confirmButtonText: "Xác nhận",
       });
-      navigate(`/confirm-email?email=${encodeURIComponent(form.email)}`);
+      if (onSaved) onSaved(); // Gọi callback để reload hoặc đóng popup
+      onClose(); // Đóng popup và trả về trang nhân viên
+      // navigate(`/confirm-email?email=${encodeURIComponent(form.email)}`); // Đã tắt chuyển trang xác thực email
     } catch (err) {
       setError(err.message || "Có lỗi xảy ra!");
     }
@@ -86,12 +96,19 @@ export default function EmployeeAdd({ onClose, onSaved }) {
           </div>
 
           {error && (
-            <div className="mb-4 text-red-600 text-center font-semibold">{error}</div>
+            <div className="mb-4 text-red-600 text-center font-semibold">
+              {error}
+            </div>
           )}
 
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <form
+            onSubmit={handleSubmit}
+            className="grid grid-cols-1 md:grid-cols-2 gap-8"
+          >
             <div>
-              <label className="block font-semibold mb-1 text-gray-700">Tên nhân viên</label>
+              <label className="block font-semibold mb-1 text-gray-700">
+                Tên nhân viên
+              </label>
               <div className="relative">
                 <input
                   name="name"
@@ -106,7 +123,9 @@ export default function EmployeeAdd({ onClose, onSaved }) {
             </div>
 
             <div>
-              <label className="block font-semibold mb-1 text-gray-700">Số điện thoại</label>
+              <label className="block font-semibold mb-1 text-gray-700">
+                Số điện thoại
+              </label>
               <div className="relative">
                 <input
                   name="phone"
@@ -120,7 +139,9 @@ export default function EmployeeAdd({ onClose, onSaved }) {
             </div>
 
             <div>
-              <label className="block font-semibold mb-1 text-gray-700">Địa chỉ</label>
+              <label className="block font-semibold mb-1 text-gray-700">
+                Địa chỉ
+              </label>
               <div className="relative">
                 <input
                   name="address"
@@ -134,7 +155,9 @@ export default function EmployeeAdd({ onClose, onSaved }) {
             </div>
 
             <div>
-              <label className="block font-semibold mb-1 text-gray-700">Email đăng nhập</label>
+              <label className="block font-semibold mb-1 text-gray-700">
+                Email đăng nhập
+              </label>
               <div className="relative">
                 <input
                   name="email"
@@ -150,7 +173,9 @@ export default function EmployeeAdd({ onClose, onSaved }) {
             </div>
 
             <div className="md:col-span-2">
-              <label className="block font-semibold mb-1 text-gray-700">Mật khẩu</label>
+              <label className="block font-semibold mb-1 text-gray-700">
+                Mật khẩu
+              </label>
               <div className="relative">
                 <input
                   name="password"
@@ -167,9 +192,31 @@ export default function EmployeeAdd({ onClose, onSaved }) {
                   className="absolute right-3 top-2.5 text-gray-400 cursor-pointer"
                   title={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
                 </span>
               </div>
+            </div>
+
+            <div>
+              <label className="block font-semibold mb-1 text-gray-700">
+                Vai trò nhân viên
+              </label>
+              <select
+                name="employeeRole"
+                value={form.employeeRole}
+                onChange={handleChange}
+                required
+                className="pl-4 pr-4 py-2 border-2 border-gray-200 rounded-xl w-full"
+              >
+                <option value="">Chọn vai trò</option>
+                <option value="Mechanic">Thợ máy</option>
+                <option value="Admin">Quản trị viên</option>
+                {/* Thêm các vai trò khác nếu cần */}
+              </select>
             </div>
 
             <div className="md:col-span-2 flex gap-6 justify-center mt-8">

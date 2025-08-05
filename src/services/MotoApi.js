@@ -18,15 +18,12 @@ export async function getMotoById(licensePlate) {
 
 // Thêm, sửa, xóa xe (cần token)
 export async function createMoto(data) {
-  const token = localStorage.getItem("token");
-  const headers = { "Content-Type": "application/json" };
-  if (token) headers["Authorization"] = `Bearer ${token}`;
   const res = await fetch(API_URL, {
     method: "POST",
-    headers,
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-  if (!res.ok) throw new Error("Thêm xe thất bại  ");
+  if (!res.ok) throw new Error("Thêm xe thất bại");
   return res.json();
 }
 

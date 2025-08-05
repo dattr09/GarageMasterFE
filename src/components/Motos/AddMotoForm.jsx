@@ -29,7 +29,7 @@ export default function AddMotoForm({ brands, customers, onClose, onSaved }) {
     brandId: "",
     customerId: "",
     dateOfSent: new Date().toISOString().split("T")[0],
-    notes: ""
+    notes: "",
   });
   const [error, setError] = useState("");
 
@@ -42,12 +42,22 @@ export default function AddMotoForm({ brands, customers, onClose, onSaved }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    if (!form.licensePlate.trim() || !form.model.trim() || !form.brandId || !form.customerId) {
+    if (
+      !form.licensePlate.trim() ||
+      !form.model.trim() ||
+      !form.brandId ||
+      !form.customerId
+    ) {
       setError("Vui lòng nhập đầy đủ thông tin!");
       return;
     }
     try {
-      await createMoto(form);
+      // Chuyển dateOfSent sang ISO string
+      const data = {
+        ...form,
+        dateOfSent: new Date(form.dateOfSent).toISOString(),
+      };
+      await createMoto(data);
       Swal.fire({
         icon: "success",
         title: "Thành công!",
@@ -86,9 +96,14 @@ export default function AddMotoForm({ brands, customers, onClose, onSaved }) {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <form
+            onSubmit={handleSubmit}
+            className="grid grid-cols-1 md:grid-cols-2 gap-8"
+          >
             <div>
-              <label className="block font-semibold mb-1 text-gray-700">Biển số xe</label>
+              <label className="block font-semibold mb-1 text-gray-700">
+                Biển số xe
+              </label>
               <div className="relative">
                 <input
                   name="licensePlate"
@@ -103,7 +118,9 @@ export default function AddMotoForm({ brands, customers, onClose, onSaved }) {
             </div>
 
             <div>
-              <label className="block font-semibold mb-1 text-gray-700">Tên xe</label>
+              <label className="block font-semibold mb-1 text-gray-700">
+                Tên xe
+              </label>
               <div className="relative">
                 <input
                   name="model"
@@ -118,7 +135,9 @@ export default function AddMotoForm({ brands, customers, onClose, onSaved }) {
             </div>
 
             <div>
-              <label className="block font-semibold mb-1 text-gray-700">Hãng xe</label>
+              <label className="block font-semibold mb-1 text-gray-700">
+                Hãng xe
+              </label>
               <select
                 name="brandId"
                 value={form.brandId}
@@ -136,7 +155,9 @@ export default function AddMotoForm({ brands, customers, onClose, onSaved }) {
             </div>
 
             <div>
-              <label className="block font-semibold mb-1 text-gray-700">Chủ xe</label>
+              <label className="block font-semibold mb-1 text-gray-700">
+                Chủ xe
+              </label>
               <select
                 name="customerId"
                 value={form.customerId}
@@ -154,7 +175,9 @@ export default function AddMotoForm({ brands, customers, onClose, onSaved }) {
             </div>
 
             <div>
-              <label className="block font-semibold mb-1 text-gray-700">Ngày gửi</label>
+              <label className="block font-semibold mb-1 text-gray-700">
+                Ngày gửi
+              </label>
               <div className="relative">
                 <input
                   type="date"
@@ -169,7 +192,9 @@ export default function AddMotoForm({ brands, customers, onClose, onSaved }) {
             </div>
 
             <div>
-              <label className="block font-semibold mb-1 text-gray-700">Ghi chú</label>
+              <label className="block font-semibold mb-1 text-gray-700">
+                Ghi chú
+              </label>
               <div className="relative">
                 <textarea
                   name="notes"
